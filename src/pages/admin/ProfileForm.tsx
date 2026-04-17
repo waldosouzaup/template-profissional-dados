@@ -85,14 +85,17 @@ export default function ProfileForm() {
             </div>
             
             <div>
-              <label className="text-sm font-medium text-foreground">Bio Detalhada</label>
+              <label className="text-sm font-medium text-foreground">Bio Detalhada (Suporta Markdown)</label>
               <Textarea
                 value={formData.bio_detailed}
                 onChange={(e) => setFormData({ ...formData, bio_detailed: e.target.value })}
-                placeholder="Bio detalhada"
-                className="mt-1"
-                rows={5}
+                placeholder="Conte sua história completa usando Markdown..."
+                className="mt-1 font-mono text-sm"
+                rows={10}
               />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Use **negrito**, # títulos, e [links](url) para formatar sua bio.
+              </p>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
