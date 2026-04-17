@@ -1,6 +1,5 @@
-# 🚀 Modern Portfolio & Blog Boilerplate
+# 🚀 Template para Profissionais de Dados & IA & TI
 
-[Português](#português) | [English](#english)
 
 ---
 
