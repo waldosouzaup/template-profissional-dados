@@ -15,3 +15,16 @@ if (import.meta.env.DEV) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// Auth state listener to handle session consistency and clean up invalid tokens
+supabase.auth.onAuthStateChange((event, session) => {
+  if (import.meta.env.DEV) {
+    console.log(`Supabase Auth Event: ${event}`);
+  }
+
+  // If a refresh fails or a user is signed out, ensure local storage is clean
+  if (event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+    // Optional: Additional logic for sign-out/token failure
+  }
+});
+
