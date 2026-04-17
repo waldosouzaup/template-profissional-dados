@@ -24,20 +24,6 @@ Este projeto é um **template profissional de Portfólio e Blog**, construído c
 
 ---
 
-## English
-
-This project is a **professional Portfolio & Blog template**, built with modern technologies to offer an elegant "Dark Mode" experience, integrated admin management, and high performance. Perfect for data engineers, developers, and AI enthusiasts.
-
-### ✨ Features
-
-- 🌑 **Native Dark Mode**: Sophisticated dark-themed interface.
-- 📝 **Integrated Blog**: Markdown support for technical posts.
-- 🛠️ **Admin Dashboard**: Full management of projects, experiences, education, and technologies.
-- 📱 **Fully Responsive**: Mobile-first design.
-- ⚡ **Performance**: Optimized with Vite + React.
-
----
-
 ## 🚀 Setup & Installation (Guia de Configuração)
 
 ### 1. Clonar e Instalar (Clone & Install)
@@ -159,4 +145,4 @@ Certifique-se de adicionar as variáveis de ambiente no painel administrativo da
 
 Este projeto está sob a licença MIT. Sinta-se à vontade para clonar e usar como base para o seu próprio portfólio profissional!
 
-Developed with ❤️ for the community.
+Developed with ❤️ por Waldo Eller.
