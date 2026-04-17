@@ -9,4 +9,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   );
 }
 
+// Log connection info in development to help debug common configuration issues
+if (import.meta.env.DEV) {
+  console.log("Supabase initialized with URL:", supabaseUrl);
+}
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
