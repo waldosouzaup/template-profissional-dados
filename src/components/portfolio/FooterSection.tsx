@@ -1,12 +1,20 @@
-import { Youtube, Linkedin, Instagram } from "lucide-react";
+import { Github, Linkedin, Instagram } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useProfiles } from "@/hooks/useProfile";
 
 const socialLinks = [
-  { icon: Youtube, href: "https://www.youtube.com/@nocodestartup", label: "YouTube" },
-  { icon: Linkedin, href: "https://www.linkedin.com/in/matheuscastelobranco/", label: "LinkedIn" },
-  { icon: Instagram, href: "https://www.instagram.com/mat_castelo/", label: "Instagram" },
+  { icon: Github, href: "https://github.com/waldosouzaup", label: "GitHub" },
+  { icon: Linkedin, href: "https://linkedin.com/in/waldoeller", label: "LinkedIn" },
+  { icon: Instagram, href: "https://instagram.com/waldoeller", label: "Instagram" },
 ];
 
 const FooterSection = () => {
+  const { data: profiles = [] } = useProfiles();
+  const profile = profiles[0];
+  
+  const profileName = profile?.full_name || "Waldo Eller";
+  const currentFocus = profile?.current_focus || "Data, Technology & AI";
+
   return (
     <footer className="animate-fade-up delay-500 mt-20 pt-10 border-t border-border">
       <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
@@ -26,10 +34,15 @@ const FooterSection = () => {
           ))}
         </div>
 
-        {/* Copyright */}
-        <p className="text-sm text-muted-foreground">
-          © 2025 Matheus Castelo | NoCode StartUp
-        </p>
+        {/* Copyright & Admin Link */}
+        <div className="flex flex-col items-center sm:items-end gap-2 text-right">
+          <p className="text-sm text-muted-foreground">
+            © 2026 {profileName} | {currentFocus}
+          </p>
+          <Link to="/admin/login" className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
+            Acesso Administrativo
+          </Link>
+        </div>
       </div>
     </footer>
   );

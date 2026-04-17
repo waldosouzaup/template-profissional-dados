@@ -32,7 +32,7 @@ const ExperienceSection = () => {
         <div className="section-icon">
           <Briefcase className="w-5 h-5 text-primary" />
         </div>
-        <h3 className="text-xl font-semibold text-foreground">Grandes Conquistas</h3>
+        <h3 className="text-xl font-semibold text-foreground">Experiências</h3>
       </div>
 
       {/* Experience Cards */}

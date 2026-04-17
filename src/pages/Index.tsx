@@ -1,8 +1,10 @@
 import ProfileCard from "@/components/portfolio/ProfileCard";
 import HeroSection from "@/components/portfolio/HeroSection";
 import ExperienceSection from "@/components/portfolio/ExperienceSection";
+import EducationSection from "@/components/portfolio/EducationSection";
 import ProjectsSection from "@/components/portfolio/ProjectsSection";
 import SkillsSection from "@/components/portfolio/SkillsSection";
+import ContactSection from "@/components/portfolio/ContactSection";
 import FooterSection from "@/components/portfolio/FooterSection";
 
 const Index = () => {
@@ -19,8 +21,10 @@ const Index = () => {
           <main className="lg:col-span-8 xl:col-span-9">
             <HeroSection />
             <ExperienceSection />
+            <EducationSection />
             <ProjectsSection />
             <SkillsSection />
+            <ContactSection />
             <FooterSection />
           </main>
         </div>
