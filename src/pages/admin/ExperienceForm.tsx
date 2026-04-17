@@ -16,22 +16,24 @@ export default function ExperienceForm() {
   const { createExperience, updateExperience, isCreating, isUpdating } = useExperiences();
   
   const [formData, setFormData] = useState({
-    type: "Curso" as string,
+    type: "Profissional" as string,
+    icon_type: "rocket" as string,
     title: "",
     institution: "",
     description: "",
-    date_completed: "",
+    period: "",
     display_order: 0,
   });
 
   useEffect(() => {
     if (experience) {
       setFormData({
-        type: experience.type || "Curso",
+        type: experience.type || "Profissional",
+        icon_type: experience.icon_type || "rocket",
         title: experience.title || "",
         institution: experience.institution || "",
         description: experience.description || "",
-        date_completed: experience.date_completed || "",
+        period: experience.period || "",
         display_order: experience.display_order || 0,
       });
     }
@@ -42,11 +44,12 @@ export default function ExperienceForm() {
     
     try {
       const data = {
-        type: formData.type as "Curso" | "Certificação" | "Acadêmico" | "Estudo",
+        type: formData.type as "Profissional" | "Embaixador" | "Projeto" | "Outros",
+        icon_type: formData.icon_type as "rocket" | "award" | "briefcase",
         title: formData.title,
         institution: formData.institution,
         description: formData.description || null,
-        date_completed: formData.date_completed || null,
+        period: formData.period || null,
         display_order: formData.display_order,
       };
       
@@ -79,22 +82,41 @@ export default function ExperienceForm() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-foreground">Tipo</label>
-              <Select 
-                value={formData.type} 
-                onValueChange={(value) => setFormData({ ...formData, type: value })}
-              >
-                <SelectTrigger className="mt-1">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Curso">Curso</SelectItem>
-                  <SelectItem value="Certificação">Certificação</SelectItem>
-                  <SelectItem value="Acadêmico">Acadêmico</SelectItem>
-                  <SelectItem value="Estudo">Estudo</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-foreground">Tipo</label>
+                <Select 
+                  value={formData.type} 
+                  onValueChange={(value) => setFormData({ ...formData, type: value })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Profissional">Profissional</SelectItem>
+                    <SelectItem value="Embaixador">Embaixador</SelectItem>
+                    <SelectItem value="Projeto">Projeto</SelectItem>
+                    <SelectItem value="Outros">Outros</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground">Ícone</label>
+                <Select 
+                  value={formData.icon_type} 
+                  onValueChange={(value) => setFormData({ ...formData, icon_type: value })}
+                >
+                  <SelectTrigger className="mt-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rocket">Foguete (Rocket)</SelectItem>
+                    <SelectItem value="award">Medalha (Award)</SelectItem>
+                    <SelectItem value="briefcase">Maleta (Briefcase)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
             <div>
@@ -102,41 +124,43 @@ export default function ExperienceForm() {
               <Input
                 value={formData.title}
                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                placeholder="Título da experiência"
+                placeholder="Ex: Fundador - NoCode StartUp"
                 required
                 className="mt-1"
               />
             </div>
             
             <div>
-              <label className="text-sm font-medium text-foreground">Instituição</label>
+              <label className="text-sm font-medium text-foreground">Empresa / Instituição</label>
               <Input
                 value={formData.institution}
                 onChange={(e) => setFormData({ ...formData, institution: e.target.value })}
-                placeholder="Instituição"
+                placeholder="Ex: NoCode StartUp"
                 required
                 className="mt-1"
               />
             </div>
             
-            <div>
-              <label className="text-sm font-medium text-foreground">Data de Conclusão</label>
-              <Input
-                type="date"
-                value={formData.date_completed}
-                onChange={(e) => setFormData({ ...formData, date_completed: e.target.value })}
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium text-foreground">Ordem de Exibição</label>
-              <Input
-                type="number"
-                value={formData.display_order}
-                onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
-                className="mt-1"
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-foreground">Período</label>
+                <Input
+                  value={formData.period}
+                  onChange={(e) => setFormData({ ...formData, period: e.target.value })}
+                  placeholder="Ex: 2022 - Presente"
+                  className="mt-1"
+                />
+              </div>
+              
+              <div>
+                <label className="text-sm font-medium text-foreground">Ordem de Exibição</label>
+                <Input
+                  type="number"
+                  value={formData.display_order}
+                  onChange={(e) => setFormData({ ...formData, display_order: parseInt(e.target.value) || 0 })}
+                  className="mt-1"
+                />
+              </div>
             </div>
             
             <div>
@@ -144,7 +168,7 @@ export default function ExperienceForm() {
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Descrição da experiência"
+                placeholder="Descrição curta ou conquistas"
                 className="mt-1"
                 rows={3}
               />

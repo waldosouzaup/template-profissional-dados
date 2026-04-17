@@ -1,5 +1,6 @@
-import { Download, MessageCircle } from "lucide-react";
+import { Download, MessageCircle, Info, BookOpen } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfile";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const { data: profiles = [], isLoading } = useProfiles();
@@ -39,12 +40,20 @@ const HeroSection = () => {
       <div className="flex flex-wrap gap-4 mt-8">
         <a href="/cv-waldo-eller.pdf" download className="btn-primary">
           <Download className="w-5 h-5" />
-          Download CV
+          CV
         </a>
         <a href="#contact" className="btn-secondary">
           <MessageCircle className="w-5 h-5" />
-          Entre em Contato
+          Contato
         </a>
+        <Link to="/about" className="btn-secondary">
+          <Info className="w-5 h-5" />
+          Sobre
+        </Link>
+        <Link to="/blog" className="btn-secondary">
+          <BookOpen className="w-5 h-5" />
+          Blog
+        </Link>
       </div>
       
       {/* Stats */}

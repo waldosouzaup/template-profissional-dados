@@ -7,6 +7,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProjectsGallery from "./pages/ProjectsGallery";
 import ProjectDetail from "./pages/ProjectDetail";
+import About from "./pages/About";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 
 // Admin
 import AdminLogin from "./pages/admin/Login";
@@ -24,6 +27,8 @@ import ExperienceForm from "./pages/admin/ExperienceForm";
 import ProfileForm from "./pages/admin/ProfileForm";
 import TechnologiesDashboard from "./pages/admin/TechnologiesDashboard";
 import TechnologyForm from "./pages/admin/TechnologyForm";
+import EducationDashboard from "./pages/admin/EducationDashboard";
+import EducationForm from "./pages/admin/EducationForm";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +42,9 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/projects" element={<ProjectsGallery />} />
           <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPost />} />
           
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -64,6 +72,11 @@ const App = () => (
             <Route path="experiences" element={<ExperiencesDashboard />} />
             <Route path="experiences/new" element={<ExperienceForm />} />
             <Route path="experiences/:id" element={<ExperienceForm />} />
+            
+            {/* Education */}
+            <Route path="education" element={<EducationDashboard />} />
+            <Route path="education/new" element={<EducationForm />} />
+            <Route path="education/:id" element={<EducationForm />} />
             
             {/* Profile */}
             <Route path="profiles" element={<ProfileForm />} />

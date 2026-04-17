@@ -8,6 +8,7 @@ const navItems = [
   { to: "/admin", icon: FolderOpen, label: "Projetos" },
   { to: "/admin/books", icon: BookOpen, label: "Livros" },
   { to: "/admin/contents", icon: FileText, label: "Conteúdos" },
+  { to: "/admin/education", icon: GraduationCap, label: "Formação" },
   { to: "/admin/courses", icon: GraduationCap, label: "Cursos" },
   { to: "/admin/experiences", icon: Briefcase, label: "Experiências" },
   { to: "/admin/profiles", icon: User, label: "Perfil" },

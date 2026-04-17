@@ -15,10 +15,24 @@ export const ContentSchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
+  markdown: z.string().optional(),
+  image_url: z.string().optional(),
   created_at: z.string().datetime().optional(),
 });
 
 export type Content = z.infer<typeof ContentSchema>;
+
+export const EducationSchema = z.object({
+  id: z.string().uuid(),
+  title: z.string().min(1, "Title is required"),
+  institution: z.string().min(1, "Institution is required"),
+  period: z.string().optional(),
+  description: z.string().optional(),
+  display_order: z.number().default(0),
+  created_at: z.string().datetime().optional(),
+});
+
+export type Education = z.infer<typeof EducationSchema>;
 
 export const CourseSchema = z.object({
   id: z.string().uuid(),
@@ -32,21 +46,24 @@ export const CourseSchema = z.object({
 
 export type Course = z.infer<typeof CourseSchema>;
 
-export const ExperienceTypeEnum = z.enum(["Curso", "Certificação", "Acadêmico", "Estudo"]);
+export const ExperienceTypeEnum = z.enum(["Profissional", "Embaixador", "Projeto", "Outros"]);
+export const IconTypeEnum = z.enum(["rocket", "award", "briefcase"]);
 
 export const ExperienceSchema = z.object({
   id: z.string().uuid(),
   type: ExperienceTypeEnum,
+  icon_type: IconTypeEnum.default("rocket"),
   title: z.string().min(1, "Title is required"),
-  institution: z.string().min(1, "Institution is required"),
+  institution: z.string().min(1, "Institution is required"), // Keeping as institution in DB for compatibility, but labeled as Company in UI
   description: z.string().optional(),
-  date_completed: z.string().optional(),
+  period: z.string().optional(), // New field for ranges like "2022 - Presente"
   display_order: z.number().default(0),
   created_at: z.string().datetime().optional(),
 });
 
 export type Experience = z.infer<typeof ExperienceSchema>;
 export type ExperienceType = z.infer<typeof ExperienceTypeEnum>;
+export type IconType = z.infer<typeof IconTypeEnum>;
 
 export const ProfileSchema = z.object({
   id: z.string().uuid(),

@@ -1,39 +1,24 @@
 import { GraduationCap } from "lucide-react";
-
-const education = [
-  {
-    title: "Sistemas de Informação",
-    institution: "UNIP - Universidade Paulista",
-    period: "2011 - 2014",
-    description: "Disciplinas: Banco de Dados, Redes de Computadores, Segurança da Informação e Gestão de Projetos de TI.",
-  },
-  {
-    title: "Pós-Graduação em Arquitetura e Projetos de Cloud Computing",
-    institution: "GRAN Faculdade",
-    period: "2026",
-    description: "Disciplinas: Modelagem de Banco de Dados, Business Intelligence, Integração de Dados e Data Lake, Probabilidade e Inferência para Ciência de Dados.",
-  },
-  {
-    title: "Pós-graduação Engenharia de Dados",
-    institution: "FOCUS Faculdade",
-    period: "2026",
-    description: "Disciplinas: Modelagem de Banco de Dados, Business Intelligence, Integração de Dados e Data Lake, Probabilidade e Inferência para Ciência de Dados.",
-  },
-  {
-    title: "Pós-graduação Ciência de Dados",
-    institution: "GRAN Faculdade",
-    period: "2026",
-    description: "Disciplinas: Modelagem de Banco de Dados, Business Intelligence, Integração de Dados e Data Lake, Probabilidade e Inferência para Ciência de Dados.",
-  },
-  {
-    title: "Pós-graduação em Marketing",
-    institution: "IESLA - Instituto de Educação Latino Americano",
-    period: "2021 - 2022",
-    description: "Disciplinas: Visualização de Dados, Bancos de Dados, Métricas na Web, SEO e Analytics, Gestão de Projetos e Metodologias Ágeis.",
-  },
-];
+import { useEducationList } from "@/hooks/useEducation";
 
 const EducationSection = () => {
+  const { data: educationItems, isLoading } = useEducationList();
+
+  if (isLoading) {
+    return (
+      <div className="mt-16 animate-pulse">
+        <div className="h-8 w-48 bg-secondary rounded mb-8" />
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-32 bg-secondary/50 rounded-xl" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (!educationItems || educationItems.length === 0) return null;
+
   return (
     <section className="animate-fade-up delay-400 mt-16">
       {/* Section Header */}
@@ -46,9 +31,9 @@ const EducationSection = () => {
 
       {/* Education Items */}
       <div className="space-y-4">
-        {education.map((edu, index) => (
+        {educationItems.map((edu, index) => (
           <div
-            key={index}
+            key={edu.id}
             className="education-item"
             style={{ animationDelay: `${(index + 4) * 100}ms` }}
           >
@@ -57,11 +42,15 @@ const EducationSection = () => {
                 <h4 className="text-lg font-semibold text-foreground">{edu.title}</h4>
                 <p className="text-muted-foreground">{edu.institution}</p>
               </div>
-              <span className="badge-time shrink-0">{edu.period}</span>
+              {edu.period && (
+                <span className="badge-time shrink-0">{edu.period}</span>
+              )}
             </div>
-            <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-              {edu.description}
-            </p>
+            {edu.description && (
+              <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+                {edu.description}
+              </p>
+            )}
           </div>
         ))}
       </div>

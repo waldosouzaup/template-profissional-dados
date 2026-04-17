@@ -1,14 +1,14 @@
 import { Link } from "react-router-dom";
-import { useExperiences } from "@/hooks/useExperiences";
+import { useEducationList } from "@/hooks/useEducation";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default function ExperiencesDashboard() {
-  const { data: experiences = [], isLoading, deleteExperience } = useExperiences();
+export default function EducationDashboard() {
+  const { data: educationItems = [], isLoading, deleteEducation } = useEducationList();
 
   const handleDelete = async (id: string) => {
-    if (confirm("Tem certeza que deseja apagar esta experiência? Esta ação é irreversível.")) {
-      await deleteExperience(id);
+    if (confirm("Tem certeza que deseja apagar esta formação? Esta ação é irreversível.")) {
+      await deleteEducation(id);
     }
   };
 
@@ -20,13 +20,13 @@ export default function ExperiencesDashboard() {
     <div className="animate-fade-up">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Experiências</h1>
-          <p className="text-muted-foreground mt-1">Gerencie suas experiências.</p>
+          <h1 className="text-3xl font-bold text-foreground">Formação</h1>
+          <p className="text-muted-foreground mt-1">Gerencie sua formação acadêmica.</p>
         </div>
-        <Link to="/admin/experiences/new">
+        <Link to="/admin/education/new">
           <Button className="gap-2">
             <Plus className="w-4 h-4" />
-            Nova Experiência
+            Nova Formação
           </Button>
         </Link>
       </div>
@@ -37,35 +37,33 @@ export default function ExperiencesDashboard() {
             <thead className="bg-secondary text-muted-foreground text-xs uppercase">
               <tr>
                 <th className="px-6 py-4 font-medium">Título</th>
-                <th className="px-6 py-4 font-medium">Tipo</th>
-                <th className="px-6 py-4 font-medium">Empresa</th>
+                <th className="px-6 py-4 font-medium">Instituição</th>
                 <th className="px-6 py-4 font-medium">Período</th>
                 <th className="px-6 py-4 font-medium">Ordem</th>
                 <th className="px-6 py-4 font-medium text-right">Ações</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {experiences.length === 0 ? (
+              {educationItems.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-8 text-center text-muted-foreground">
-                    Nenhuma experiência encontrada.
+                    Nenhuma formação encontrada.
                   </td>
                 </tr>
               ) : (
-                experiences.map((exp) => (
-                  <tr key={exp.id} className="hover:bg-secondary/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-foreground">{exp.title}</td>
+                educationItems.map((edu) => (
+                  <tr key={edu.id} className="hover:bg-secondary/50 transition-colors">
+                    <td className="px-6 py-4 font-medium text-foreground">{edu.title}</td>
+                    <td className="px-6 py-4 text-foreground">{edu.institution}</td>
                     <td className="px-6 py-4">
-                      <span className="badge-time">{exp.type}</span>
+                      <span className="badge-time">{edu.period}</span>
                     </td>
-                    <td className="px-6 py-4 text-foreground">{exp.institution}</td>
-                    <td className="px-6 py-4 text-muted-foreground">{exp.period}</td>
                     <td className="px-6 py-4 text-foreground font-mono">
-                      {exp.display_order ?? 0}
+                      {edu.display_order ?? 0}
                     </td>
                     <td className="px-6 py-4 text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <Link to={`/admin/experiences/${exp.id}`}>
+                        <Link to={`/admin/education/${edu.id}`}>
                           <Button variant="ghost" size="icon">
                             <Pencil className="w-4 h-4 text-muted-foreground" />
                           </Button>
@@ -73,7 +71,7 @@ export default function ExperiencesDashboard() {
                         <Button 
                           variant="ghost" 
                           size="icon" 
-                          onClick={() => handleDelete(exp.id)}
+                          onClick={() => handleDelete(edu.id)}
                         >
                           <Trash2 className="w-4 h-4 text-destructive" />
                         </Button>
