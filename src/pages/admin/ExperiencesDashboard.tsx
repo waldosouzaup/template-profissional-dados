@@ -12,6 +12,16 @@ export default function ExperiencesDashboard() {
     }
   };
 
+  const getTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      professional: "Profissional",
+      ambassador: "Embaixador",
+      project: "Projeto",
+      others: "Outros",
+    };
+    return labels[type] || type;
+  };
+
   if (isLoading) {
     return <div className="text-muted-foreground animate-pulse">Carregando dados...</div>;
   }
@@ -56,7 +66,7 @@ export default function ExperiencesDashboard() {
                   <tr key={exp.id} className="hover:bg-secondary/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-foreground">{exp.title}</td>
                     <td className="px-6 py-4">
-                      <span className="badge-time">{exp.type}</span>
+                      <span className="badge-time">{getTypeLabel(exp.type)}</span>
                     </td>
                     <td className="px-6 py-4 text-foreground">{exp.institution}</td>
                     <td className="px-6 py-4 text-muted-foreground">{exp.period}</td>

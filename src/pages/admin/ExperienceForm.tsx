@@ -16,7 +16,7 @@ export default function ExperienceForm() {
   const { createExperience, updateExperience, isCreating, isUpdating } = useExperiences();
   
   const [formData, setFormData] = useState({
-    type: "Profissional" as string,
+    type: "professional" as string,
     icon_type: "rocket" as string,
     title: "",
     institution: "",
@@ -28,7 +28,7 @@ export default function ExperienceForm() {
   useEffect(() => {
     if (experience) {
       setFormData({
-        type: experience.type || "Profissional",
+        type: experience.type || "professional",
         icon_type: experience.icon_type || "rocket",
         title: experience.title || "",
         institution: experience.institution || "",
@@ -44,7 +44,7 @@ export default function ExperienceForm() {
     
     try {
       const data = {
-        type: formData.type as "Profissional" | "Embaixador" | "Projeto" | "Outros",
+        type: formData.type as "professional" | "ambassador" | "project" | "others",
         icon_type: formData.icon_type as "rocket" | "award" | "briefcase",
         title: formData.title,
         institution: formData.institution,
@@ -93,10 +93,10 @@ export default function ExperienceForm() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="Profissional">Profissional</SelectItem>
-                    <SelectItem value="Embaixador">Embaixador</SelectItem>
-                    <SelectItem value="Projeto">Projeto</SelectItem>
-                    <SelectItem value="Outros">Outros</SelectItem>
+                    <SelectItem value="professional">Profissional</SelectItem>
+                    <SelectItem value="ambassador">Embaixador</SelectItem>
+                    <SelectItem value="project">Projeto</SelectItem>
+                    <SelectItem value="others">Outros</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -46,7 +46,7 @@ export const CourseSchema = z.object({
 
 export type Course = z.infer<typeof CourseSchema>;
 
-export const ExperienceTypeEnum = z.enum(["Profissional", "Embaixador", "Projeto", "Outros"]);
+export const ExperienceTypeEnum = z.enum(["professional", "ambassador", "project", "others"]);
 export const IconTypeEnum = z.enum(["rocket", "award", "briefcase"]);
 
 export const ExperienceSchema = z.object({
