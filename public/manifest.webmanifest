@@ -1,0 +1,16 @@
+{
+  "name": "Waldo Eller - Portfolio",
+  "short_name": "Waldo Eller",
+  "description": "Portfolio e Blog de Waldo Eller, Especialista em Dados, Tecnologia e IA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

@@ -1,11 +1,9 @@
 import { z } from "zod";
 
 export const ProjectCategoryEnum = z.enum([
-  "marketplace",
-  "saas",
-  "automations",
-  "platform",
-  "mobile",
+  "Dados",
+  "Web",
+  "IA",
 ]);
 
 export type ProjectCategory = z.infer<typeof ProjectCategoryEnum>;
@@ -67,12 +65,8 @@ export const ProjectSchema = z.object({
 
 export type Project = z.infer<typeof ProjectSchema>;
 
-export const projectCategories: Record<string, { label: string; icon: string }> = {
-  marketplace: { label: "Marketplace", icon: "ShoppingCart" },
-  saas: { label: "SaaS", icon: "Cloud" },
-  automations: { label: "Automações", icon: "Workflow" },
-  platform: { label: "Plataforma", icon: "Layers" },
-  Web: { label: "Web", icon: "Cloud" },
-  Dados: { label: "Dados", icon: "Layers" },
-  IA: { label: "IA", icon: "Workflow" },
+export const projectCategories: Record<ProjectCategory, { label: string; icon: string }> = {
+  Dados: { label: "Dados", icon: "Database" },
+  Web: { label: "Web", icon: "Globe" },
+  IA: { label: "IA", icon: "Brain" },
 };

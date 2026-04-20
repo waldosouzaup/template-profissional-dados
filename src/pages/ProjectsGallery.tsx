@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { 
-  ShoppingCart, 
-  Cloud, 
-  Workflow, 
-  Layers, 
-  Smartphone,
+  Database, 
+  Globe, 
+  Brain,
   ArrowUpRight,
   FolderOpen,
   ArrowLeft
@@ -14,11 +12,9 @@ import { ProjectCategory, projectCategories } from "@/types/project";
 import { useProjects } from "@/hooks/useProjects";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  ShoppingCart,
-  Cloud,
-  Workflow,
-  Layers,
-  Smartphone,
+  Database,
+  Globe,
+  Brain,
 };
 
 const ProjectsGallery = () => {
@@ -33,7 +29,7 @@ const ProjectsGallery = () => {
   const categories = Object.keys(projectCategories) as ProjectCategory[];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pt-16">
       <div className="container mx-auto px-4 py-8 md:py-16">
         {/* Header */}
         <div className="animate-fade-up">
@@ -70,7 +66,7 @@ const ProjectsGallery = () => {
           {categories.map((cat) => {
             const catInfo = projectCategories[cat];
             if (!catInfo) return null;
-            const Icon = iconMap[catInfo.icon] || Workflow;
+            const Icon = iconMap[catInfo.icon] || Database;
             return (
               <button
                 key={cat}

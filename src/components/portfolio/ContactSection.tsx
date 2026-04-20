@@ -1,11 +1,44 @@
-import { Mail, Linkedin, Github } from "lucide-react";
+import { useState } from "react";
+import { Mail, Send, User, MessageSquare } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfile";
+import { toast } from "sonner";
 
 const ContactSection = () => {
   const { data: profiles = [] } = useProfiles();
   const profile = profiles[0];
   
   const email = profile?.email || "contato@waldoeller.com";
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [isSending, setIsSending] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.name || !formData.email || !formData.message) {
+      toast.error("Por favor, preencha todos os campos.");
+      return;
+    }
+
+    setIsSending(true);
+
+    const subject = encodeURIComponent(`Contato via Portfólio - ${formData.name}`);
+    const body = encodeURIComponent(
+      `Nome: ${formData.name}\nEmail: ${formData.email}\n\nMensagem:\n${formData.message}`
+    );
+    
+    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+    
+    setTimeout(() => {
+      setIsSending(false);
+      setFormData({ name: "", email: "", message: "" });
+      toast.success("Cliente de email aberto! Envie sua mensagem.");
+    }, 1000);
+  };
 
   return (
     <section id="contact" className="animate-fade-up delay-500 mt-20">
@@ -18,28 +51,86 @@ const ContactSection = () => {
       </div>
 
       {/* Contact Info */}
-      <div className="space-y-4">
+      <div className="mb-6">
         <div className="contact-info-item">
           <span className="contact-label">Email</span>
           <a href={`mailto:${email}`} className="contact-value hover:text-primary transition-colors">
             {email}
           </a>
         </div>
-        
-        <div className="contact-info-item">
-          <span className="contact-label">LinkedIn</span>
-          <a href="https://linkedin.com/in/waldoeller" target="_blank" rel="noopener noreferrer" className="contact-value hover:text-primary transition-colors">
-            in/waldoeller
-          </a>
-        </div>
-        
-        <div className="contact-info-item">
-          <span className="contact-label">GitHub</span>
-          <a href="https://github.com/waldosouzaup" target="_blank" rel="noopener noreferrer" className="contact-value hover:text-primary transition-colors">
-            /waldosouzaup
-          </a>
-        </div>
       </div>
+
+      {/* Contact Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {/* Name */}
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <User className="w-4 h-4" />
+            </div>
+            <input
+              type="text"
+              placeholder="Seu nome"
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary/50"
+              style={{
+                background: 'hsl(0 0% 8%)',
+                border: '1px solid hsl(0 0% 18%)',
+              }}
+              required
+            />
+          </div>
+
+          {/* Email */}
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <Mail className="w-4 h-4" />
+            </div>
+            <input
+              type="email"
+              placeholder="Seu email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary/50"
+              style={{
+                background: 'hsl(0 0% 8%)',
+                border: '1px solid hsl(0 0% 18%)',
+              }}
+              required
+            />
+          </div>
+        </div>
+
+        {/* Message */}
+        <div className="relative">
+          <div className="absolute left-4 top-4 text-muted-foreground">
+            <MessageSquare className="w-4 h-4" />
+          </div>
+          <textarea
+            placeholder="Sua mensagem..."
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            rows={4}
+            className="w-full pl-11 pr-4 py-3.5 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/60 transition-all duration-300 focus:outline-none focus:ring-1 focus:ring-primary/50 resize-none"
+            style={{
+              background: 'hsl(0 0% 8%)',
+              border: '1px solid hsl(0 0% 18%)',
+            }}
+            required
+          />
+        </div>
+
+        {/* Submit Button */}
+        <button
+          type="submit"
+          disabled={isSending}
+          className="btn-primary w-full sm:w-auto justify-center"
+        >
+          <Send className="w-4 h-4" />
+          {isSending ? "Abrindo email..." : "Enviar mensagem"}
+        </button>
+      </form>
     </section>
   );
 };

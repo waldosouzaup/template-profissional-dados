@@ -495,7 +495,7 @@ const ProjectDetail = () => {
       </div>
 
       {/* ── FOOTER CTA ── */}
-      <footer className="border-t border-white/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+      <footer className="border-t border-white/[0.05] py-24 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
         <div>
           <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/20 mb-2">
             Próximo passo
@@ -507,7 +507,12 @@ const ProjectDetail = () => {
         <div className="flex items-center gap-4">
           <Link
             to="/#contact"
-            className="px-7 py-3 border border-white/15 rounded-full text-sm text-white/60 hover:border-white/40 hover:text-white transition-colors"
+            className="group relative px-8 py-3.5 rounded-full text-sm font-medium transition-all duration-500 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 60% 35%) 100%)',
+              color: 'hsl(0 0% 4%)',
+              boxShadow: '0 0 25px hsl(142 71% 45% / 0.25), 0 4px 15px hsl(0 0% 0% / 0.3)',
+            }}
           >
             Entrar em contato
           </Link>

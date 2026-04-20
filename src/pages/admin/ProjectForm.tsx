@@ -4,7 +4,7 @@ import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useProjects, useProject } from "@/hooks/useProjects";
-import { ProjectSchema, Project } from "@/types/project";
+import { ProjectSchema, Project, projectCategories, ProjectCategory } from "@/types/project";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/admin/ImageUpload";
@@ -172,7 +172,16 @@ export default function AdminProjectForm() {
             </div>
             <div className="md:col-span-1">
               <label className="block text-sm font-medium mb-1">Categoria*</label>
-              <Input {...form.register("category")} placeholder="Ex: Web, SaaS, Mobile" />
+              <select
+                {...form.register("category")}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">Selecione uma categoria</option>
+                {Object.entries(projectCategories).map(([key, { label }]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+              {form.formState.errors.category && <p className="text-red-500 text-xs mt-1">{form.formState.errors.category.message}</p>}
             </div>
             <div className="md:col-span-1">
               <label className="block text-sm font-medium mb-1">Ordem de Exibição</label>

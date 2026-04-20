@@ -27,20 +27,31 @@ export const useExperiences = () => {
 
   const createMutation = useMutation({
     mutationFn: async (newExperience: Omit<Experience, "id" | "created_at">) => {
+      console.log("Creating experience with payload:", JSON.stringify(newExperience, null, 2));
+      
       const { data, error } = await supabase
         .from("experience")
         .insert([newExperience])
         .select()
         .single();
         
-      if (error) throw error;
+      if (error) {
+        console.error("Supabase INSERT error details:", {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code,
+        });
+        throw error;
+      }
       return data as Experience;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["experiences"] });
       toast.success("Experiência criada com sucesso!");
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error("Full error object:", error);
       toast.error(`Erro ao criar experiência: ${error.message}`);
     },
   });

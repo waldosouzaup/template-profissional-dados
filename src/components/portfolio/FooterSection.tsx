@@ -5,7 +5,7 @@ import { useProfiles } from "@/hooks/useProfile";
 const socialLinks = [
   { icon: Github, href: "https://github.com/waldosouzaup", label: "GitHub" },
   { icon: Linkedin, href: "https://linkedin.com/in/waldoeller", label: "LinkedIn" },
-  { icon: Instagram, href: "https://instagram.com/waldoeller", label: "Instagram" },
+  { icon: Instagram, href: "https://www.instagram.com/waldo.eller", label: "Instagram" },
 ];
 
 const FooterSection = () => {

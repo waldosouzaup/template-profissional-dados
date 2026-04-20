@@ -16,7 +16,7 @@ export default function ExperienceForm() {
   const { createExperience, updateExperience, isCreating, isUpdating } = useExperiences();
   
   const [formData, setFormData] = useState({
-    type: "professional" as string,
+    type: "profissional" as string,
     icon_type: "rocket" as string,
     title: "",
     institution: "",
@@ -28,7 +28,7 @@ export default function ExperienceForm() {
   useEffect(() => {
     if (experience) {
       setFormData({
-        type: experience.type || "professional",
+        type: experience.type || "profissional",
         icon_type: experience.icon_type || "rocket",
         title: experience.title || "",
         institution: experience.institution || "",
@@ -44,12 +44,12 @@ export default function ExperienceForm() {
     
     try {
       const data = {
-        type: formData.type as "professional" | "ambassador" | "project" | "others",
+        type: formData.type as "profissional" | "embaixador" | "projeto" | "outros",
         icon_type: formData.icon_type as "rocket" | "award" | "briefcase",
         title: formData.title,
         institution: formData.institution,
-        description: formData.description || null,
-        period: formData.period || null,
+        description: formData.description || "",
+        period: formData.period || "",
         display_order: formData.display_order,
       };
       
@@ -93,10 +93,10 @@ export default function ExperienceForm() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="professional">Profissional</SelectItem>
-                    <SelectItem value="ambassador">Embaixador</SelectItem>
-                    <SelectItem value="project">Projeto</SelectItem>
-                    <SelectItem value="others">Outros</SelectItem>
+                    <SelectItem value="profissional">Profissional</SelectItem>
+                    <SelectItem value="embaixador">Embaixador</SelectItem>
+                    <SelectItem value="projeto">Projeto</SelectItem>
+                    <SelectItem value="outros">Outros</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -13,13 +13,7 @@ export default function ExperiencesDashboard() {
   };
 
   const getTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      professional: "Profissional",
-      ambassador: "Embaixador",
-      project: "Projeto",
-      others: "Outros",
-    };
-    return labels[type] || type;
+    return type ? type.charAt(0).toUpperCase() + type.slice(1) : "Outros";
   };
 
   if (isLoading) {

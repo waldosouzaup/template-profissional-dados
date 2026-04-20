@@ -22,6 +22,8 @@ export default function ProfileForm() {
     avatar_url: "",
     location: "",
     current_focus: "",
+    about_title: "",
+    cv_url: "",
   });
 
   useEffect(() => {
@@ -35,6 +37,8 @@ export default function ProfileForm() {
         avatar_url: profile.avatar_url || "",
         location: profile.location || "",
         current_focus: profile.current_focus || "",
+        about_title: profile.about_title || "",
+        cv_url: profile.cv_url || "",
       });
     }
   }, [profile]);
@@ -148,6 +152,29 @@ export default function ProfileForm() {
                   className="mt-1"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-foreground">Título da Página Sobre</label>
+              <Input
+                value={formData.about_title}
+                onChange={(e) => setFormData({ ...formData, about_title: e.target.value })}
+                placeholder="Título da página Sobre"
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-foreground">Link do CV (PDF para Download)</label>
+              <Input
+                value={formData.cv_url}
+                onChange={(e) => setFormData({ ...formData, cv_url: e.target.value })}
+                placeholder="https://exemplo.com/meu-cv.pdf"
+                className="mt-1"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Cole aqui o link do PDF do seu currículo. Este link será usado no botão CV da página inicial.
+              </p>
             </div>
             
             <div className="flex gap-2 pt-4">

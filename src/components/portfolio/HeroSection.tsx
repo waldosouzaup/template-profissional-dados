@@ -9,6 +9,7 @@ const HeroSection = () => {
   const profileName = profile?.full_name || "Waldo Eller";
   const currentFocus = profile?.current_focus || "Data, Technology & AI";
   const bioSummary = profile?.bio_summary || "Transformando dados em decisões que geram resultado real";
+  const cvUrl = profile?.cv_url || "";
 
   return (
     <section className="animate-fade-up delay-100">
@@ -21,7 +22,7 @@ const HeroSection = () => {
       </div>
       
       {/* Greeting */}
-      <p className="text-muted-foreground text-lg mb-4">👋 Say Hello</p>
+      <p className="text-muted-foreground text-lg mb-4">Olá</p>
       
       {/* Main Headline */}
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-2">
@@ -38,10 +39,17 @@ const HeroSection = () => {
 
       {/* Action Buttons */}
       <div className="flex flex-wrap gap-4 mt-8">
-        <a href="/cv-waldo-eller.pdf" download className="btn-primary">
-          <Download className="w-5 h-5" />
-          CV
-        </a>
+        {cvUrl ? (
+          <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
+            <Download className="w-5 h-5" />
+            CV
+          </a>
+        ) : (
+          <span className="btn-primary opacity-50 cursor-not-allowed">
+            <Download className="w-5 h-5" />
+            CV
+          </span>
+        )}
         <a href="#contact" className="btn-secondary">
           <MessageCircle className="w-5 h-5" />
           Contato

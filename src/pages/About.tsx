@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { ArrowLeft, User, Book as BookIcon, GraduationCap, ExternalLink, Calendar, Loader2 } from "lucide-react";
+import { User, Book as BookIcon, GraduationCap, ExternalLink, Calendar, Loader2, Mail, Phone, ArrowRight } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfile";
 import { useBooks } from "@/hooks/useBooks";
 import { useCourses } from "@/hooks/useCourses";
@@ -30,22 +30,7 @@ const About = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20">
-      {/* TOP NAV */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/[0.04]">
-        <Link
-          to="/"
-          className="flex items-center gap-2 text-sm text-white/40 hover:text-white/80 transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          Voltar para Início
-        </Link>
-        <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/25 hidden sm:block">
-          Sobre Mim
-        </span>
-        <div className="w-20" /> {/* Spacer */}
-      </header>
-
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20 pt-16">
       {/* HERO */}
       <section className="pt-32 pb-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
         <div className="flex items-center gap-4 mb-6">
@@ -57,8 +42,25 @@ const About = () => {
           </p>
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-white leading-[1.05] max-w-4xl">
-          Paixão por transformar dados em <span className="text-primary italic">conhecimento</span>.
+          {profile?.about_title || "Paixão por transformar dados em"} <span className="text-primary italic">conhecimento</span>.
         </h1>
+        
+        {(profile?.phone || profile?.email) && (
+          <div className="flex flex-wrap items-center gap-6 mt-8">
+            {profile?.phone && (
+              <a href={`tel:${profile.phone}`} className="flex items-center gap-2 text-white/50 hover:text-primary transition-colors">
+                <Phone className="w-4 h-4" />
+                <span className="text-sm">{profile.phone}</span>
+              </a>
+            )}
+            {profile?.email && (
+              <a href={`mailto:${profile.email}`} className="flex items-center gap-2 text-white/50 hover:text-primary transition-colors">
+                <Mail className="w-4 h-4" />
+                <span className="text-sm">{profile.email}</span>
+              </a>
+            )}
+          </div>
+        )}
       </section>
 
       {/* CONTENT & BIO */}
@@ -85,24 +87,52 @@ const About = () => {
               <BookIcon className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/30 mb-1">Inpiração</p>
+              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/30 mb-1">Inspiração</p>
               <h3 className="text-2xl font-light text-white">Estante de Livros</h3>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* Improved Book Grid — Bookshelf Style */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {books.map((book) => (
-              <div key={book.id} className="glass-panel p-6 rounded-2xl group hover:border-primary/30 transition-all">
-                {book.image_url && (
-                  <div className="aspect-[3/4] rounded-lg overflow-hidden mb-4 bg-white/5">
-                    <img src={book.image_url} alt={book.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+              <div 
+                key={book.id} 
+                className="group cursor-default"
+              >
+                {/* Book Cover */}
+                <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 border border-white/[0.06] shadow-lg shadow-black/30 transition-all duration-500 group-hover:shadow-primary/10 group-hover:border-primary/20 group-hover:-translate-y-1 group-hover:rotate-[-1deg]">
+                  {book.image_url ? (
+                    <img 
+                      src={book.image_url} 
+                      alt={book.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-white/[0.04] to-white/[0.01]">
+                      <BookIcon className="w-8 h-8 text-white/15 mb-3" />
+                      <p className="text-[11px] text-white/30 text-center font-medium leading-tight">{book.title}</p>
+                    </div>
+                  )}
+                  
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-3">
+                    <p className="text-[12px] font-medium text-white leading-tight">{book.title}</p>
+                    {book.author && (
+                      <p className="text-[10px] text-white/50 mt-0.5">{book.author}</p>
+                    )}
                   </div>
-                )}
-                <h4 className="text-lg font-medium text-white mb-1">{book.title}</h4>
-                <p className="text-sm text-white/40 mb-3">{book.author}</p>
-                {book.description && (
-                  <p className="text-sm text-white/60 leading-relaxed line-clamp-3">{book.description}</p>
-                )}
+
+                  {/* Spine effect */}
+                  <div className="absolute left-0 top-0 bottom-0 w-[3px] bg-gradient-to-b from-white/10 via-white/5 to-white/10 group-hover:from-primary/30 group-hover:via-primary/10 group-hover:to-primary/30 transition-colors duration-500" />
+                </div>
+                
+                {/* Book Info Below Cover */}
+                <div className="mt-2.5 px-0.5">
+                  <h4 className="text-[12px] font-medium text-white/70 leading-tight line-clamp-2 group-hover:text-white/90 transition-colors">{book.title}</h4>
+                  {book.author && (
+                    <p className="text-[10px] text-white/30 mt-0.5 truncate">{book.author}</p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
@@ -166,21 +196,38 @@ const About = () => {
         </section>
       )}
       
-      {/* FOOTER CTA */}
-      <footer className="border-t border-white/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto text-center">
-        <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/20 mb-6">
-          Gostou do que leu?
-        </p>
-        <Link
-          to="/#contact"
-          className="inline-block px-10 py-4 border border-white/15 rounded-full text-sm text-white/60 hover:border-white/40 hover:text-white transition-colors"
-        >
-          Vamos conversar
-        </Link>
+      {/* FOOTER CTA — Highlighted */}
+      <footer className="border-t border-white/[0.05] py-24 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto text-center">
+        <div className="relative">
+          {/* Glow effect */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <div className="w-64 h-64 bg-primary/5 rounded-full blur-[100px]" />
+          </div>
+          
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/20 mb-4">
+            Gostou do que leu?
+          </p>
+          <h3 className="text-3xl sm:text-4xl font-light text-white/80 mb-8 max-w-lg mx-auto leading-tight">
+            Vamos transformar dados em <span className="text-primary">resultados</span> juntos.
+          </h3>
+          <Link
+            to="/#contact"
+            className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-sm font-medium transition-all duration-500 hover:scale-105"
+            style={{
+              background: 'linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 60% 35%) 100%)',
+              color: 'hsl(0 0% 4%)',
+              boxShadow: '0 0 30px hsl(142 71% 45% / 0.2), 0 4px 20px hsl(0 0% 0% / 0.3)',
+            }}
+          >
+            Vamos Conversar
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </div>
       </footer>
     </div>
   );
 };
 
 export default About;
+
 

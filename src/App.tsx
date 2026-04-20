@@ -10,6 +10,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Navbar from "./components/portfolio/Navbar";
 
 // Admin
 import AdminLogin from "./pages/admin/Login";
@@ -38,6 +39,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/projects" element={<ProjectsGallery />} />

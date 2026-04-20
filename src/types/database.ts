@@ -46,7 +46,7 @@ export const CourseSchema = z.object({
 
 export type Course = z.infer<typeof CourseSchema>;
 
-export const ExperienceTypeEnum = z.enum(["professional", "ambassador", "project", "others"]);
+export const ExperienceTypeEnum = z.enum(["profissional", "embaixador", "projeto", "outros"]);
 export const IconTypeEnum = z.enum(["rocket", "award", "briefcase"]);
 
 export const ExperienceSchema = z.object({
@@ -76,6 +76,8 @@ export const ProfileSchema = z.object({
   avatar_url: z.string().optional(),
   location: z.string().default("Brasília, DF"),
   current_focus: z.string().default("Engenharia de Dados"),
+  about_title: z.string().optional(),
+  cv_url: z.string().optional(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;
