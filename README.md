@@ -215,4 +215,4 @@ Seu portfólio está configurado e responsivo, pronto para brilhar online.
 
 Este projeto está sob a licença MIT. Sinta-se à vontade para clonar, modificar as estéticas e usar livremente para a sua própria apresentação técnica! No painel de administração, as ferramentas se tornam dinâmicas e de fácil uso.
 
-Desenvolvido para ajudar profissionais de tecnologia a apresentarem o que fazem de melhor aos recrutadores e clientes.
+Desenvolvido por Waldo Eller para ajudar profissionais de tecnologia a apresentarem o que fazem de melhor aos recrutadores e clientes.
