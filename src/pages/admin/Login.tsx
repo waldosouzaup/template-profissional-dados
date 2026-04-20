@@ -61,7 +61,7 @@ export default function AdminLogin() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="admin@exemplo.com"
                 required
-                autocomplete="email"
+                autoComplete="email"
                 className="w-full bg-secondary/50 border-secondary"
               />
             </div>
@@ -76,7 +76,7 @@ export default function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 required
-                autocomplete="current-password"
+                autoComplete="current-password"
                 className="w-full bg-secondary/50 border-secondary"
               />
             </div>
