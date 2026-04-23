@@ -32,7 +32,7 @@ Siga este passo a passo detalhado para clonar e rodar o seu próprio portfólio.
 Primeiro, obtenha o código fonte do repositório:
 
 ```bash
-git clone https://github.com/waldosouzaup/dark-mode-mirror.git
+git clone https://github.com/waldosouzaup/template-profissional-dados.git
 cd dark-mode-mirror
 npm install
 ```
