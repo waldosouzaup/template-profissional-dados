@@ -262,15 +262,36 @@ const BlogPost = () => {
 
           <aside className="hidden lg:block">
             <div className="sticky top-28 space-y-12">
-
+              <div className="py-8 border-t border-white/[0.06]">
+                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Sobre o Autor</p>
+                <p className="text-sm text-white/40 leading-relaxed mb-6">
+                  Analista de Dados | BI | Gosto de transformar dados em insights que ajudam negócios a tomar decisões melhores.
+                </p>
+                <Link to="/about" className="text-[10px] font-bold tracking-widest uppercase text-primary hover:text-primary/80 transition-colors">
+                  Ver Perfil Completo →
+                </Link>
+              </div>
 
               <div className="py-8 border-t border-white/[0.06]">
                 <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Compartilhar</p>
                 <div className="flex gap-4">
-                  <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all">
+                  <button 
+                    onClick={() => {
+                      const url = encodeURIComponent(window.location.href);
+                      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+                    }}
+                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                  >
                     <span className="text-xs">Li</span>
                   </button>
-                  <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all">
+                  <button 
+                    onClick={() => {
+                      const url = encodeURIComponent(window.location.href);
+                      const text = encodeURIComponent(post.title);
+                      window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+                    }}
+                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                  >
                     <span className="text-xs">Tw</span>
                   </button>
                 </div>
