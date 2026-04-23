@@ -42,7 +42,19 @@ const About = () => {
           </p>
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-white leading-[1.05] max-w-4xl">
-          {profile?.about_title || "Paixão por transformar dados em"} <span className="text-primary italic">conhecimento</span>.
+          {(() => {
+            const title = profile?.about_title || "Paixão por transformar dados em conhecimento";
+            const words = title.trim().split(/\s+/);
+            if (words.length === 0) return null;
+            const lastWord = words.pop();
+            const mainTitle = words.join(" ");
+            return (
+              <>
+                {mainTitle}{mainTitle ? " " : ""}
+                <span className="text-primary italic">{lastWord}</span>
+              </>
+            );
+          })()}
         </h1>
         
         {(profile?.phone || profile?.email) && (

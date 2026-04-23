@@ -32,8 +32,8 @@ Siga este passo a passo detalhado para clonar e rodar o seu próprio portfólio.
 Primeiro, obtenha o código fonte do repositório:
 
 ```bash
-git clone https://github.com/seu-usuario/seu-repositorio.git
-cd seu-repositorio
+git clone https://github.com/waldosouzaup/dark-mode-mirror.git
+cd dark-mode-mirror
 npm install
 ```
 
@@ -176,6 +176,13 @@ create policy "Allow authenticated CRUD" on courses for all to authenticated usi
 Ainda no Supabase Dashboard, navegue até a guia **Authentication > Users** e clique em **Add user** (Adicionar Usuário). 
 Crie a sua conta de Email e Senha. Este será o login que você usará para acessar o `/admin` do portfólio.
 
+#### 📂 Configurando o Storage (Imagens)
+
+Para que o upload de fotos de perfil e capas de projetos funcione:
+1. No painel do Supabase, vá em **Storage**.
+2. Clique em **New Bucket** e crie um bucket chamado `portfolio`.
+3. Certifique-se de marcar a opção **Public bucket** para que as imagens fiquem visíveis no seu site.
+
 ### 3. Configurar as Variáveis de Ambiente Locais
 
 Crie um novo arquivo chamado `.env.local` na pasta raiz do projeto clonado, e preencha com as credenciais que você anotou no Passo 2:
@@ -208,6 +215,12 @@ Fazer o deploy para a nuvem é rápido e gratuito com plataformas como a Netlify
 5. Clique em Deploy.
 
 Seu portfólio está configurado e responsivo, pronto para brilhar online.
+
+## 👨‍💻 Criador
+
+Este projeto foi desenvolvido e é mantido por **Waldo Eller**. Se você gostou deste template ou deseja conhecer mais do meu trabalho, visite meu site oficial:
+
+👉 [**www.waldoeller.com**](https://www.waldoeller.com)
 
 ---
 
