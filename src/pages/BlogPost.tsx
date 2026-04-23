@@ -262,15 +262,7 @@ const BlogPost = () => {
 
           <aside className="hidden lg:block">
             <div className="sticky top-28 space-y-12">
-              <div className="py-8 border-t border-white/[0.06]">
-                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Sobre o Autor</p>
-                <p className="text-sm text-white/40 leading-relaxed mb-6">
-                  Fundador da NoCode StartUp e apaixonado por democratizar o acesso à tecnologia e inteligência de dados.
-                </p>
-                <Link to="/about" className="text-[10px] font-bold tracking-widest uppercase text-primary hover:text-primary/80 transition-colors">
-                  Ver Perfil Completo →
-                </Link>
-              </div>
+
 
               <div className="py-8 border-t border-white/[0.06]">
                 <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Compartilhar</p>
