@@ -2,9 +2,9 @@
 
 ---
 
-## Português
-
 Este projeto é um **template profissional de Portfólio e Blog**, construído com tecnologias modernas para oferecer uma experiência de "Dark Mode" elegante, gestão administrativa integrada e alta performance. Ideal para engenheiros de dados, desenvolvedores e entusiastas de IA que desejam uma presença online de impacto.
+
+![Template](https://ltgqjjxhkqunuiqxmfvl.supabase.co/storage/v1/object/public/portfolio/00-template.png)
 
 ### ✨ Funcionalidades
 
