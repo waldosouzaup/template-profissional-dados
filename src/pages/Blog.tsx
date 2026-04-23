@@ -61,7 +61,7 @@ const Blog = () => {
           {contents.map((post, index) => (
             <Link 
               key={post.id} 
-              to={`/blog/${post.id}`}
+              to={`/blog/${post.slug || post.id}`}
               className="group relative bg-white/[0.015] border border-white/[0.04] rounded-2xl overflow-hidden hover:border-white/10 hover:bg-white/[0.025] transition-all duration-500 flex flex-col"
               style={{ animationDelay: `${index * 100}ms` }}
             >

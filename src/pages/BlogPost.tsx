@@ -84,13 +84,13 @@ const CodeBlock = ({
 };
 
 const BlogPost = () => {
-  const { id } = useParams<{ id: string }>();
-  const { data: post, isLoading } = useContent(id);
+  const { idOrSlug } = useParams<{ idOrSlug: string }>();
+  const { data: post, isLoading } = useContent(idOrSlug);
   const articleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [idOrSlug]);
 
   if (isLoading) {
     return (

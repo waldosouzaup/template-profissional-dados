@@ -37,6 +37,7 @@ export default function ContentsDashboard() {
             <thead className="bg-secondary text-muted-foreground text-xs uppercase">
               <tr>
                 <th className="px-6 py-4 font-medium">Título</th>
+                <th className="px-6 py-4 font-medium">Slug</th>
                 <th className="px-6 py-4 font-medium">Descrição</th>
                 <th className="px-6 py-4 font-medium text-right">Ações</th>
               </tr>
@@ -44,7 +45,7 @@ export default function ContentsDashboard() {
             <tbody className="divide-y divide-border">
               {contents.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="px-6 py-8 text-center text-muted-foreground">
+                  <td colSpan={4} className="px-6 py-8 text-center text-muted-foreground">
                     Nenhum conteúdo encontrado.
                   </td>
                 </tr>
@@ -52,7 +53,10 @@ export default function ContentsDashboard() {
                 contents.map((content) => (
                   <tr key={content.id} className="hover:bg-secondary/50 transition-colors">
                     <td className="px-6 py-4 font-medium text-foreground">{content.title}</td>
-                    <td className="px-6 py-4 text-muted-foreground max-w-md truncate">
+                    <td className="px-6 py-4 text-xs font-mono text-muted-foreground">
+                      {content.slug || <span className="italic opacity-50">sem slug</span>}
+                    </td>
+                    <td className="px-6 py-4 text-muted-foreground max-w-xs truncate">
                       {content.description || "-"}
                     </td>
                     <td className="px-6 py-4 text-right">

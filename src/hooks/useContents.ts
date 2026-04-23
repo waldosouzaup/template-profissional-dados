@@ -92,15 +92,22 @@ export const useContents = () => {
   };
 };
 
-export const useContent = (id: string | undefined) => {
+export const useContent = (idOrSlug: string | undefined) => {
   const fetchContent = async (): Promise<Content | null> => {
-    if (!id) return null;
+    if (!idOrSlug) return null;
     
-    const { data, error } = await supabase
-      .from("contents")
-      .select("*")
-      .eq("id", id)
-      .single();
+    // Check if it's a UUID
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
+    
+    let query = supabase.from("contents").select("*");
+    
+    if (isUuid) {
+      query = query.eq("id", idOrSlug);
+    } else {
+      query = query.eq("slug", idOrSlug);
+    }
+    
+    const { data, error } = await query.single();
       
     if (error) {
       if (error.code === 'PGRST116') return null;
@@ -111,8 +118,8 @@ export const useContent = (id: string | undefined) => {
   };
 
   return useQuery({
-    queryKey: ["content", id],
+    queryKey: ["content", idOrSlug],
     queryFn: fetchContent,
-    enabled: !!id,
+    enabled: !!idOrSlug,
   });
 };

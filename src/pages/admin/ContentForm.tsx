@@ -16,15 +16,28 @@ export default function ContentForm() {
   
   const [formData, setFormData] = useState({
     title: "",
+    slug: "",
     description: "",
     markdown: "",
     image_url: "",
   });
 
+  const generateSlug = (text: string) => {
+    return text
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^\w\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/--+/g, "-")
+      .trim();
+  };
+
   useEffect(() => {
     if (content) {
       setFormData({
         title: content.title || "",
+        slug: content.slug || "",
         description: content.description || "",
         markdown: content.markdown || "",
         image_url: content.image_url || "",
@@ -32,14 +45,22 @@ export default function ContentForm() {
     }
   }, [content]);
 
+  const handleTitleChange = (title: string) => {
+    const newSlug = !isEditing ? generateSlug(title) : formData.slug;
+    setFormData({ ...formData, title, slug: newSlug });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Ensure slug is not empty
+    const finalSlug = formData.slug || generateSlug(formData.title);
+    
     try {
       if (isEditing && content) {
-        await updateContent({ ...content, ...formData });
+        await updateContent({ ...content, ...formData, slug: finalSlug });
       } else {
-        await createContent(formData);
+        await createContent({ ...formData, slug: finalSlug });
       }
       navigate("/admin/contents");
     } catch (error) {
@@ -69,11 +90,25 @@ export default function ContentForm() {
               <label className="text-sm font-medium text-foreground">Título</label>
               <Input
                 value={formData.title}
-                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                onChange={(e) => handleTitleChange(e.target.value)}
                 placeholder="Título do post"
                 required
                 className="mt-1"
               />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-foreground">Slug (URL)</label>
+              <Input
+                value={formData.slug}
+                onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
+                placeholder="exemplo-de-slug"
+                required
+                className="mt-1"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                A URL será: waldoeller.com/blog/{formData.slug || "titulo-do-post"}
+              </p>
             </div>
             
             <div>

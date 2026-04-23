@@ -14,6 +14,7 @@ export type Book = z.infer<typeof BookSchema>;
 export const ContentSchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(1, "Title is required"),
+  slug: z.string().optional(),
   description: z.string().optional(),
   markdown: z.string().optional(),
   image_url: z.string().optional(),
