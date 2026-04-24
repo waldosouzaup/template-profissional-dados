@@ -12,6 +12,8 @@ import {
 import { projectCategories } from "@/types/project";
 import { useProject } from "@/hooks/useProjects";
 
+import remarkGfm from "remark-gfm";
+
 /* ─────────────────────────────────────────────
    SCROLL PROGRESS BAR
 ───────────────────────────────────────────── */
@@ -322,6 +324,7 @@ const ProjectDetail = () => {
                   "
                 >
                     <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
                       components={{
                         h2: ({ children, ...props }: any) => (
                           <h2 className="text-3xl font-light text-white/90 mt-20 mb-6 pb-5 border-b border-white/[0.06]" {...props}>{children}</h2>
