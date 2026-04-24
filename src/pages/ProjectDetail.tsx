@@ -104,9 +104,12 @@ const ListBlock = ({
   if (!items || items.length === 0) return null;
   return (
     <div className="py-8 border-t border-white/[0.06]">
-      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/25 mb-5">
-        {title}
-      </p>
+      <div className="flex items-center gap-2 mb-5">
+        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+        <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/80">
+          {title}
+        </p>
+      </div>
       <ul className="space-y-3">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-2.5 group">
@@ -213,7 +216,7 @@ const ProjectDetail = () => {
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm px-4 py-1.5 border border-white/15 rounded-full text-white/60 hover:border-white/40 hover:text-white transition-colors"
+              className="flex items-center gap-1.5 text-xs sm:text-sm px-4 py-1.5 border border-emerald-500/30 rounded-full text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
             >
               Demo
               <ExternalLink className="w-3.5 h-3.5" />
@@ -330,7 +333,14 @@ const ProjectDetail = () => {
                           const isSectionLabel = sectionKeywords.includes(text.trim());
                           
                           if (isSectionLabel) {
-                            return <h3 className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/25 !mt-16 !mb-4 !leading-none uppercase" {...props}>{children}</h3>;
+                            return (
+                              <div className="flex items-center gap-2 mt-16 mb-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                                <h3 className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/80 !m-0 !leading-none" {...props}>
+                                  {children}
+                                </h3>
+                              </div>
+                            );
                           }
                           return <h3 className="text-xl font-light text-white/75 mt-14 mb-4" {...props}>{children}</h3>;
                         },
@@ -350,7 +360,14 @@ const ProjectDetail = () => {
                           
                           // Also handle if those words are just written as plain paragraphs
                           if (sectionKeywords.includes(text.trim()) && text.trim().length < 30) {
-                            return <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/25 !mt-16 !mb-4 !leading-none">{children}</p>;
+                            return (
+                              <div className="flex items-center gap-2 mt-16 mb-4">
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                                <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/80 !m-0 !leading-none">
+                                  {children}
+                                </p>
+                              </div>
+                            );
                           }
                           return <p {...props}>{children}</p>;
                         },
@@ -387,9 +404,12 @@ const ProjectDetail = () => {
                   <div className="mb-4 p-6 border border-white/[0.06] rounded-xl space-y-5 bg-white/[0.015]">
                     {project.cardProblem && (
                       <div>
-                        <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/25 mb-1.5">
-                          Problema
-                        </p>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/80">
+                            Problema
+                          </p>
+                        </div>
                         <p className="text-[13px] text-white/55 leading-relaxed">
                           {project.cardProblem}
                         </p>
@@ -397,9 +417,12 @@ const ProjectDetail = () => {
                     )}
                     {project.cardSolution && (
                       <div>
-                        <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/25 mb-1.5">
-                          Solução
-                        </p>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/80">
+                            Solução
+                          </p>
+                        </div>
                         <p className="text-[13px] text-white/55 leading-relaxed">
                           {project.cardSolution}
                         </p>
@@ -407,9 +430,12 @@ const ProjectDetail = () => {
                     )}
                     {project.cardResult && (
                       <div>
-                        <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/25 mb-1.5">
-                          Resultado
-                        </p>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/80">
+                            Resultado
+                          </p>
+                        </div>
                         <p className="text-[13px] text-white/55 leading-relaxed">
                           {project.cardResult}
                         </p>
@@ -421,9 +447,12 @@ const ProjectDetail = () => {
                 {/* Stats / Results */}
                 {hasStats && (
                   <div className="border-t border-white/[0.06] py-6 mb-2 space-y-5">
-                    <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/25">
-                      Métricas
-                    </p>
+                    <div className="flex items-center gap-2 mb-5">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/80">
+                        Métricas
+                      </p>
+                    </div>
                     {project.stats!.map((s, i) => (
                       <div key={i}>
                         <p className="text-lg font-light text-white/90 leading-tight">
@@ -440,9 +469,12 @@ const ProjectDetail = () => {
                 {/* Technologies */}
                 {project.tags && project.tags.length > 0 && (
                   <div className="py-6 border-t border-white/[0.06]">
-                    <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/25 mb-4">
-                      Tecnologias
-                    </p>
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                      <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/80">
+                        Tecnologias
+                      </p>
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {project.tags.map((t) => (
                         <Badge key={t} label={t} />
@@ -470,10 +502,29 @@ const ProjectDetail = () => {
                       href={project.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between w-full px-5 py-3.5 border border-white/10 rounded-xl text-sm text-white/55 hover:border-white/30 hover:text-white/80 transition-colors group"
+                      className="group relative flex items-center justify-between w-full px-6 py-4 rounded-xl text-sm font-semibold transition-all duration-300 overflow-hidden"
+                      style={{
+                        background: 'linear-gradient(135deg, hsl(142 71% 45% / 0.1) 0%, hsl(142 71% 45% / 0.05) 100%)',
+                        border: '1px solid hsl(142 71% 45% / 0.3)',
+                        color: 'hsl(142 71% 65%)',
+                        boxShadow: '0 0 20px hsl(142 71% 45% / 0.1)',
+                      }}
                     >
-                      Ver Demo
-                      <ExternalLink className="w-3.5 h-3.5 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+                      {/* Background hover effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      
+                      <span className="relative z-10 flex items-center gap-2">
+                        Ver Demo ao Vivo
+                        <span className="flex h-2 w-2 relative">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                      </span>
+                      
+                      <ExternalLink className="relative z-10 w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                      
+                      {/* Subtle glow on hover */}
+                      <div className="absolute -inset-1 bg-emerald-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
                     </a>
                   )}
                   {project.githubUrl && (
