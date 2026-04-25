@@ -265,7 +265,7 @@ const ProjectDetail = () => {
 
       {/* ── BODY: ARTICLE + SIDEBAR ── */}
       <div className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 pb-40">
-        <div className={`flex gap-20 ${hasSidebar ? "lg:grid lg:grid-cols-[1fr_300px]" : ""}`}>
+        <div className={`flex flex-col lg:grid gap-12 lg:gap-20 ${hasSidebar ? "lg:grid-cols-[1fr_300px]" : ""}`}>
 
           {/* ── LEFT: MAIN CONTENT ── */}
           <main className="min-w-0">
@@ -397,7 +397,7 @@ const ProjectDetail = () => {
 
           {/* ── RIGHT: SIDEBAR ── */}
           {hasSidebar && (
-            <aside className="hidden lg:block">
+            <aside className="block">
               <div className="sticky top-28 space-y-0">
 
                 {/* Card: problem / solution / result */}
