@@ -64,7 +64,8 @@ create table profiles (
   current_focus text default 'Engenharia de Dados',
   about_title text,
   cv_url text,
-  favicon_url text
+  favicon_url text,
+  hero_title text
 );
 
 -- TABELA DE PROJETOS (PROJECTS)

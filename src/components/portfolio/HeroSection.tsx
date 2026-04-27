@@ -7,6 +7,7 @@ const HeroSection = () => {
   const profile = profiles[0];
   
   const profileName = profile?.full_name || "Waldo Eller";
+  const heroTitle = profile?.hero_title || `Eu sou ${profileName.split(' ')[0]} ${profileName.split(' ')[1]},`;
   const currentFocus = profile?.current_focus || "Data, Technology & AI";
   const bioSummary = profile?.bio_summary || "Transformando dados em decisões que geram resultado real";
   const cvUrl = profile?.cv_url || "";
@@ -26,7 +27,7 @@ const HeroSection = () => {
       
       {/* Main Headline */}
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-2">
-        Eu sou {profileName.split(' ')[0]} {profileName.split(' ')[1]},
+        {heroTitle}
       </h1>
       <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-primary leading-tight">
         {currentFocus}

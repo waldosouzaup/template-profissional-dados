@@ -25,6 +25,7 @@ export default function ProfileForm() {
     about_title: "",
     cv_url: "",
     favicon_url: "",
+    hero_title: "",
   });
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export default function ProfileForm() {
         about_title: profile.about_title || "",
         cv_url: profile.cv_url || "",
         favicon_url: profile.favicon_url || "",
+        hero_title: profile.hero_title || "",
       });
     }
   }, [profile]);
@@ -154,6 +156,16 @@ export default function ProfileForm() {
                   className="mt-1"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-foreground">Título Principal da Home (Hero)</label>
+              <Input
+                value={formData.hero_title}
+                onChange={(e) => setFormData({ ...formData, hero_title: e.target.value })}
+                placeholder="Ex: Eu sou Waldo Eller,"
+                className="mt-1"
+              />
             </div>
 
             <div>

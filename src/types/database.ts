@@ -80,6 +80,7 @@ export const ProfileSchema = z.object({
   about_title: z.string().optional(),
   cv_url: z.string().optional(),
   favicon_url: z.string().optional(),
+  hero_title: z.string().optional(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;
