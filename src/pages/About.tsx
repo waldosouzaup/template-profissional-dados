@@ -5,6 +5,7 @@ import { useProfiles } from "@/hooks/useProfile";
 import { useBooks } from "@/hooks/useBooks";
 import { useCourses } from "@/hooks/useCourses";
 import ReactMarkdown from "react-markdown";
+import SEOHead from "@/components/SEOHead";
 
 const About = () => {
   const { data: profiles = [], isLoading: loadingProfile } = useProfiles();
@@ -29,10 +30,30 @@ const About = () => {
     );
   }
 
+  const pageTitle = profile?.about_title || "Paixão por transformar dados em conhecimento";
+
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20 pt-16">
+      <SEOHead
+        title={`Sobre — ${profile?.full_name || "Waldo Eller"}`}
+        description={profile?.bio_summary || "Conheça a trajetória e experiência de Waldo Eller, Especialista em Dados, Tecnologia e IA."}
+        canonical="https://waldoeller.com/about"
+        ogType="profile"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "Person",
+          name: profile?.full_name || "Waldo Eller",
+          jobTitle: profile?.current_focus || "Especialista em Dados",
+          email: profile?.email,
+          telephone: profile?.phone,
+          image: profile?.avatar_url,
+          url: "https://waldoeller.com/about",
+          address: profile?.location ? { "@type": "PostalAddress", addressLocality: profile.location } : undefined,
+        }}
+      />
+
       {/* HERO */}
-      <section className="pt-32 pb-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
+      <section className="pt-32 pb-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         <div className="flex items-center gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
             <User className="w-6 h-6 text-primary" />
@@ -43,7 +64,7 @@ const About = () => {
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-white leading-[1.05] max-w-4xl">
           {(() => {
-            const title = profile?.about_title || "Paixão por transformar dados em conhecimento";
+            const title = pageTitle;
             const words = title.trim().split(/\s+/);
             if (words.length === 0) return null;
             const lastWord = words.pop();
@@ -76,7 +97,7 @@ const About = () => {
       </section>
 
       {/* CONTENT & BIO */}
-      <div className="max-w-[1000px] mx-auto px-8 sm:px-12 lg:px-20 pb-20">
+      <div className="max-w-[1000px] mx-auto px-8 sm:px-12 lg:px-20 pb-20 animate-[fadeInUp_0.8s_ease-out_0.1s_both]">
         <article className="
           prose prose-invert max-w-none
           prose-headings:font-light prose-headings:tracking-tight
@@ -93,23 +114,24 @@ const About = () => {
 
       {/* BOOKS SECTION */}
       {books.length > 0 && (
-        <section className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 py-20 border-t border-white/[0.04]">
+        <section className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 py-20 border-t border-white/[0.04] animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
           <div className="flex items-center gap-4 mb-12">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <BookIcon className="w-5 h-5 text-primary" />
             </div>
             <div>
               <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/30 mb-1">Inspiração</p>
-              <h3 className="text-2xl font-light text-white">Estante de Livros</h3>
+              <h2 className="text-2xl font-light text-white">Estante de Livros</h2>
             </div>
           </div>
           
           {/* Improved Book Grid — Bookshelf Style */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
-            {books.map((book) => (
+            {books.map((book, index) => (
               <div 
                 key={book.id} 
                 className="group cursor-default"
+                style={{ animationDelay: `${index * 60}ms`, animation: 'fadeInUp 0.5s ease-out both' }}
               >
                 {/* Book Cover */}
                 <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-white/5 border border-white/[0.06] shadow-lg shadow-black/30 transition-all duration-500 group-hover:shadow-primary/10 group-hover:border-primary/20 group-hover:-translate-y-1 group-hover:rotate-[-1deg]">
@@ -117,6 +139,7 @@ const About = () => {
                     <img 
                       src={book.image_url} 
                       alt={book.title} 
+                      loading="lazy"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" 
                     />
                   ) : (
@@ -153,23 +176,27 @@ const About = () => {
 
       {/* COURSES SECTION */}
       {courses.length > 0 && (
-        <section className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 py-20 border-t border-white/[0.04] bg-white/[0.01]">
+        <section className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 py-20 border-t border-white/[0.04] bg-white/[0.01] animate-[fadeInUp_0.8s_ease-out_0.3s_both]">
           <div className="flex items-center gap-4 mb-12">
             <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
               <GraduationCap className="w-5 h-5 text-primary" />
             </div>
             <div>
               <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/30 mb-1">Certificações</p>
-              <h3 className="text-2xl font-light text-white">Cursos Extras</h3>
+              <h2 className="text-2xl font-light text-white">Cursos Extras</h2>
             </div>
           </div>
 
           <div className="space-y-4">
-            {courses.map((course) => (
-              <div key={course.id} className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-white/[0.03] transition-colors">
+            {courses.map((course, index) => (
+              <div
+                key={course.id}
+                className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-white/[0.03] transition-all duration-300 hover:border-white/[0.08]"
+                style={{ animationDelay: `${index * 80}ms`, animation: 'fadeInUp 0.5s ease-out both' }}
+              >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h4 className="text-lg font-medium text-white">{course.title}</h4>
+                    <h3 className="text-lg font-medium text-white">{course.title}</h3>
                     {course.period && (
                       <span className="flex items-center gap-1.5 px-3 py-1 bg-white/5 rounded-full text-[10px] font-medium tracking-wide text-white/40 uppercase">
                         <Calendar className="w-3 h-3" />
@@ -241,5 +268,3 @@ const About = () => {
 };
 
 export default About;
-
-

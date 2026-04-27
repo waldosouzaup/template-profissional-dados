@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { ProjectCategory, projectCategories } from "@/types/project";
 import { useProjects } from "@/hooks/useProjects";
+import SEOHead from "@/components/SEOHead";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Database,
@@ -30,6 +31,19 @@ const ProjectsGallery = () => {
 
   return (
     <div className="min-h-screen bg-background pt-16">
+      <SEOHead
+        title="Projetos — Portfólio"
+        description="Explore os projetos desenvolvidos por Waldo Eller utilizando tecnologias de Dados, IA e Web."
+        canonical="https://waldoeller.com/projects"
+        ogType="website"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: "Projetos — Waldo Eller",
+          description: "Portfólio de projetos em Dados, IA e Web.",
+          url: "https://waldoeller.com/projects",
+        }}
+      />
       <div className="container mx-auto px-4 py-8 md:py-16">
         {/* Header */}
         <div className="animate-fade-up">

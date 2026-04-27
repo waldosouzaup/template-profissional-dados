@@ -24,6 +24,7 @@ export default function ProfileForm() {
     current_focus: "",
     about_title: "",
     cv_url: "",
+    favicon_url: "",
   });
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function ProfileForm() {
         current_focus: profile.current_focus || "",
         about_title: profile.about_title || "",
         cv_url: profile.cv_url || "",
+        favicon_url: profile.favicon_url || "",
       });
     }
   }, [profile]);
@@ -162,6 +164,18 @@ export default function ProfileForm() {
                 placeholder="Título da página Sobre"
                 className="mt-1"
               />
+            </div>
+
+            <div>
+              <ImageUpload
+                label="Favicon do Site"
+                value={formData.favicon_url}
+                onChange={(url) => setFormData({ ...formData, favicon_url: url })}
+                path="favicon"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Envie uma imagem PNG (idealmente 512×512px) para usar como ícone do site no navegador.
+              </p>
             </div>
 
             <div>

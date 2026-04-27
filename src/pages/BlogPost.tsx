@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import { 
@@ -7,12 +7,15 @@ import {
   User, 
   Copy, 
   Check, 
-  ChevronRight 
+  ChevronRight,
+  Clock,
+  Share2
 } from "lucide-react";
 import { useContent } from "@/hooks/useContents";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import remarkGfm from "remark-gfm";
+import SEOHead from "@/components/SEOHead";
 
 /* ─────────────────────────────────────────────
    SCROLL PROGRESS BAR
@@ -84,6 +87,53 @@ const CodeBlock = ({
   );
 };
 
+/* ─────────────────────────────────────────────
+   TABLE OF CONTENTS
+ ───────────────────────────────────────────── */
+const TableOfContents = ({ markdown }: { markdown: string }) => {
+  const headings = useMemo(() => {
+    const lines = markdown.split("\n");
+    const result: { level: number; text: string; id: string }[] = [];
+    for (const line of lines) {
+      const match = line.match(/^(#{2,3})\s+(.+)/);
+      if (match) {
+        const text = match[2].trim();
+        const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+        result.push({ level: match[1].length, text, id });
+      }
+    }
+    return result;
+  }, [markdown]);
+
+  if (headings.length < 2) return null;
+
+  return (
+    <div className="py-8 border-t border-white/[0.06]">
+      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Neste Artigo</p>
+      <nav className="space-y-2">
+        {headings.map((h, i) => (
+          <a
+            key={i}
+            href={`#${h.id}`}
+            className={`block text-[13px] leading-snug transition-colors hover:text-white/80 ${
+              h.level === 2 ? "text-white/45 font-medium" : "text-white/25 pl-3"
+            }`}
+          >
+            {h.text}
+          </a>
+        ))}
+      </nav>
+    </div>
+  );
+};
+
+/** Estimate reading time from markdown text */
+const estimateReadingTime = (text?: string): number => {
+  if (!text) return 1;
+  const words = text.trim().split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / 200));
+};
+
 const BlogPost = () => {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { data: post, isLoading } = useContent(idOrSlug);
@@ -106,34 +156,41 @@ const BlogPost = () => {
 
   if (!post) return null;
 
+  const readingTime = estimateReadingTime(post.markdown);
+
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20">
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20 pt-16">
+      <SEOHead
+        title={post.title}
+        description={post.description || `Leia "${post.title}" no blog de Waldo Eller.`}
+        canonical={`https://waldoeller.com/blog/${post.slug || post.id}`}
+        ogImage={post.image_url}
+        ogType="article"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "BlogPosting",
+          headline: post.title,
+          description: post.description,
+          datePublished: post.created_at,
+          url: `https://waldoeller.com/blog/${post.slug || post.id}`,
+          author: {
+            "@type": "Person",
+            name: "Waldo Eller",
+            url: "https://waldoeller.com/about",
+          },
+          publisher: {
+            "@type": "Person",
+            name: "Waldo Eller",
+          },
+          ...(post.image_url && { image: post.image_url }),
+          wordCount: post.markdown?.split(/\s+/).length,
+          timeRequired: `PT${readingTime}M`,
+        }}
+      />
       <ScrollProgress />
 
-      {/* TOP NAV */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/[0.04]">
-        <Link
-          to="/blog"
-          className="flex items-center gap-2 text-sm text-white/40 hover:text-white/80 transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-          Blog
-        </Link>
-        <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/25 hidden sm:block">
-          Explorando Dados & IA
-        </span>
-        <div className="flex items-center gap-4">
-          <Link 
-            to="/" 
-            className="text-[10px] font-bold tracking-widest uppercase text-white/30 hover:text-primary transition-colors"
-          >
-            Início
-          </Link>
-        </div>
-      </header>
-
       {/* HERO */}
-      <section className="pt-32 pb-10 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
+      <section className="pt-24 pb-10 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         {post.image_url && (
           <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden mb-16 border border-white/[0.06] shadow-2xl">
             <img
@@ -154,6 +211,10 @@ const BlogPost = () => {
             <div className="flex items-center gap-2">
               <User className="w-3.5 h-3.5" />
               Waldo Eller
+            </div>
+            <div className="flex items-center gap-2">
+              <Clock className="w-3.5 h-3.5" />
+              {readingTime} min de leitura
             </div>
           </div>
 
@@ -223,18 +284,21 @@ const BlogPost = () => {
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   components={{
-                    h2: ({ children, ...props }: any) => (
-                      <h2 className="text-3xl font-light text-white/90 mt-20 mb-6 pb-5 border-b border-white/[0.06]" {...props}>{children}</h2>
-                    ),
+                    h2: ({ children, ...props }: any) => {
+                      const text = typeof children === "string" ? children : Array.isArray(children) ? children.map((c: any) => (typeof c === "string" ? c : "")).join("") : "";
+                      const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
+                      return <h2 id={id} className="text-3xl font-light text-white/90 mt-20 mb-6 pb-5 border-b border-white/[0.06] scroll-mt-24" {...props}>{children}</h2>;
+                    },
                     h3: ({ children, ...props }: any) => {
                       const text = typeof children === "string" ? children : Array.isArray(children) ? children.map((c: any) => (typeof c === "string" ? c : "")).join("") : "";
                       const sectionKeywords = ["Problema", "Contexto", "Estratégia", "Resultados", "Solução", "Objetivo", "Tecnologias", "Arquitetura", "Conclusão", "Próximos Passos", "Impacto", "Insights"];
                       const isSectionLabel = sectionKeywords.includes(text.trim());
+                      const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
                       
                       if (isSectionLabel) {
-                        return <h3 className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/25 !mt-16 !mb-4 !leading-none uppercase" {...props}>{children}</h3>;
+                        return <h3 id={id} className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/25 !mt-16 !mb-4 !leading-none uppercase scroll-mt-24" {...props}>{children}</h3>;
                       }
-                      return <h3 className="text-xl font-light text-white/75 mt-14 mb-4" {...props}>{children}</h3>;
+                      return <h3 id={id} className="text-xl font-light text-white/75 mt-14 mb-4 scroll-mt-24" {...props}>{children}</h3>;
                     },
                     pre: ({ children }: any) => (
                       <CodeBlock>{(children as any)?.props?.children}</CodeBlock>
@@ -254,6 +318,9 @@ const BlogPost = () => {
                       }
                       return <p {...props}>{children}</p>;
                     },
+                    img: ({ src, alt, ...props }: any) => (
+                      <img src={src} alt={alt || ""} loading="lazy" {...props} />
+                    ),
                   }}
                 >
                   {post.markdown || ""}
@@ -263,7 +330,10 @@ const BlogPost = () => {
           </main>
 
           <aside className="hidden lg:block">
-            <div className="sticky top-28 space-y-12">
+            <div className="sticky top-28 space-y-0">
+              {/* Table of Contents */}
+              {post.markdown && <TableOfContents markdown={post.markdown} />}
+
               <div className="py-8 border-t border-white/[0.06]">
                 <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Sobre o Autor</p>
                 <p className="text-sm text-white/40 leading-relaxed mb-6">
@@ -283,6 +353,7 @@ const BlogPost = () => {
                       window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
                     }}
                     className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                    aria-label="Compartilhar no LinkedIn"
                   >
                     <span className="text-xs">Li</span>
                   </button>
@@ -293,8 +364,18 @@ const BlogPost = () => {
                       window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
                     }}
                     className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                    aria-label="Compartilhar no Twitter"
                   >
                     <span className="text-xs">Tw</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                    }}
+                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                    aria-label="Copiar link"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

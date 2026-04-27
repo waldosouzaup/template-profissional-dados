@@ -79,6 +79,7 @@ export const ProfileSchema = z.object({
   current_focus: z.string().default("Engenharia de Dados"),
   about_title: z.string().optional(),
   cv_url: z.string().optional(),
+  favicon_url: z.string().optional(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;

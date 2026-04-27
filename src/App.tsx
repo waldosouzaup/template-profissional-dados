@@ -30,8 +30,14 @@ import TechnologiesDashboard from "./pages/admin/TechnologiesDashboard";
 import TechnologyForm from "./pages/admin/TechnologyForm";
 import EducationDashboard from "./pages/admin/EducationDashboard";
 import EducationForm from "./pages/admin/EducationForm";
+import useDynamicFavicon from "./hooks/useDynamicFavicon";
 
 const queryClient = new QueryClient();
+
+const FaviconUpdater = () => {
+  useDynamicFavicon();
+  return null;
+};
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -39,6 +45,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <FaviconUpdater />
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />

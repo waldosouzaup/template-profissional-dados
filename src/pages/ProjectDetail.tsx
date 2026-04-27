@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { projectCategories } from "@/types/project";
 import { useProject } from "@/hooks/useProjects";
-
+import SEOHead from "@/components/SEOHead";
 import remarkGfm from "remark-gfm";
 
 /* ─────────────────────────────────────────────
@@ -182,11 +182,28 @@ const ProjectDetail = () => {
     hasNextSteps;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20">
+    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20 pt-16">
+      <SEOHead
+        title={`${project.title} — Projeto`}
+        description={project.description || `Projeto: ${project.title}`}
+        canonical={`https://waldoeller.com/projects/${project.id}`}
+        ogImage={project.coverImage}
+        ogType="article"
+        jsonLd={{
+          "@context": "https://schema.org",
+          "@type": "CreativeWork",
+          name: project.title,
+          description: project.description,
+          url: `https://waldoeller.com/projects/${project.id}`,
+          author: { "@type": "Person", name: "Waldo Eller" },
+          ...(project.coverImage && { image: project.coverImage }),
+          keywords: project.tags?.join(", "),
+        }}
+      />
       <ScrollProgress />
 
       {/* ── TOP NAV ── */}
-      <header className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/[0.04]">
+      <header className="fixed top-16 left-0 right-0 z-30 flex items-center justify-between px-8 py-3 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/[0.04]">
         <Link
           to="/projects"
           className="flex items-center gap-2 text-sm text-white/40 hover:text-white/80 transition-colors group"
@@ -228,7 +245,7 @@ const ProjectDetail = () => {
       </header>
 
       {/* ── HERO ── */}
-      <section className="pt-28 pb-0 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
+      <section className="pt-20 pb-0 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         {/* Cover image — full bleed with overlay */}
         {project.coverImage && (
           <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden mb-20 border border-white/[0.06]">
@@ -397,7 +414,7 @@ const ProjectDetail = () => {
 
           {/* ── RIGHT: SIDEBAR ── */}
           {hasSidebar && (
-            <aside className="block">
+            <aside className="block order-first lg:order-none">
               <div className="sticky top-28 space-y-0">
 
                 {/* Card: problem / solution / result */}
