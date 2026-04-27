@@ -9,10 +9,11 @@ Este projeto é um **template profissional de Portfólio e Blog**, construído c
 ### ✨ Funcionalidades
 
 - 🌑 **Dark Mode Nativo**: Interface sofisticada com tema escuro (Dark Mode Mirror UI).
-- 📝 **Blog Integrado**: Suporte a Markdown para posts técnicos e tutoriais.
+- 📝 **Blog Integrado**: Suporte a Markdown para posts técnicos e tutoriais com tempo de leitura estimado e índice interativo.
 - 📚 **Biblioteca & Certificações**: Seções dinâmicas para exibir livros que você recomenda e cursos/certificações extras.
-- 🛠️ **Painel Administrativo**: Gestão completa com autenticação Supabase para gerenciar Portfólio, Experiências, Educação, Livros, Cursos e Configurações de Perfil.
-- 📱 **Responsivo**: Adaptado para desktop, tablet e mobile.
+- 🛠️ **Painel Administrativo**: Gestão completa com autenticação Supabase para gerenciar Portfólio, Experiências, Educação, Livros, Cursos e Configurações de Perfil (incluindo upload do seu próprio Favicon).
+- 🔍 **SEO Otimizado**: Meta tags dinâmicas, Microdados Estruturados (JSON-LD) e geração pronta para sitemap para garantir visibilidade máxima nos motores de busca e compartilhamento social.
+- 📱 **Responsivo**: Adaptado para desktop, tablet e mobile com animações fluidas (Framer Motion / CSS).
 - ⚡ **Performance**: Construído com Vite + React para carregamento instantâneo.
 
 ### 🛠️ Tecnologias
@@ -62,7 +63,8 @@ create table profiles (
   location text default 'Brasília, DF',
   current_focus text default 'Engenharia de Dados',
   about_title text,
-  cv_url text
+  cv_url text,
+  favicon_url text
 );
 
 -- TABELA DE PROJETOS (PROJECTS)
