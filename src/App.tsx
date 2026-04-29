@@ -30,6 +30,7 @@ import TechnologiesDashboard from "./pages/admin/TechnologiesDashboard";
 import TechnologyForm from "./pages/admin/TechnologyForm";
 import EducationDashboard from "./pages/admin/EducationDashboard";
 import EducationForm from "./pages/admin/EducationForm";
+import AdminSettings from "./pages/admin/Settings";
 import useDynamicFavicon from "./hooks/useDynamicFavicon";
 
 const queryClient = new QueryClient();
@@ -94,6 +95,9 @@ const App = () => (
             <Route path="technologies" element={<TechnologiesDashboard />} />
             <Route path="technologies/new" element={<TechnologyForm />} />
             <Route path="technologies/:id" element={<TechnologyForm />} />
+            
+            {/* Settings */}
+            <Route path="settings" element={<AdminSettings />} />
           </Route>
 
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

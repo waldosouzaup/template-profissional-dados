@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { LogOut, LayoutDashboard, FolderOpen, BookOpen, FileText, GraduationCap, Briefcase, User, Cpu, Loader2 } from "lucide-react";
+import { LogOut, LayoutDashboard, FolderOpen, BookOpen, FileText, GraduationCap, Briefcase, User, Cpu, Loader2, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
@@ -13,6 +13,7 @@ const navItems = [
   { to: "/admin/experiences", icon: Briefcase, label: "Experiências" },
   { to: "/admin/profiles", icon: User, label: "Perfil" },
   { to: "/admin/technologies", icon: Cpu, label: "Tecnologias" },
+  { to: "/admin/settings", icon: SettingsIcon, label: "Configurações" },
 ];
 
 export default function AdminLayout() {
