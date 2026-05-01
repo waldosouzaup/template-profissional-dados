@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { BookOpen, Calendar, ChevronRight, Clock } from "lucide-react";
 import { useContents } from "@/hooks/useContents";
@@ -14,11 +14,25 @@ const estimateReadingTime = (text?: string): number => {
 };
 
 const Blog = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const { data: contents = [], isLoading } = useContents();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const categories = Array.from(new Set(contents.map(post => post.category).filter(Boolean))) as string[];
+  
+  const categoryCounts = contents.reduce((acc, post) => {
+    if (post.category) {
+      acc[post.category] = (acc[post.category] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  const filteredContents = selectedCategory 
+    ? contents.filter(post => post.category === selectedCategory)
+    : contents;
 
   if (isLoading) {
     return (
@@ -74,10 +88,49 @@ const Blog = () => {
         </h1>
       </section>
 
+      {/* CATEGORIES NAVIGATION */}
+      <section className="px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto mb-12 animate-[fadeInUp_0.7s_ease-out_0.2s_both]">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className={`px-6 py-2.5 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-300 border ${
+              selectedCategory === null
+                ? "bg-primary text-[#0a0a0a] border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]"
+                : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:border-white/20 hover:text-white"
+            }`}
+          >
+            Todos
+            <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[9px] ${
+              selectedCategory === null ? "bg-[#0a0a0a]/20" : "bg-white/10"
+            }`}>
+              {contents.length}
+            </span>
+          </button>
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setSelectedCategory(category)}
+              className={`px-6 py-2.5 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-300 border flex items-center ${
+                selectedCategory === category
+                  ? "bg-primary text-[#0a0a0a] border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]"
+                  : "bg-white/[0.03] text-white/40 border-white/[0.06] hover:border-white/20 hover:text-white"
+              }`}
+            >
+              {category}
+              <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[9px] ${
+                selectedCategory === category ? "bg-[#0a0a0a]/20" : "bg-white/10"
+              }`}>
+                {categoryCounts[category]}
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
       {/* BLOG GRID */}
       <div className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 pb-40">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {contents.map((post, index) => {
+          {filteredContents.map((post, index) => {
             const readingTime = estimateReadingTime(post.markdown);
             return (
               <Link 
@@ -104,8 +157,10 @@ const Blog = () => {
 
                 {/* Content */}
                 <div className="p-8 flex-1 flex flex-col">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-primary">Post</span>
+                  <div className="flex items-center gap-3 mb-4 flex-wrap">
+                    <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-primary border border-primary/20 bg-primary/5 px-2 py-1 rounded-sm">
+                      {post.category || "Post"}
+                    </span>
                     {post.created_at && (
                       <div className="flex items-center gap-1.5 text-[9px] text-white/20 uppercase tracking-widest">
                         <Calendar className="w-3 h-3" />

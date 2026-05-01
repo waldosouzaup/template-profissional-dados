@@ -8,13 +8,16 @@ Este projeto é um **template profissional de Portfólio e Blog**, construído c
 
 ### ✨ Funcionalidades
 
-- 🌑 **Dark Mode Nativo**: Interface sofisticada com tema escuro (Dark Mode Mirror UI).
-- 📝 **Blog Integrado**: Suporte a Markdown para posts técnicos e tutoriais com tempo de leitura estimado e índice interativo.
+- 🌑 **Dark/Light Mode Premium**: Suporte total a temas claros e escuros, configurável via painel administrativo.
+- 🎨 **Personalização de Cores**: Escolha entre 6 paletas de cores de destaque premium (Verde, Azul, Roxo, Laranja, Rosa, Amarelo) que alteram instantaneamente a estética de todo o site.
+- 🏷️ **Páginas Customizadas (CMS)**: Crie novas páginas dinâmicas com suporte a Markdown diretamente pelo admin (ex: `/p/seu-link`).
+- 📝 **Blog Integrado com Categorias**: Sistema de blog completo com suporte a Markdown, categorias filtráveis, tempo de leitura estimado e índice interativo.
+- 📂 **Arquivos do Post**: Campo dedicado para vincular pastas do Google Drive com arquivos de apoio diretamente nos posts do blog.
+- 🏠 **Branding Dinâmico**: Altere o ícone de logo da Navbar diretamente no perfil usando qualquer ícone da biblioteca Lucide.
 - 📚 **Biblioteca & Certificações**: Seções dinâmicas para exibir livros que você recomenda e cursos/certificações extras.
-- 🛠️ **Painel Administrativo**: Gestão completa com autenticação Supabase para gerenciar Portfólio, Experiências, Educação, Livros, Cursos e Configurações de Perfil (incluindo upload do seu próprio Favicon).
-- 🔍 **SEO Otimizado**: Meta tags dinâmicas, Microdados Estruturados (JSON-LD) e geração pronta para sitemap para garantir visibilidade máxima nos motores de busca e compartilhamento social.
-- 📱 **Responsivo**: Adaptado para desktop, tablet e mobile com animações fluidas (Framer Motion / CSS).
-- ⚡ **Performance**: Construído com Vite + React para carregamento instantâneo.
+- 🛠️ **Painel Administrativo**: Gestão completa com autenticação Supabase para gerenciar Portfólio, Experiências, Educação, Livros, Cursos, Páginas Customizadas e Configurações de Perfil (incluindo Favicon).
+- 🔍 **SEO Otimizado**: Meta tags dinâmicas, Microdados Estruturados (JSON-LD) e geração pronta para sitemap para garantir visibilidade máxima nos motores de busca.
+- ⚡ **Performance Ultra**: Construído com Vite + React para carregamento instantâneo.
 
 ### 🛠️ Tecnologias
 
@@ -65,7 +68,10 @@ create table profiles (
   about_title text,
   cv_url text,
   favicon_url text,
-  hero_title text
+  hero_title text,
+  navbar_icon text default 'Database',
+  theme text default 'dark',
+  primary_color text default '142 71% 45%'
 );
 
 -- TABELA DE PROJETOS (PROJECTS)
@@ -122,6 +128,17 @@ create table contents (
   description text,
   markdown text,
   image_url text,
+  category text,
+  drive_folder_url text,
+  created_at timestamp with time zone default now()
+);
+
+-- TABELA DE PÁGINAS CUSTOMIZADAS (CUSTOM_PAGES)
+create table custom_pages (
+  id uuid default gen_random_uuid() primary key,
+  title text not null,
+  slug text not null unique,
+  markdown text,
   created_at timestamp with time zone default now()
 );
 
@@ -152,15 +169,17 @@ alter table projects enable row level security;
 alter table education enable row level security;
 alter table experience enable row level security;
 alter table contents enable row level security;
+alter table custom_pages enable row level security;
 alter table books enable row level security;
 alter table courses enable row level security;
 
--- Políticas de Acesso de Leitura Pública (Permitir acesso de visitantes anônimos ao frontend)
+-- Políticas de Acesso de Leitura Pública
 create policy "Allow public read access" on profiles for select using (true);
 create policy "Allow public read access" on projects for select using (true);
 create policy "Allow public read access" on education for select using (true);
 create policy "Allow public read access" on experience for select using (true);
 create policy "Allow public read access" on contents for select using (true);
+create policy "Allow public read access" on custom_pages for select using (true);
 create policy "Allow public read access" on books for select using (true);
 create policy "Allow public read access" on courses for select using (true);
 
@@ -170,6 +189,7 @@ create policy "Allow authenticated CRUD" on projects for all to authenticated us
 create policy "Allow authenticated CRUD" on education for all to authenticated using (true) with check (true);
 create policy "Allow authenticated CRUD" on experience for all to authenticated using (true) with check (true);
 create policy "Allow authenticated CRUD" on contents for all to authenticated using (true) with check (true);
+create policy "Allow authenticated CRUD" on custom_pages for all to authenticated using (true) with check (true);
 create policy "Allow authenticated CRUD" on books for all to authenticated using (true) with check (true);
 create policy "Allow authenticated CRUD" on courses for all to authenticated using (true) with check (true);
 ```
@@ -224,6 +244,40 @@ Seu portfólio está configurado e responsivo, pronto para brilhar online.
 Este projeto foi desenvolvido e é mantido por **Waldo Eller**. Se você gostou deste template ou deseja conhecer mais do meu trabalho, visite meu site oficial:
 
 👉 [**www.waldoeller.com**](https://www.waldoeller.com)
+
+---
+
+## 🎨 Gestão de Ícones (Experiências e Skills)
+
+Este template foi projetado para oferecer flexibilidade total na renderização de ícones para as suas tecnologias e experiências. Abaixo, explicamos como gerenciar e utilizar os ícones através do Painel Administrativo.
+
+### Seção 'Experiências'
+Na seção de Experiências profissionais, o sistema utiliza a biblioteca **Lucide React**.
+No momento do cadastro de uma nova experiência no painel de administração (`/admin/experiences`), você deve selecionar o tipo da experiência que define o ícone padrão, ou inserir o nome do ícone diretamente. 
+
+Os ícones padrão suportados na aba de experiência são:
+- `rocket`: Ideal para experiências profissionais e lançamentos.
+- `award`: Ideal para prêmios, reconhecimentos ou posições de destaque.
+- `briefcase`: Ideal para experiência corporativa, trabalhos formais ou projetos de longo prazo.
+
+*(Se necessário adicionar novos ícones na experiência, basta adicionar novos nomes no schema do banco de dados na constante `IconTypeEnum` e injetar o ícone correspondente no frontend via Lucide).*
+
+### Seção 'Skills & Tecnologias'
+A seção de Tecnologias da página inicial possui um renderizador dinâmico extremamente robusto, que mapeia ícones diretamente das bibliotecas `react-icons/si` (Simple Icons) e `lucide-react`.
+
+1. **Como Inserir o Ícone no Painel**:
+   No painel administrativo de Tecnologias (`/admin/technologies`), há um campo chamado **"Ícone"**. Neste campo, você deve digitar o nome exato do componente de ícone desejado da biblioteca Simple Icons.
+   Exemplos comuns:
+   - Para Python: digite `SiPython`
+   - Para React: digite `SiReact`
+   - Para Docker: digite `SiDocker`
+   - Para AWS: digite `SiAmazonaws` ou use o fallback configurado.
+
+2. **Fallbacks Internos Automáticos**:
+   O sistema foi configurado com um mapeamento automático (Fallback) para tecnologias famosas que as vezes possuem nomes complexos ou não estão disponíveis. Caso a string não seja encontrada exatamente no repositório do `react-icons`, o sistema tentará renderizar ícones baseados no `lucide-react` para garantir que o layout nunca quebre (Ex: Azure, Power BI, AWS, Databricks).
+
+3. **Pesquisa de Ícones**:
+   Para consultar o nome exato de um ícone que você queira usar na seção de skills, visite o site oficial do [React Icons - Simple Icons](https://react-icons.github.io/react-icons/icons/si/) e busque pela tecnologia. Lembre-se sempre de copiar o nome completo com o prefixo `Si` (Exemplo: `SiPostgresql`).
 
 ---
 

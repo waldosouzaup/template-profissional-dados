@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Info } from "lucide-react";
 
 export default function TechnologyForm() {
   const { id } = useParams();
@@ -79,6 +80,23 @@ export default function TechnologyForm() {
           <CardTitle>{isEditing ? "Editar Tecnologia" : "Nova Tecnologia"}</CardTitle>
         </CardHeader>
         <CardContent>
+          <div className="bg-secondary/30 border border-border rounded-lg p-4 mb-6">
+            <h4 className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+              <Info className="w-4 h-4 text-primary" />
+              Guia de Ícones (Iconografia)
+            </h4>
+            <ul className="text-[12px] text-muted-foreground space-y-1.5 list-disc list-inside">
+              <li>
+                <strong>Marcas/Tecnologias:</strong> Utilize o prefixo <code className="bg-muted text-foreground px-1 py-0.5 rounded">Si</code> seguido do nome em PascalCase. 
+                <br />Exemplos: <code className="bg-muted text-foreground px-1 py-0.5 rounded">SiPython</code>, <code className="bg-muted text-foreground px-1 py-0.5 rounded">SiPostgresql</code>, <code className="bg-muted text-foreground px-1 py-0.5 rounded">SiGooglecloud</code>.
+              </li>
+              <li>
+                <strong>Genéricos (Lucide):</strong> Para conceitos gerais, use o nome do ícone Lucide em PascalCase. 
+                <br />Exemplos: <code className="bg-muted text-foreground px-1 py-0.5 rounded">Database</code>, <code className="bg-muted text-foreground px-1 py-0.5 rounded">Cloud</code>, <code className="bg-muted text-foreground px-1 py-0.5 rounded">Zap</code>.
+              </li>
+            </ul>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-sm font-medium text-foreground">Título</label>

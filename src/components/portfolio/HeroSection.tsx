@@ -14,16 +14,7 @@ const HeroSection = () => {
 
   return (
     <section className="animate-fade-up delay-100">
-      {/* Available to work badge */}
-      <div className="flex items-center gap-2 mb-6">
-        <span className="available-badge">
-          <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-          Disponível para novos desafios.
-        </span>
-      </div>
-      
-
-      
+      {/* Removed Available Badge */}
       {/* Main Headline */}
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-2">
         {heroTitle}

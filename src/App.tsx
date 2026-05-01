@@ -17,6 +17,8 @@ import AdminLogin from "./pages/admin/Login";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
 import AdminProjectForm from "./pages/admin/ProjectForm";
+import JourneyDashboard from "./pages/admin/JourneyDashboard";
+import JourneyForm from "./pages/admin/JourneyForm";
 import BooksDashboard from "./pages/admin/BooksDashboard";
 import BookForm from "./pages/admin/BookForm";
 import ContentsDashboard from "./pages/admin/ContentsDashboard";
@@ -31,6 +33,9 @@ import TechnologyForm from "./pages/admin/TechnologyForm";
 import EducationDashboard from "./pages/admin/EducationDashboard";
 import EducationForm from "./pages/admin/EducationForm";
 import AdminSettings from "./pages/admin/Settings";
+import CustomPagesDashboard from "./pages/admin/CustomPagesDashboard";
+import CustomPageForm from "./pages/admin/CustomPageForm";
+import CustomPageView from "./pages/CustomPageView";
 import useDynamicFavicon from "./hooks/useDynamicFavicon";
 
 const queryClient = new QueryClient();
@@ -40,6 +45,8 @@ const FaviconUpdater = () => {
   return null;
 };
 
+import { ThemeProvider } from "./components/ThemeProvider";
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -47,6 +54,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <FaviconUpdater />
+        <ThemeProvider />
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
@@ -55,6 +63,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:idOrSlug" element={<BlogPost />} />
+          <Route path="/p/:slug" element={<CustomPageView />} />
           
           {/* Admin Routes */}
           <Route path="/admin/login" element={<AdminLogin />} />
@@ -62,6 +71,11 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="projects/new" element={<AdminProjectForm />} />
             <Route path="projects/:id" element={<AdminProjectForm />} />
+            
+            {/* Journey */}
+            <Route path="journey" element={<JourneyDashboard />} />
+            <Route path="journey/new" element={<JourneyForm />} />
+            <Route path="journey/:id" element={<JourneyForm />} />
             
             {/* Books */}
             <Route path="books" element={<BooksDashboard />} />
@@ -87,6 +101,11 @@ const App = () => (
             <Route path="education" element={<EducationDashboard />} />
             <Route path="education/new" element={<EducationForm />} />
             <Route path="education/:id" element={<EducationForm />} />
+
+            {/* Custom Pages */}
+            <Route path="custom-pages" element={<CustomPagesDashboard />} />
+            <Route path="custom-pages/new" element={<CustomPageForm />} />
+            <Route path="custom-pages/:id" element={<CustomPageForm />} />
             
             {/* Profile */}
             <Route path="profiles" element={<ProfileForm />} />

@@ -9,7 +9,8 @@ import {
   Check, 
   ChevronRight,
   Clock,
-  Share2
+  Share2,
+  FolderOpen
 } from "lucide-react";
 import { useContent } from "@/hooks/useContents";
 import { format } from "date-fns";
@@ -204,6 +205,11 @@ const BlogPost = () => {
 
         <div className="flex flex-col max-w-4xl">
           <div className="flex flex-wrap items-center gap-6 mb-8 text-[10px] font-bold tracking-[0.25em] uppercase text-white/30">
+            {post.category && (
+              <span className="text-primary border border-primary/20 bg-primary/5 px-3 py-1.5 rounded-sm">
+                {post.category}
+              </span>
+            )}
             <div className="flex items-center gap-2">
               <Calendar className="w-3.5 h-3.5" />
               {post.created_at ? format(new Date(post.created_at), "dd 'de' MMMM, yyyy", { locale: ptBR }) : "--"}
@@ -222,9 +228,23 @@ const BlogPost = () => {
             {post.title}
           </h1>
 
-          <p className="text-xl text-white/40 font-light leading-relaxed max-w-2xl border-l-[3px] border-primary/30 pl-8">
+          <p className="text-xl text-white/40 font-light leading-relaxed max-w-2xl border-l-[3px] border-primary/30 pl-8 mb-8">
             {post.description}
           </p>
+
+          {post.drive_folder_url && (
+            <div>
+              <a 
+                href={post.drive_folder_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:border-primary/40 rounded-full text-sm font-medium transition-all"
+              >
+                <FolderOpen className="w-4 h-4" />
+                Ver Arquivos
+              </a>
+            </div>
+          )}
         </div>
       </section>
 

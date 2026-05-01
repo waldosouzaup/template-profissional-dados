@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 
 export default function ContentForm() {
   const { id } = useParams();
@@ -19,7 +20,9 @@ export default function ContentForm() {
     slug: "",
     description: "",
     markdown: "",
+    category: "",
     image_url: "",
+    drive_folder_url: "",
   });
 
   const generateSlug = (text: string) => {
@@ -40,7 +43,9 @@ export default function ContentForm() {
         slug: content.slug || "",
         description: content.description || "",
         markdown: content.markdown || "",
+        category: content.category || "",
         image_url: content.image_url || "",
+        drive_folder_url: content.drive_folder_url || "",
       });
     }
   }, [content]);
@@ -112,6 +117,16 @@ export default function ContentForm() {
             </div>
             
             <div>
+              <label className="text-sm font-medium text-foreground">Categoria</label>
+              <Input
+                value={formData.category}
+                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                placeholder="Ex: Certificação Linux, Docker, Carreira"
+                className="mt-1"
+              />
+            </div>
+            
+            <div>
               <label className="text-sm font-medium text-foreground">Resumo (Thumbnail)</label>
               <Textarea
                 value={formData.description}
@@ -123,13 +138,25 @@ export default function ContentForm() {
             </div>
 
             <div>
-              <label className="text-sm font-medium text-foreground">URL da Imagem de Capa</label>
-              <Input
+              <ImageUpload
+                label="Imagem de Capa do Post"
                 value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                placeholder="https://exemplo.com/imagem.png"
+                onChange={(url) => setFormData({ ...formData, image_url: url })}
+                path="blog"
+              />
+            </div>
+            
+            <div>
+              <label className="text-sm font-medium text-foreground">Link do Google Drive (Arquivos)</label>
+              <Input
+                value={formData.drive_folder_url}
+                onChange={(e) => setFormData({ ...formData, drive_folder_url: e.target.value })}
+                placeholder="https://drive.google.com/drive/folders/..."
                 className="mt-1"
               />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Link da pasta do Google Drive com os arquivos deste post.
+              </p>
             </div>
             
             <div>

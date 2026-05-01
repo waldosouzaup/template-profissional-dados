@@ -11,17 +11,40 @@ export const BookSchema = z.object({
 
 export type Book = z.infer<typeof BookSchema>;
 
+export const JourneyItemSchema = z.object({
+  id: z.string().uuid(),
+  year: z.string().min(1, "Year is required"),
+  title: z.string().min(1, "Title is required"),
+  description: z.string().optional(),
+  order_index: z.number().default(0),
+  created_at: z.string().datetime().optional(),
+});
+
+export type JourneyItem = z.infer<typeof JourneyItemSchema>;
+
 export const ContentSchema = z.object({
   id: z.string().uuid(),
   title: z.string().min(1, "Title is required"),
   slug: z.string().optional(),
   description: z.string().optional(),
   markdown: z.string().optional(),
+  category: z.string().optional(),
   image_url: z.string().optional(),
+  drive_folder_url: z.string().optional(),
   created_at: z.string().datetime().optional(),
 });
 
 export type Content = z.infer<typeof ContentSchema>;
+
+export const CustomPageSchema = z.object({
+  id: z.string().uuid().optional(),
+  title: z.string().min(1, "Title is required"),
+  slug: z.string().min(1, "Slug is required"),
+  markdown: z.string().optional(),
+  created_at: z.string().datetime().optional(),
+});
+
+export type CustomPage = z.infer<typeof CustomPageSchema>;
 
 export const EducationSchema = z.object({
   id: z.string().uuid(),
@@ -81,6 +104,9 @@ export const ProfileSchema = z.object({
   cv_url: z.string().optional(),
   favicon_url: z.string().optional(),
   hero_title: z.string().optional(),
+  navbar_icon: z.string().optional(),
+  theme: z.enum(["dark", "light"]).default("dark"),
+  primary_color: z.string().default("142 71% 45%"),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;

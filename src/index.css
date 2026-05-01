@@ -42,9 +42,51 @@
 
     /* Custom tokens */
     --card-highlight: 0 0% 10%;
-    --text-secondary: 0 0% 65%;
-    --text-tertiary: 0 0% 50%;
+    --card-dark: 0 0% 7%;
+    --border-hover: 0 0% 25%;
+    --border-muted: 0 0% 20%;
+    --text-secondary: 0 0% 80%;
+    --text-tertiary: 0 0% 70%;
     --badge-bg: 0 0% 15%;
+  }
+
+  .light {
+    --background: 0 0% 96%;
+    --foreground: 0 0% 4%;
+
+    --card: 0 0% 100%;
+    --card-dark: 0 0% 98%;
+    --card-foreground: 0 0% 4%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 4%;
+
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 98%;
+
+    --secondary: 0 0% 92%;
+    --secondary-foreground: 0 0% 4%;
+
+    --muted: 0 0% 92%;
+    --muted-foreground: 0 0% 40%;
+
+    --accent: 142 71% 45%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 85%;
+    --border-hover: 0 0% 75%;
+    --border-muted: 0 0% 80%;
+    
+    --input: 0 0% 85%;
+    --ring: 142 71% 45%;
+
+    --card-highlight: 0 0% 100%;
+    --text-secondary: 0 0% 20%;
+    --text-tertiary: 0 0% 40%;
+    --badge-bg: 0 0% 90%;
   }
 }
 
@@ -67,19 +109,19 @@
   /* Profile Card */
   .profile-card {
     @apply bg-card rounded-3xl p-6 flex flex-col items-center gap-4;
-    background: linear-gradient(180deg, hsl(0 0% 10%) 0%, hsl(0 0% 7%) 100%);
-    border: 1px solid hsl(0 0% 15%);
+    background: linear-gradient(180deg, hsl(var(--card-highlight)) 0%, hsl(var(--card-dark)) 100%);
+    border: 1px solid hsl(var(--border));
   }
 
   /* Experience/Project Cards */
   .content-card {
     @apply bg-card rounded-2xl p-5 transition-all duration-300;
-    border: 1px solid hsl(0 0% 15%);
+    border: 1px solid hsl(var(--border));
   }
 
   .content-card:hover {
-    border-color: hsl(0 0% 25%);
-    background: hsl(0 0% 10%);
+    border-color: hsl(var(--border-hover));
+    background: hsl(var(--card-highlight));
   }
 
   /* Section Header with Icon */
@@ -89,7 +131,7 @@
 
   .section-icon {
     @apply w-10 h-10 rounded-xl flex items-center justify-center;
-    background: linear-gradient(135deg, hsl(0 0% 15%) 0%, hsl(0 0% 10%) 100%);
+    background: linear-gradient(135deg, hsl(var(--border)) 0%, hsl(var(--card-highlight)) 100%);
   }
 
   /* Stats Grid */
@@ -116,8 +158,8 @@
   /* Social Icon Button */
   .social-icon {
     @apply w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300;
-    background: hsl(0 0% 15%);
-    border: 1px solid hsl(0 0% 20%);
+    background: hsl(var(--border));
+    border: 1px solid hsl(var(--border-muted));
   }
 
   .social-icon:hover {
@@ -127,37 +169,37 @@
   }
 
   .social-icon:hover svg {
-    color: hsl(0 0% 4%);
+    color: hsl(var(--background));
   }
 
   /* Badge/Tag */
   .badge-time {
     @apply px-3 py-1.5 rounded-lg text-xs font-medium;
-    background: hsl(0 0% 15%);
-    color: hsl(0 0% 70%);
+    background: hsl(var(--border));
+    color: hsl(var(--text-tertiary));
   }
 
   /* Skill Card */
   .skill-card {
     @apply flex items-center gap-4 p-4 rounded-2xl transition-all duration-300;
-    background: hsl(0 0% 8%);
-    border: 1px solid hsl(0 0% 15%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
   }
 
   .skill-card:hover {
-    border-color: hsl(0 0% 25%);
-    background: hsl(0 0% 10%);
+    border-color: hsl(var(--border-hover));
+    background: hsl(var(--card-highlight));
   }
 
   .skill-icon {
     @apply w-12 h-12 rounded-xl flex items-center justify-center;
-    background: linear-gradient(135deg, hsl(0 0% 15%) 0%, hsl(0 0% 10%) 100%);
+    background: linear-gradient(135deg, hsl(var(--border)) 0%, hsl(var(--card-highlight)) 100%);
   }
 
   /* Project Card */
   .project-card {
     @apply relative rounded-2xl overflow-hidden transition-all duration-500 cursor-pointer;
-    border: 1px solid hsl(0 0% 15%);
+    border: 1px solid hsl(var(--border));
   }
 
   .project-card:hover {
@@ -210,14 +252,14 @@
   /* Category Tabs */
   .category-tab {
     @apply px-4 py-2 rounded-xl text-sm font-medium transition-all duration-300 flex items-center gap-2;
-    background: hsl(0 0% 12%);
-    color: hsl(0 0% 60%);
-    border: 1px solid hsl(0 0% 15%);
+    background: hsl(var(--secondary));
+    color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(var(--border));
   }
 
   .category-tab:hover {
-    background: hsl(0 0% 15%);
-    color: hsl(0 0% 80%);
+    background: hsl(var(--border));
+    color: hsl(var(--text-secondary));
   }
 
   .category-tab.active {
@@ -229,8 +271,8 @@
   /* Project Gallery Card */
   .project-gallery-card {
     @apply relative rounded-2xl overflow-hidden transition-all duration-500;
-    background: hsl(0 0% 8%);
-    border: 1px solid hsl(0 0% 15%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
     animation: fadeUp 0.6s ease-out forwards;
     opacity: 0;
   }
@@ -243,15 +285,15 @@
   /* Tag Mini */
   .tag-mini {
     @apply px-2 py-0.5 rounded text-xs;
-    background: hsl(0 0% 12%);
-    color: hsl(0 0% 70%);
+    background: hsl(var(--secondary));
+    color: hsl(var(--text-tertiary));
   }
 
   /* Stat Card */
   .stat-card {
     @apply text-center p-4 rounded-2xl;
-    background: hsl(0 0% 8%);
-    border: 1px solid hsl(0 0% 15%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
   }
 
   .stat-card .stat-value {
@@ -265,7 +307,7 @@
   /* Tech Tag */
   .tech-tag {
     @apply px-3 py-1.5 rounded-lg text-sm font-medium;
-    background: hsl(0 0% 12%);
+    background: hsl(var(--secondary));
     color: hsl(var(--primary));
     border: 1px solid hsl(var(--primary) / 0.3);
   }
@@ -301,40 +343,40 @@
   /* Secondary Button */
   .btn-secondary {
     @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-medium transition-all duration-300;
-    background: hsl(0 0% 12%);
-    color: hsl(0 0% 80%);
-    border: 1px solid hsl(0 0% 15%);
+    background: hsl(var(--secondary));
+    color: hsl(var(--text-secondary));
+    border: 1px solid hsl(var(--border));
   }
 
   .btn-secondary:hover {
-    background: hsl(0 0% 15%);
-    border-color: hsl(0 0% 25%);
-    color: hsl(0 0% 95%);
+    background: hsl(var(--border));
+    border-color: hsl(var(--border-hover));
+    color: hsl(var(--foreground));
   }
 
   /* Contact Card */
   .contact-card {
     @apply flex items-center gap-4 p-4 rounded-2xl transition-all duration-300;
-    background: hsl(0 0% 8%);
-    border: 1px solid hsl(0 0% 15%);
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
   }
 
   .contact-card:hover {
     border-color: hsl(var(--primary) / 0.5);
-    background: hsl(0 0% 10%);
+    background: hsl(var(--card-highlight));
   }
 
   .contact-icon {
     @apply w-12 h-12 rounded-xl flex items-center justify-center shrink-0;
-    background: linear-gradient(135deg, hsl(0 0% 15%) 0%, hsl(0 0% 10%) 100%);
+    background: linear-gradient(135deg, hsl(var(--border)) 0%, hsl(var(--card-highlight)) 100%);
   }
 
   /* Social Link */
   .social-link {
     @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300;
-    background: hsl(0 0% 12%);
-    color: hsl(0 0% 60%);
-    border: 1px solid hsl(0 0% 15%);
+    background: hsl(var(--secondary));
+    color: hsl(var(--muted-foreground));
+    border: 1px solid hsl(var(--border));
   }
 
   .social-link:hover {
@@ -359,12 +401,12 @@
   /* Education Item */
   .education-item {
     @apply bg-card rounded-2xl p-5 transition-all duration-300;
-    border: 1px solid hsl(0 0% 15%);
+    border: 1px solid hsl(var(--border));
   }
 
   .education-item:hover {
-    border-color: hsl(0 0% 25%);
-    background: hsl(0 0% 10%);
+    border-color: hsl(var(--border-hover));
+    background: hsl(var(--card-highlight));
   }
 }
 

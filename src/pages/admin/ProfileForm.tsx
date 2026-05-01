@@ -16,7 +16,6 @@ export default function ProfileForm() {
   const [formData, setFormData] = useState({
     full_name: "",
     bio_summary: "",
-    bio_detailed: "",
     phone: "",
     email: "",
     avatar_url: "",
@@ -33,7 +32,6 @@ export default function ProfileForm() {
       setFormData({
         full_name: profile.full_name || "",
         bio_summary: profile.bio_summary || "",
-        bio_detailed: profile.bio_detailed || "",
         phone: profile.phone || "",
         email: profile.email || "",
         avatar_url: profile.avatar_url || "",
@@ -70,142 +68,157 @@ export default function ProfileForm() {
           <CardTitle>Editar Perfil</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="text-sm font-medium text-foreground">Nome Completo</label>
-              <Input
-                value={formData.full_name}
-                onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                placeholder="Seu nome"
-                className="mt-1"
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium text-foreground">Bio Resumida</label>
-              <Textarea
-                value={formData.bio_summary}
-                onChange={(e) => setFormData({ ...formData, bio_summary: e.target.value })}
-                placeholder="Resumo da sua bio"
-                className="mt-1"
-                rows={2}
-              />
-            </div>
-            
-            <div>
-              <label className="text-sm font-medium text-foreground">Bio Detalhada (Suporta Markdown)</label>
-              <Textarea
-                value={formData.bio_detailed}
-                onChange={(e) => setFormData({ ...formData, bio_detailed: e.target.value })}
-                placeholder="Conte sua história completa usando Markdown..."
-                className="mt-1 font-mono text-sm"
-                rows={10}
-              />
-              <p className="text-[10px] text-muted-foreground mt-1">
-                Use **negrito**, # títulos, e [links](url) para formatar sua bio.
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* INFORMAÇÕES PESSOAIS */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium border-b border-border pb-2">Informações Pessoais</h3>
               <div>
-                <label className="text-sm font-medium text-foreground">Telefone</label>
+                <label className="text-sm font-medium text-foreground">Nome Completo</label>
                 <Input
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="Telefone"
+                  value={formData.full_name}
+                  onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
+                  placeholder="Seu nome"
                   className="mt-1"
                 />
               </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground">Localização</label>
+                  <Input
+                    value={formData.location}
+                    onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+                    placeholder="Cidade, UF"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground">Foco Atual</label>
+                  <Input
+                    value={formData.current_focus}
+                    onChange={(e) => setFormData({ ...formData, current_focus: e.target.value })}
+                    placeholder="Foco atual"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* CONTATO */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium border-b border-border pb-2">Contato</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-sm font-medium text-foreground">Telefone</label>
+                  <Input
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="Telefone"
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-foreground">Email</label>
+                  <Input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Email"
+                    className="mt-1"
+                  />
+                </div>
+              </div>
+              
               <div>
-                <label className="text-sm font-medium text-foreground">Email</label>
+                <label className="text-sm font-medium text-foreground">Link do CV (PDF para Download)</label>
                 <Input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="Email"
+                  value={formData.cv_url}
+                  onChange={(e) => setFormData({ ...formData, cv_url: e.target.value })}
+                  placeholder="https://exemplo.com/meu-cv.pdf"
+                  className="mt-1"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Cole aqui o link do PDF do seu currículo. Este link será usado no botão CV da página inicial.
+                </p>
+              </div>
+            </div>
+
+            {/* TEXTOS E PÁGINAS */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium border-b border-border pb-2">Textos das Páginas</h3>
+              <div>
+                <label className="text-sm font-medium text-foreground">Título Principal da Home (Hero)</label>
+                <Input
+                  value={formData.hero_title}
+                  onChange={(e) => setFormData({ ...formData, hero_title: e.target.value })}
+                  placeholder="Ex: Eu sou Waldo Eller,"
                   className="mt-1"
                 />
               </div>
-            </div>
-            
-            <div>
-              <ImageUpload
-                label="Foto de Perfil (Avatar)"
-                value={formData.avatar_url}
-                onChange={(url) => setFormData({ ...formData, avatar_url: url })}
-                path="profile"
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
+
               <div>
-                <label className="text-sm font-medium text-foreground">Localização</label>
-                <Input
-                  value={formData.location}
-                  onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  placeholder="Cidade, UF"
+                <label className="text-sm font-medium text-foreground">Bio Resumida (Página Inicial)</label>
+                <Textarea
+                  value={formData.bio_summary}
+                  onChange={(e) => setFormData({ ...formData, bio_summary: e.target.value })}
+                  placeholder="Resumo da sua bio"
                   className="mt-1"
+                  rows={3}
                 />
               </div>
+
               <div>
-                <label className="text-sm font-medium text-foreground">Foco Atual</label>
+                <label className="text-sm font-medium text-foreground">Título da Página Sobre</label>
                 <Input
-                  value={formData.current_focus}
-                  onChange={(e) => setFormData({ ...formData, current_focus: e.target.value })}
-                  placeholder="Foco atual"
+                  value={formData.about_title}
+                  onChange={(e) => setFormData({ ...formData, about_title: e.target.value })}
+                  placeholder="Título da página Sobre"
                   className="mt-1"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="text-sm font-medium text-foreground">Título Principal da Home (Hero)</label>
-              <Input
-                value={formData.hero_title}
-                onChange={(e) => setFormData({ ...formData, hero_title: e.target.value })}
-                placeholder="Ex: Eu sou Waldo Eller,"
-                className="mt-1"
-              />
-            </div>
+            {/* MÍDIA & BRANDING */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium border-b border-border pb-2">Mídia & Branding</h3>
+              <div>
+                <ImageUpload
+                  label="Foto de Perfil (Avatar)"
+                  value={formData.avatar_url}
+                  onChange={(url) => setFormData({ ...formData, avatar_url: url })}
+                  path="profile"
+                />
+              </div>
+              
+              <div className="pt-4">
+                <ImageUpload
+                  label="Favicon do Site"
+                  value={formData.favicon_url}
+                  onChange={(url) => setFormData({ ...formData, favicon_url: url })}
+                  path="favicon"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Envie uma imagem PNG (idealmente 512×512px) para usar como ícone do site no navegador.
+                </p>
+              </div>
 
-            <div>
-              <label className="text-sm font-medium text-foreground">Título da Página Sobre</label>
-              <Input
-                value={formData.about_title}
-                onChange={(e) => setFormData({ ...formData, about_title: e.target.value })}
-                placeholder="Título da página Sobre"
-                className="mt-1"
-              />
-            </div>
-
-            <div>
-              <ImageUpload
-                label="Favicon do Site"
-                value={formData.favicon_url}
-                onChange={(url) => setFormData({ ...formData, favicon_url: url })}
-                path="favicon"
-              />
-              <p className="text-[10px] text-muted-foreground mt-1">
-                Envie uma imagem PNG (idealmente 512×512px) para usar como ícone do site no navegador.
-              </p>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium text-foreground">Link do CV (PDF para Download)</label>
-              <Input
-                value={formData.cv_url}
-                onChange={(e) => setFormData({ ...formData, cv_url: e.target.value })}
-                placeholder="https://exemplo.com/meu-cv.pdf"
-                className="mt-1"
-              />
-              <p className="text-[10px] text-muted-foreground mt-1">
-                Cole aqui o link do PDF do seu currículo. Este link será usado no botão CV da página inicial.
-              </p>
+              <div>
+                <label className="text-sm font-medium text-foreground">Ícone da Navbar (Logo)</label>
+                <Input
+                  value={formData.navbar_icon}
+                  onChange={(e) => setFormData({ ...formData, navbar_icon: e.target.value })}
+                  placeholder="Ex: Database, Code, Terminal (nome do ícone Lucide)"
+                  className="mt-1"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Nome do ícone da biblioteca Lucide React (em PascalCase). Ex: Database, Code, Terminal.
+                </p>
+              </div>
             </div>
             
-            <div className="flex gap-2 pt-4">
-              <Button type="submit" disabled={isUpdating}>
-                {isUpdating ? "Salvando..." : "Salvar"}
+            <div className="flex gap-2 pt-6 border-t border-border">
+              <Button type="submit" disabled={isUpdating} className="w-full sm:w-auto">
+                {isUpdating ? "Salvando..." : "Salvar Alterações"}
               </Button>
             </div>
           </form>

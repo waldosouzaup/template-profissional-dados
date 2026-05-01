@@ -1,5 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Book, HelpCircle, Info, Settings as SettingsIcon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Book, HelpCircle, Info, Settings as SettingsIcon, Palette, Moon, Sun, Loader2 } from "lucide-react";
+import { useProfiles } from "@/hooks/useProfile";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Button } from "@/components/ui/button";
 
 export default function Settings() {
   return (
@@ -9,8 +14,10 @@ export default function Settings() {
           <SettingsIcon className="w-8 h-8 text-primary" />
           Configurações
         </h1>
-        <p className="text-muted-foreground mt-1">Configurações gerais e documentação.</p>
+        <p className="text-muted-foreground mt-1">Personalize a aparência e veja as instruções do sistema.</p>
       </div>
+
+      <ThemeSettings />
 
       <Card>
         <CardHeader>
@@ -68,5 +75,107 @@ export default function Settings() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+const THEME_COLORS = [
+  { name: "Verde (Padrão)", value: "142 71% 45%", hex: "#22c55e" },
+  { name: "Azul", value: "221 83% 53%", hex: "#3b82f6" },
+  { name: "Roxo", value: "262 83% 58%", hex: "#8b5cf6" },
+  { name: "Laranja", value: "24 98% 50%", hex: "#f97316" },
+  { name: "Rosa", value: "346 87% 43%", hex: "#e11d48" },
+  { name: "Amarelo", value: "45 93% 47%", hex: "#eab308" },
+];
+
+function ThemeSettings() {
+  const { data: profiles = [], updateProfile, isUpdating } = useProfiles();
+  const profile = profiles[0];
+  
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [color, setColor] = useState("142 71% 45%");
+
+  useEffect(() => {
+    if (profile) {
+      setTheme(profile.theme as "dark" | "light" || "dark");
+      setColor(profile.primary_color || "142 71% 45%");
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!profile) return;
+    await updateProfile({
+      ...profile,
+      theme,
+      primary_color: color,
+    });
+  };
+
+  if (!profile) return null;
+
+  return (
+    <Card className="border-border">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Palette className="w-5 h-5 text-primary" />
+          Aparência do Portfólio
+        </CardTitle>
+        <CardDescription>
+          Escolha o tema (Claro/Escuro) e a cor de destaque principal do projeto.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-8">
+        
+        {/* Tema */}
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">Tema</Label>
+          <RadioGroup 
+            value={theme} 
+            onValueChange={(val: "dark" | "light") => setTheme(val)}
+            className="flex gap-4"
+          >
+            <div className={`flex items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/50'}`} onClick={() => setTheme('dark')}>
+              <RadioGroupItem value="dark" id="dark" className="sr-only" />
+              <div className="flex flex-col items-center gap-2">
+                <Moon className={`w-6 h-6 ${theme === 'dark' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`font-medium ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Dark Mode</span>
+              </div>
+            </div>
+            
+            <div className={`flex items-center justify-center p-4 rounded-xl border-2 cursor-pointer transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:border-primary/50'}`} onClick={() => setTheme('light')}>
+              <RadioGroupItem value="light" id="light" className="sr-only" />
+              <div className="flex flex-col items-center gap-2">
+                <Sun className={`w-6 h-6 ${theme === 'light' ? 'text-primary' : 'text-muted-foreground'}`} />
+                <span className={`font-medium ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Light Mode</span>
+              </div>
+            </div>
+          </RadioGroup>
+        </div>
+
+        {/* Cores */}
+        <div className="space-y-3">
+          <Label className="text-base font-semibold">Cor de Destaque</Label>
+          <div className="flex flex-wrap gap-3">
+            {THEME_COLORS.map((c) => (
+              <button
+                key={c.name}
+                onClick={() => setColor(c.value)}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  color === c.value 
+                    ? "ring-2 ring-offset-2 ring-offset-background ring-foreground scale-110" 
+                    : "hover:scale-110 ring-1 ring-border"
+                }`}
+                style={{ backgroundColor: c.hex }}
+                title={c.name}
+              />
+            ))}
+          </div>
+        </div>
+
+        <Button onClick={handleSave} disabled={isUpdating} className="w-full sm:w-auto">
+          {isUpdating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          Salvar Aparência
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

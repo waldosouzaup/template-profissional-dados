@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
-import { LogOut, LayoutDashboard, FolderOpen, BookOpen, FileText, GraduationCap, Briefcase, User, Cpu, Loader2, Settings as SettingsIcon } from "lucide-react";
+import { LogOut, LayoutDashboard, FolderOpen, BookOpen, FileText, GraduationCap, Briefcase, User, Cpu, Loader2, Settings as SettingsIcon, Milestone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
   { to: "/admin", icon: FolderOpen, label: "Projetos" },
+  { to: "/admin/journey", icon: Milestone, label: "Jornada" },
   { to: "/admin/books", icon: BookOpen, label: "Livros" },
   { to: "/admin/contents", icon: FileText, label: "Conteúdos" },
   { to: "/admin/education", icon: GraduationCap, label: "Formação" },
   { to: "/admin/courses", icon: GraduationCap, label: "Cursos" },
   { to: "/admin/experiences", icon: Briefcase, label: "Experiências" },
+  { to: "/admin/custom-pages", icon: FileText, label: "Páginas Custom." },
   { to: "/admin/profiles", icon: User, label: "Perfil" },
   { to: "/admin/technologies", icon: Cpu, label: "Tecnologias" },
   { to: "/admin/settings", icon: SettingsIcon, label: "Configurações" },

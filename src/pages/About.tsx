@@ -4,8 +4,10 @@ import { User, Book as BookIcon, GraduationCap, ExternalLink, Calendar, Loader2,
 import { useProfiles } from "@/hooks/useProfile";
 import { useBooks } from "@/hooks/useBooks";
 import { useCourses } from "@/hooks/useCourses";
-import ReactMarkdown from "react-markdown";
 import SEOHead from "@/components/SEOHead";
+import ExperienceSection from "@/components/portfolio/ExperienceSection";
+import EducationSection from "@/components/portfolio/EducationSection";
+import JourneySection from "@/components/portfolio/JourneySection";
 
 const About = () => {
   const { data: profiles = [], isLoading: loadingProfile } = useProfiles();
@@ -96,20 +98,11 @@ const About = () => {
         )}
       </section>
 
-      {/* CONTENT & BIO */}
-      <div className="max-w-[1000px] mx-auto px-8 sm:px-12 lg:px-20 pb-20 animate-[fadeInUp_0.8s_ease-out_0.1s_both]">
-        <article className="
-          prose prose-invert max-w-none
-          prose-headings:font-light prose-headings:tracking-tight
-          prose-h2:text-3xl prose-h2:text-white/90 prose-h2:mt-20 prose-h2:mb-6 prose-h2:pb-5 prose-h2:border-b prose-h2:border-white/[0.06]
-          prose-p:text-white/55 prose-p:leading-[2.2] prose-p:text-[18px] prose-p:my-8
-          prose-strong:text-white/85 prose-strong:font-medium
-          prose-blockquote:border-l-[3px] prose-blockquote:border-white/15 prose-blockquote:pl-7 prose-blockquote:text-white/40 prose-blockquote:my-12
-        ">
-          <ReactMarkdown>
-            {profile?.bio_detailed || "Conteúdo em breve..."}
-          </ReactMarkdown>
-        </article>
+      {/* JOURNEY, EXPERIENCE & EDUCATION */}
+      <div className="max-w-[1000px] mx-auto px-8 sm:px-12 lg:px-20 pb-20">
+        <JourneySection />
+        <ExperienceSection />
+        <EducationSection />
       </div>
 
       {/* BOOKS SECTION */}
