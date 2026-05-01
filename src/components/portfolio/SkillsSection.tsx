@@ -1,9 +1,21 @@
 import { Zap, Code, Database, Cpu, Brain, Laptop, Server, Globe, Smartphone, Shield, Search, Terminal, Database as DbIcon, Code2, LucideIcon, Loader2 } from "lucide-react";
+import { SiPython, SiDocker, SiJavascript, SiTypescript, SiReact, SiHtml5, SiCss, SiTailwindcss, SiGit, SiGithub, SiFigma } from "react-icons/si";
 import { useTechnologies } from "@/hooks/useTechnologies";
 
-const iconMap: Record<string, LucideIcon> = {
+const iconMap: Record<string, React.ElementType> = {
   Zap, Code, Database, Cpu, Brain, Laptop, Server, Globe, Smartphone, Shield, Search, Terminal, Code2,
   "Db": DbIcon,
+  SiPython, "Python": SiPython, "python": SiPython,
+  SiDocker, "Docker": SiDocker, "docker": SiDocker,
+  SiJavascript, "JavaScript": SiJavascript, "javascript": SiJavascript, "js": SiJavascript,
+  SiTypescript, "TypeScript": SiTypescript, "typescript": SiTypescript, "ts": SiTypescript,
+  SiReact, "React": SiReact, "react": SiReact,
+  SiHtml5, "HTML": SiHtml5, "html": SiHtml5, "html5": SiHtml5,
+  SiCss, "CSS": SiCss, "css": SiCss, "css3": SiCss,
+  SiTailwindcss, "Tailwind": SiTailwindcss, "tailwind": SiTailwindcss, "tailwindcss": SiTailwindcss,
+  SiGit, "Git": SiGit, "git": SiGit,
+  SiGithub, "GitHub": SiGithub, "github": SiGithub,
+  SiFigma, "Figma": SiFigma, "figma": SiFigma
 };
 
 const SkillsSection = () => {
@@ -41,7 +53,7 @@ const SkillsSection = () => {
         <div className="section-icon">
           <Zap className="w-5 h-5 text-primary" />
         </div>
-        <h3 className="text-xl font-semibold text-foreground">Skills / Competências</h3>
+        <h3 className="text-xl font-semibold text-foreground">Skills & Tecnologias</h3>
       </div>
 
       {/* Skills Grid */}

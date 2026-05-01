@@ -22,8 +22,7 @@ const HeroSection = () => {
         </span>
       </div>
       
-      {/* Greeting */}
-      <p className="text-muted-foreground text-lg mb-4">Olá</p>
+
       
       {/* Main Headline */}
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-2">

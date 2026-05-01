@@ -108,7 +108,7 @@ export default function TechnologyForm() {
                 <Input
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  placeholder="Ex: Zap, Code, Database, Cpu"
+                  placeholder="Ex: Zap, SiPython, SiDocker, Database"
                   className="mt-1"
                 />
               </div>
