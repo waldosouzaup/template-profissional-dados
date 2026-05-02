@@ -123,3 +123,30 @@ export const useContent = (idOrSlug: string | undefined) => {
     enabled: !!idOrSlug,
   });
 };
+
+export const useRelatedContents = (category: string | undefined | null, currentPostId: string | undefined) => {
+  const fetchRelated = async (): Promise<Content[]> => {
+    if (!category || !currentPostId) return [];
+    
+    const { data, error } = await supabase
+      .from("contents")
+      .select("*")
+      .eq("category", category)
+      .neq("id", currentPostId)
+      .order("created_at", { ascending: false })
+      .limit(3);
+      
+    if (error) {
+      console.error("Error fetching related contents:", error);
+      throw new Error(error.message);
+    }
+    
+    return data || [];
+  };
+
+  return useQuery({
+    queryKey: ["related-contents", category, currentPostId],
+    queryFn: fetchRelated,
+    enabled: !!category && !!currentPostId,
+  });
+};

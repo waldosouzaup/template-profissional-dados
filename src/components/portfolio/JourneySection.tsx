@@ -15,10 +15,10 @@ export default function JourneySection() {
           <Milestone className="w-5 h-5 text-primary" />
         </div>
         <div>
-          <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/30 mb-1">
+          <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30 mb-1">
             Timeline
           </p>
-          <h2 className="text-2xl font-light text-white">Minha Jornada</h2>
+          <h2 className="text-2xl font-light text-foreground">Minha Jornada</h2>
         </div>
       </div>
 
@@ -35,16 +35,16 @@ export default function JourneySection() {
             </div>
             
             {/* Content Card */}
-            <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] glass-panel p-6 rounded-2xl hover:bg-white/[0.03] transition-all duration-300 hover:border-primary/20 hover:shadow-[0_0_30px_rgba(34,197,94,0.05)]">
+            <div className="w-[calc(100%-3rem)] md:w-[calc(50%-2.5rem)] glass-panel p-6 rounded-2xl hover:bg-foreground/[0.03] transition-all duration-300 hover:border-primary/20 hover:shadow-[0_0_30px_rgba(34,197,94,0.05)]">
               <div className="flex flex-col gap-2">
                 <span className="inline-block px-3 py-1 bg-primary/10 text-primary text-[10px] font-bold tracking-widest uppercase rounded-full w-fit">
                   {item.year}
                 </span>
-                <h3 className="text-xl font-medium text-white/90 leading-tight">
+                <h3 className="text-xl font-medium text-foreground/90 leading-tight">
                   {item.title}
                 </h3>
                 {item.description && (
-                  <p className="text-sm text-white/50 leading-relaxed mt-2">
+                  <p className="text-sm text-foreground/50 leading-relaxed mt-2">
                     {item.description}
                   </p>
                 )}

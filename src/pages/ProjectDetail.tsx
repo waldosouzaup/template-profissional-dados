@@ -28,9 +28,9 @@ const ScrollProgress = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
-    <div className="fixed top-0 left-0 w-full h-[2px] z-50 bg-white/5">
+    <div className="fixed top-0 left-0 w-full h-[2px] z-50 bg-foreground/5">
       <div
-        className="h-full bg-white/60 transition-all duration-75"
+        className="h-full bg-foreground/60 transition-all duration-75"
         style={{ width: `${pct}%` }}
       />
     </div>
@@ -59,13 +59,13 @@ const CodeBlock = ({
 
   return (
     <div className="relative my-8 group">
-      <div className="flex items-center justify-between px-5 py-2.5 bg-white/[0.04] border border-white/8 rounded-t-xl">
-        <span className="text-[10px] font-mono tracking-widest uppercase text-white/30">
+      <div className="flex items-center justify-between px-5 py-2.5 bg-foreground/[0.04] border border-foreground/8 rounded-t-xl">
+        <span className="text-[10px] font-mono tracking-widest uppercase text-foreground/30">
           {lang}
         </span>
         <button
           onClick={copy}
-          className="flex items-center gap-1.5 text-[11px] text-white/30 hover:text-white/70 transition-colors"
+          className="flex items-center gap-1.5 text-[11px] text-foreground/30 hover:text-foreground/70 transition-colors"
         >
           {copied ? (
             <Check className="w-3.5 h-3.5" />
@@ -75,8 +75,8 @@ const CodeBlock = ({
           {copied ? "Copiado" : "Copiar"}
         </button>
       </div>
-      <pre className="bg-[#0d0d0d] border border-t-0 border-white/8 rounded-b-xl p-6 overflow-x-auto">
-        <code className={`text-sm font-mono text-white/70 leading-relaxed ${className ?? ""}`}>
+      <pre className="bg-card border border-t-0 border-foreground/8 rounded-b-xl p-6 overflow-x-auto">
+        <code className={`text-sm font-mono text-foreground/70 leading-relaxed ${className ?? ""}`}>
           {text}
         </code>
       </pre>
@@ -88,7 +88,7 @@ const CodeBlock = ({
    INLINE BADGE
 ───────────────────────────────────────────── */
 const Badge = ({ label }: { label: string }) => (
-  <span className="inline-block px-3 py-1 text-[11px] font-medium tracking-wide border border-white/10 rounded-full text-white/50 bg-white/[0.03] hover:border-white/20 hover:text-white/70 transition-colors">
+  <span className="inline-block px-3 py-1 text-[11px] font-medium tracking-wide border border-foreground/10 rounded-full text-foreground/50 bg-foreground/[0.03] hover:border-foreground/20 hover:text-foreground/70 transition-colors">
     {label}
   </span>
 );
@@ -105,18 +105,18 @@ const ListBlock = ({
 }) => {
   if (!items || items.length === 0) return null;
   return (
-    <div className="py-8 border-t border-white/[0.06]">
+    <div className="py-8 border-t border-foreground/[0.06]">
       <div className="flex items-center gap-2 mb-5">
         <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-        <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/80">
+        <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/80">
           {title}
         </p>
       </div>
       <ul className="space-y-3">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-2.5 group">
-            <div className="w-1 h-1 rounded-full bg-white/20 mt-2 shrink-0 group-hover:bg-white/50 transition-colors" />
-            <span className="text-[13px] text-white/50 leading-relaxed group-hover:text-white/75 transition-colors">
+            <div className="w-1 h-1 rounded-full bg-foreground/20 mt-2 shrink-0 group-hover:bg-foreground/50 transition-colors" />
+            <span className="text-[13px] text-foreground/50 leading-relaxed group-hover:text-foreground/75 transition-colors">
               {item}
             </span>
           </li>
@@ -130,9 +130,9 @@ const ListBlock = ({
    STAT CARD
 ───────────────────────────────────────────── */
 const StatCard = ({ value, label }: { value: string; label: string }) => (
-  <div className="py-6 border-t border-white/[0.06]">
-    <p className="text-3xl font-light text-white tracking-tight">{value}</p>
-    <p className="text-[11px] tracking-widest uppercase text-white/30 mt-1">
+  <div className="py-6 border-t border-foreground/[0.06]">
+    <p className="text-3xl font-light text-foreground tracking-tight">{value}</p>
+    <p className="text-[11px] tracking-widest uppercase text-foreground/30 mt-1">
       {label}
     </p>
   </div>
@@ -153,10 +153,10 @@ const ProjectDetail = () => {
   /* Loading */
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border border-white/10 rounded-full border-t-white/40 animate-spin" />
-          <p className="text-[11px] tracking-[0.3em] uppercase text-white/25">
+          <div className="w-8 h-8 border border-foreground/10 rounded-full border-t-foreground/40 animate-spin" />
+          <p className="text-[11px] tracking-[0.3em] uppercase text-foreground/25">
             Carregando
           </p>
         </div>
@@ -182,7 +182,7 @@ const ProjectDetail = () => {
     hasNextSteps;
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20 pt-16">
+    <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 pt-16">
       <SEOHead
         title={`${project.title} — Projeto`}
         description={project.description || `Projeto: ${project.title}`}
@@ -203,17 +203,17 @@ const ProjectDetail = () => {
       <ScrollProgress />
 
       {/* ── TOP NAV ── */}
-      <header className="fixed top-16 left-0 right-0 z-30 flex items-center justify-between px-8 py-3 bg-[#0a0a0a]/80 backdrop-blur-xl border-b border-white/[0.04]">
+      <header className="fixed top-16 left-0 right-0 z-30 flex items-center justify-between px-8 py-3 bg-background/80 backdrop-blur-xl border-b border-foreground/[0.04]">
         <Link
           to="/projects"
-          className="flex items-center gap-2 text-sm text-white/40 hover:text-white/80 transition-colors group"
+          className="flex items-center gap-2 text-sm text-foreground/40 hover:text-foreground/80 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Projetos
         </Link>
 
         {/* Category pill */}
-        <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/25 hidden sm:block">
+        <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/25 hidden sm:block">
           {categoryInfo?.label || project.category}
         </span>
 
@@ -224,7 +224,7 @@ const ProjectDetail = () => {
               href={project.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-white/40 hover:text-white/80 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-foreground/40 hover:text-foreground/80 transition-colors"
             >
               <Github className="w-4 h-4" />
               <span className="hidden sm:inline">Código</span>
@@ -248,19 +248,19 @@ const ProjectDetail = () => {
       <section className="pt-20 pb-0 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         {/* Cover image — full bleed with overlay */}
         {project.coverImage && (
-          <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden mb-20 border border-white/[0.06]">
+          <div className="relative w-full rounded-2xl overflow-hidden mb-20 border border-border bg-card shadow-2xl">
             <img
               src={project.coverImage}
               alt={project.title}
-              className="w-full h-full object-cover object-top"
+              className="w-full h-auto block max-h-[800px] object-contain"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/40 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent pointer-events-none" />
             {/* Title overlay on image */}
-            <div className="absolute bottom-0 left-0 right-0 px-10 pb-10">
-              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/40 mb-3">
+            <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-10 pb-6 sm:pb-10">
+              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/40 mb-2 sm:mb-3">
                 {categoryInfo?.label || project.category}
               </p>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-white leading-[1.05]">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground leading-[1.05]">
                 {project.title}
               </h1>
             </div>
@@ -270,10 +270,10 @@ const ProjectDetail = () => {
         {/* No image: title alone */}
         {!project.coverImage && (
           <div className="mb-20 pt-8">
-            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/30 mb-4">
+            <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30 mb-4">
               {categoryInfo?.label || project.category}
             </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-white leading-[1.05] max-w-3xl">
+            <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-foreground leading-[1.05] max-w-3xl">
               {project.title}
             </h1>
           </div>
@@ -292,59 +292,59 @@ const ProjectDetail = () => {
               <div ref={articleRef}>
                 <article
                   className="
-                    prose prose-invert max-w-none
+                    prose dark:prose-invert max-w-none
 
                     /* Headings */
                     prose-headings:font-light prose-headings:tracking-tight
-                    prose-h1:text-5xl prose-h1:text-white/95 prose-h1:mt-0 prose-h1:mb-10 prose-h1:leading-[1.05]
-                    prose-h2:text-3xl prose-h2:text-white/90 prose-h2:mt-20 prose-h2:mb-6 prose-h2:pb-5 prose-h2:border-b prose-h2:border-white/[0.06]
-                    prose-h3:text-xl prose-h3:text-white/75 prose-h3:mt-14 prose-h3:mb-4
-                    prose-h4:text-base prose-h4:text-white/60 prose-h4:mt-10 prose-h4:mb-3 prose-h4:tracking-wide
+                    prose-h1:text-5xl prose-h1:text-foreground prose-h1:mt-0 prose-h1:mb-10 prose-h1:leading-[1.05]
+                    prose-h2:text-3xl prose-h2:text-foreground prose-h2:mt-20 prose-h2:mb-6 prose-h2:pb-5 prose-h2:border-b prose-h2:border-border
+                    prose-h3:text-xl prose-h3:text-foreground/75 prose-h3:mt-14 prose-h3:mb-4
+                    prose-h4:text-base prose-h4:text-foreground/60 prose-h4:mt-10 prose-h4:mb-3 prose-h4:tracking-wide
 
                     /* Body text */
-                    prose-p:text-white/55 prose-p:leading-[2] prose-p:text-[16px] prose-p:my-6
+                    prose-p:text-foreground/70 prose-p:leading-[2] prose-p:text-[16px] prose-p:my-6
 
                     /* Links */
-                    prose-a:text-white/70 prose-a:no-underline prose-a:border-b prose-a:border-white/20
-                    hover:prose-a:text-white hover:prose-a:border-white/60 prose-a:transition-colors prose-a:pb-px
+                    prose-a:text-primary prose-a:no-underline prose-a:border-b prose-a:border-primary/20
+                    hover:prose-a:text-primary/80 hover:prose-a:border-primary/60 prose-a:transition-colors prose-a:pb-px
 
                     /* Strong / em */
-                    prose-strong:text-white/85 prose-strong:font-medium
-                    prose-em:text-white/60 prose-em:not-italic prose-em:font-light
+                    prose-strong:text-foreground prose-strong:font-medium
+                    prose-em:text-foreground/60 prose-em:not-italic prose-em:font-light
 
                     /* Blockquote */
-                    prose-blockquote:border-l-[3px] prose-blockquote:border-white/15
+                    prose-blockquote:border-l-[3px] prose-blockquote:border-primary/20
                     prose-blockquote:pl-7 prose-blockquote:not-italic
-                    prose-blockquote:text-white/40 prose-blockquote:text-[15px]
+                    prose-blockquote:text-foreground/50 prose-blockquote:text-[15px]
                     prose-blockquote:my-12 prose-blockquote:leading-[2]
 
                     /* Lists */
-                    prose-li:text-white/55 prose-li:leading-[1.9] prose-li:text-[15px] prose-li:my-2
+                    prose-li:text-foreground/70 prose-li:leading-[1.9] prose-li:text-[15px] prose-li:my-2
                     prose-ul:my-8 prose-ol:my-8
 
                     /* HR */
-                    prose-hr:border-white/[0.05] prose-hr:my-16
+                    prose-hr:border-border prose-hr:my-16
 
                     /* Images */
-                    prose-img:rounded-2xl prose-img:border prose-img:border-white/[0.06] prose-img:shadow-2xl prose-img:my-12
+                    prose-img:rounded-2xl prose-img:border prose-img:border-border prose-img:shadow-2xl prose-img:my-12
 
                     /* Inline code */
-                    prose-code:text-emerald-400/80 prose-code:bg-emerald-950/30 prose-code:px-2
+                    prose-code:text-primary prose-code:bg-primary/5 prose-code:px-2
                     prose-code:py-0.5 prose-code:rounded prose-code:text-[13px] prose-code:font-mono
                     prose-code:before:content-none prose-code:after:content-none
 
                     /* Tables */
                     prose-table:text-sm prose-table:border-collapse
-                    prose-th:text-white/40 prose-th:font-medium prose-th:tracking-wide
-                    prose-th:border-b prose-th:border-white/[0.08] prose-th:pb-3 prose-th:text-left
-                    prose-td:text-white/50 prose-td:border-b prose-td:border-white/[0.04] prose-td:py-3
+                    prose-th:text-foreground/60 prose-th:font-medium prose-th:tracking-wide
+                    prose-th:border-b prose-th:border-border prose-th:pb-3 prose-th:text-left
+                    prose-td:text-foreground/50 prose-td:border-b prose-td:border-border/50 prose-td:py-3
                   "
                 >
                     <ReactMarkdown
                       remarkPlugins={[remarkGfm]}
                       components={{
                         h2: ({ children, ...props }: any) => (
-                          <h2 className="text-3xl font-light text-white/90 mt-20 mb-6 pb-5 border-b border-white/[0.06]" {...props}>{children}</h2>
+                          <h2 className="text-3xl font-light text-foreground mt-20 mb-6 pb-5 border-b border-border" {...props}>{children}</h2>
                         ),
                         h3: ({ children, ...props }: any) => {
                           // Allow the specific section titles to reuse our aesthetic label styling
@@ -356,13 +356,13 @@ const ProjectDetail = () => {
                             return (
                               <div className="flex items-center gap-2 mt-16 mb-4">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                                <h3 className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/80 !m-0 !leading-none" {...props}>
+                                <h3 className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/80 !m-0 !leading-none" {...props}>
                                   {children}
                                 </h3>
                               </div>
                             );
                           }
-                          return <h3 className="text-xl font-light text-white/75 mt-14 mb-4" {...props}>{children}</h3>;
+                          return <h3 className="text-xl font-light text-foreground/75 mt-14 mb-4" {...props}>{children}</h3>;
                         },
                         pre: ({ children }: any) => (
                           <CodeBlock>{(children as any)?.props?.children}</CodeBlock>
@@ -383,7 +383,7 @@ const ProjectDetail = () => {
                             return (
                               <div className="flex items-center gap-2 mt-16 mb-4">
                                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                                <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/80 !m-0 !leading-none">
+                                <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/80 !m-0 !leading-none">
                                   {children}
                                 </p>
                               </div>
@@ -398,13 +398,13 @@ const ProjectDetail = () => {
                 </article>
               </div>
             ) : (
-              <div className="py-24 text-center border border-white/[0.04] rounded-2xl">
-                <p className="text-sm text-white/25 mb-4">
+              <div className="py-24 text-center border border-foreground/[0.04] rounded-2xl">
+                <p className="text-sm text-foreground/25 mb-4">
                   Este projeto ainda não possui conteúdo detalhado.
                 </p>
                 <Link
                   to="/projects"
-                  className="text-sm text-white/40 hover:text-white/70 transition-colors underline underline-offset-4"
+                  className="text-sm text-foreground/40 hover:text-foreground/70 transition-colors underline underline-offset-4"
                 >
                   Ver outros projetos
                 </Link>
@@ -421,16 +421,16 @@ const ProjectDetail = () => {
                 {(project.cardProblem ||
                   project.cardSolution ||
                   project.cardResult) && (
-                  <div className="mb-4 p-6 border border-white/[0.06] rounded-xl space-y-5 bg-white/[0.015]">
+                  <div className="mb-4 p-6 border border-foreground/[0.06] rounded-xl space-y-5 bg-foreground/[0.015]">
                     {project.cardProblem && (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/80">
+                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                             Problema
                           </p>
                         </div>
-                        <p className="text-[13px] text-white/55 leading-relaxed">
+                        <p className="text-[13px] text-foreground/55 leading-relaxed">
                           {project.cardProblem}
                         </p>
                       </div>
@@ -439,11 +439,11 @@ const ProjectDetail = () => {
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/80">
+                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                             Solução
                           </p>
                         </div>
-                        <p className="text-[13px] text-white/55 leading-relaxed">
+                        <p className="text-[13px] text-foreground/55 leading-relaxed">
                           {project.cardSolution}
                         </p>
                       </div>
@@ -452,11 +452,11 @@ const ProjectDetail = () => {
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-white/80">
+                          <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                             Resultado
                           </p>
                         </div>
-                        <p className="text-[13px] text-white/55 leading-relaxed">
+                        <p className="text-[13px] text-foreground/55 leading-relaxed">
                           {project.cardResult}
                         </p>
                       </div>
@@ -466,19 +466,19 @@ const ProjectDetail = () => {
 
                 {/* Stats / Results */}
                 {hasStats && (
-                  <div className="border-t border-white/[0.06] py-6 mb-2 space-y-5">
+                  <div className="border-t border-foreground/[0.06] py-6 mb-2 space-y-5">
                     <div className="flex items-center gap-2 mb-5">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/80">
+                      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/80">
                         Métricas
                       </p>
                     </div>
                     {project.stats!.map((s, i) => (
                       <div key={i}>
-                        <p className="text-lg font-light text-white/90 leading-tight">
+                        <p className="text-lg font-light text-foreground/90 leading-tight">
                           {s.value}
                         </p>
-                        <p className="text-[11px] text-white/30 mt-0.5 leading-snug">
+                        <p className="text-[11px] text-foreground/30 mt-0.5 leading-snug">
                           {s.label}
                         </p>
                       </div>
@@ -488,10 +488,10 @@ const ProjectDetail = () => {
 
                 {/* Technologies */}
                 {project.tags && project.tags.length > 0 && (
-                  <div className="py-6 border-t border-white/[0.06]">
+                  <div className="py-6 border-t border-foreground/[0.06]">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
-                      <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/80">
+                      <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                         Tecnologias
                       </p>
                     </div>
@@ -516,7 +516,7 @@ const ProjectDetail = () => {
                 <ListBlock title="Próximos Passos" items={project.nextSteps} />
 
                 {/* Links */}
-                <div className="pt-6 border-t border-white/[0.06] space-y-3">
+                <div className="pt-6 border-t border-foreground/[0.06] space-y-3">
                   {project.link && project.link !== "#" && (
                     <a
                       href={project.link}
@@ -552,7 +552,7 @@ const ProjectDetail = () => {
                       href={project.githubUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-between w-full px-5 py-3.5 border border-white/[0.06] rounded-xl text-sm text-white/35 hover:border-white/15 hover:text-white/60 transition-colors group"
+                      className="flex items-center justify-between w-full px-5 py-3.5 border border-foreground/[0.06] rounded-xl text-sm text-foreground/35 hover:border-foreground/15 hover:text-foreground/60 transition-colors group"
                     >
                       Ver Código
                       <Github className="w-3.5 h-3.5 opacity-40 group-hover:opacity-80 transition-opacity" />
@@ -566,12 +566,12 @@ const ProjectDetail = () => {
       </div>
 
       {/* ── FOOTER CTA ── */}
-      <footer className="border-t border-white/[0.05] py-24 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+      <footer className="border-t border-foreground/[0.05] py-24 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
         <div>
-          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/20 mb-2">
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/20 mb-2">
             Próximo passo
           </p>
-          <p className="text-2xl font-light text-white/70">
+          <p className="text-2xl font-light text-foreground/70">
             Vamos conversar sobre o seu projeto.
           </p>
         </div>
@@ -589,7 +589,7 @@ const ProjectDetail = () => {
           </Link>
           <Link
             to="/projects"
-            className="px-7 py-3 text-sm text-white/30 hover:text-white/60 transition-colors"
+            className="px-7 py-3 text-sm text-foreground/30 hover:text-foreground/60 transition-colors"
           >
             Ver mais projetos →
           </Link>

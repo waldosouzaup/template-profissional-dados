@@ -12,7 +12,7 @@ import {
   Share2,
   FolderOpen
 } from "lucide-react";
-import { useContent } from "@/hooks/useContents";
+import { useContent, useRelatedContents } from "@/hooks/useContents";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import remarkGfm from "remark-gfm";
@@ -32,7 +32,7 @@ const ScrollProgress = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
   return (
-    <div className="fixed top-0 left-0 w-full h-[2px] z-50 bg-white/5">
+    <div className="fixed top-0 left-0 w-full h-[2px] z-50 bg-foreground/5">
       <div
         className="h-full bg-primary/60 transition-all duration-75"
         style={{ width: `${pct}%` }}
@@ -63,13 +63,13 @@ const CodeBlock = ({
 
   return (
     <div className="relative my-8 group">
-      <div className="flex items-center justify-between px-5 py-2.5 bg-white/[0.04] border border-white/8 rounded-t-xl">
-        <span className="text-[10px] font-mono tracking-widest uppercase text-white/30">
+      <div className="flex items-center justify-between px-5 py-2.5 bg-foreground/[0.04] border border-foreground/8 rounded-t-xl">
+        <span className="text-[10px] font-mono tracking-widest uppercase text-foreground/30">
           {lang}
         </span>
         <button
           onClick={copy}
-          className="flex items-center gap-1.5 text-[11px] text-white/30 hover:text-white/70 transition-colors"
+          className="flex items-center gap-1.5 text-[11px] text-foreground/30 hover:text-foreground/70 transition-colors"
         >
           {copied ? (
             <Check className="w-3.5 h-3.5" />
@@ -79,8 +79,8 @@ const CodeBlock = ({
           {copied ? "Copiado" : "Copiar"}
         </button>
       </div>
-      <pre className="bg-[#0d0d0d] border border-t-0 border-white/8 rounded-b-xl p-6 overflow-x-auto">
-        <code className={`text-sm font-mono text-white/70 leading-relaxed ${className ?? ""}`}>
+      <pre className="bg-card border border-t-0 border-foreground/8 rounded-b-xl p-6 overflow-x-auto">
+        <code className={`text-sm font-mono text-foreground/70 leading-relaxed ${className ?? ""}`}>
           {text}
         </code>
       </pre>
@@ -109,15 +109,15 @@ const TableOfContents = ({ markdown }: { markdown: string }) => {
   if (headings.length < 2) return null;
 
   return (
-    <div className="py-8 border-t border-white/[0.06]">
-      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Neste Artigo</p>
+    <div className="py-8 border-t border-foreground/[0.06]">
+      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-4">Neste Artigo</p>
       <nav className="space-y-2">
         {headings.map((h, i) => (
           <a
             key={i}
             href={`#${h.id}`}
-            className={`block text-[13px] leading-snug transition-colors hover:text-white/80 ${
-              h.level === 2 ? "text-white/45 font-medium" : "text-white/25 pl-3"
+            className={`block text-[13px] leading-snug transition-colors hover:text-foreground/80 ${
+              h.level === 2 ? "text-foreground/45 font-medium" : "text-foreground/25 pl-3"
             }`}
           >
             {h.text}
@@ -135,6 +135,67 @@ const estimateReadingTime = (text?: string): number => {
   return Math.max(1, Math.ceil(words / 200));
 };
 
+/* ─────────────────────────────────────────────
+   RELATED ARTICLES
+ ───────────────────────────────────────────── */
+const RelatedArticles = ({ category, currentPostId }: { category: string; currentPostId: string }) => {
+  const { data: relatedPosts, isLoading } = useRelatedContents(category, currentPostId);
+
+  if (isLoading || !relatedPosts || relatedPosts.length === 0) return null;
+
+  return (
+    <div className="border-t border-foreground/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
+      <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/20 mb-8">Artigos Relacionados</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {relatedPosts.map((post) => {
+          const readingTime = estimateReadingTime(post.markdown);
+          return (
+            <Link
+              key={post.id}
+              to={`/blog/${post.slug || post.id}`}
+              className="group relative bg-foreground/[0.015] border border-foreground/[0.04] rounded-2xl overflow-hidden hover:border-foreground/10 hover:bg-foreground/[0.025] transition-all duration-500 flex flex-col"
+            >
+              <div className="aspect-[16/9] w-full overflow-hidden bg-foreground/[0.02]">
+                {post.image_url ? (
+                  <img
+                    src={post.image_url}
+                    alt={post.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/[0.02] to-white/[0.005]">
+                    <div className="w-8 h-8 rounded-full bg-foreground/5" />
+                  </div>
+                )}
+              </div>
+              <div className="p-6 flex-1 flex flex-col">
+                <div className="flex items-center gap-3 mb-3 flex-wrap">
+                  <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-primary border border-primary/20 bg-primary/5 px-2 py-1 rounded-sm">
+                    {post.category || "Post"}
+                  </span>
+                  <div className="flex items-center gap-1 text-[9px] text-foreground/20 uppercase tracking-widest">
+                    <Clock className="w-3 h-3" />
+                    {readingTime} min
+                  </div>
+                </div>
+                <h3 className="text-lg font-light text-foreground group-hover:text-primary transition-colors mb-3 leading-tight line-clamp-2">
+                  {post.title}
+                </h3>
+                <div className="mt-auto flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-foreground/40 group-hover:text-foreground transition-colors">
+                  Ler artigo
+                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+
 const BlogPost = () => {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { data: post, isLoading } = useContent(idOrSlug);
@@ -146,10 +207,10 @@ const BlogPost = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-8 h-8 border border-white/10 rounded-full border-t-white/40 animate-spin" />
-          <p className="text-[11px] tracking-[0.3em] uppercase text-white/25">Carregando Post</p>
+          <div className="w-8 h-8 border border-foreground/10 rounded-full border-t-foreground/40 animate-spin" />
+          <p className="text-[11px] tracking-[0.3em] uppercase text-foreground/25">Carregando Post</p>
         </div>
       </div>
     );
@@ -160,7 +221,7 @@ const BlogPost = () => {
   const readingTime = estimateReadingTime(post.markdown);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white selection:bg-white/20 pt-16">
+    <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 pt-16">
       <SEOHead
         title={post.title}
         description={post.description || `Leia "${post.title}" no blog de Waldo Eller.`}
@@ -193,18 +254,17 @@ const BlogPost = () => {
       {/* HERO */}
       <section className="pt-24 pb-10 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         {post.image_url && (
-          <div className="relative w-full aspect-[21/9] rounded-2xl overflow-hidden mb-16 border border-white/[0.06] shadow-2xl">
+          <div className="relative w-full rounded-2xl overflow-hidden mb-16 border border-border shadow-2xl bg-card">
             <img
               src={post.image_url}
               alt={post.title}
-              className="w-full h-full object-cover"
+              className="w-full h-auto block max-h-[600px] object-contain"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent" />
           </div>
         )}
 
         <div className="flex flex-col max-w-4xl">
-          <div className="flex flex-wrap items-center gap-6 mb-8 text-[10px] font-bold tracking-[0.25em] uppercase text-white/30">
+          <div className="flex flex-wrap items-center gap-6 mb-8 text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30">
             {post.category && (
               <span className="text-primary border border-primary/20 bg-primary/5 px-3 py-1.5 rounded-sm">
                 {post.category}
@@ -224,11 +284,11 @@ const BlogPost = () => {
             </div>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-white leading-[1.05] mb-8">
+          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-foreground leading-[1.05] mb-8">
             {post.title}
           </h1>
 
-          <p className="text-xl text-white/40 font-light leading-relaxed max-w-2xl border-l-[3px] border-primary/30 pl-8 mb-8">
+          <p className="text-xl text-foreground/40 font-light leading-relaxed max-w-2xl border-l-[3px] border-primary/30 pl-8 mb-8">
             {post.description}
           </p>
 
@@ -254,52 +314,52 @@ const BlogPost = () => {
           <main className="min-w-0">
             <div ref={articleRef}>
               <article className="
-                prose prose-invert max-w-none
+                prose dark:prose-invert max-w-none
 
                 /* Headings */
                 prose-headings:font-light prose-headings:tracking-tight
-                prose-h1:text-5xl prose-h1:text-white/95 prose-h1:mt-0 prose-h1:mb-10 prose-h1:leading-[1.05]
-                prose-h2:text-3xl prose-h2:text-white/90 prose-h2:mt-20 prose-h2:mb-6 prose-h2:pb-5 prose-h2:border-b prose-h2:border-white/[0.06]
-                prose-h3:text-xl prose-h3:text-white/75 prose-h3:mt-14 prose-h3:mb-4
-                prose-h4:text-base prose-h4:text-white/60 prose-h4:mt-10 prose-h4:mb-3 prose-h4:tracking-wide
+                prose-h1:text-5xl prose-h1:text-foreground prose-h1:mt-0 prose-h1:mb-10 prose-h1:leading-[1.05]
+                prose-h2:text-3xl prose-h2:text-foreground prose-h2:mt-20 prose-h2:mb-6 prose-h2:pb-5 prose-h2:border-b prose-h2:border-border
+                prose-h3:text-xl prose-h3:text-foreground/75 prose-h3:mt-14 prose-h3:mb-4
+                prose-h4:text-base prose-h4:text-foreground/60 prose-h4:mt-10 prose-h4:mb-3 prose-h4:tracking-wide
 
                 /* Body text */
-                prose-p:text-white/55 prose-p:leading-[2] prose-p:text-[16px] prose-p:my-6
+                prose-p:text-foreground/70 prose-p:leading-[2] prose-p:text-[16px] prose-p:my-6
 
                 /* Links */
-                prose-a:text-white/70 prose-a:no-underline prose-a:border-b prose-a:border-white/20
-                hover:prose-a:text-white hover:prose-a:border-white/60 prose-a:transition-colors prose-a:pb-px
+                prose-a:text-primary prose-a:no-underline prose-a:border-b prose-a:border-primary/20
+                hover:prose-a:text-primary/80 hover:prose-a:border-primary/60 prose-a:transition-colors prose-a:pb-px
 
                 /* Strong / em */
-                prose-strong:text-white/85 prose-strong:font-medium
-                prose-em:text-white/60 prose-em:not-italic prose-em:font-light
+                prose-strong:text-foreground prose-strong:font-medium
+                prose-em:text-foreground/60 prose-em:not-italic prose-em:font-light
 
                 /* Blockquote */
-                prose-blockquote:border-l-[3px] prose-blockquote:border-white/15
+                prose-blockquote:border-l-[3px] prose-blockquote:border-primary/20
                 prose-blockquote:pl-7 prose-blockquote:not-italic
-                prose-blockquote:text-white/40 prose-blockquote:text-[15px]
+                prose-blockquote:text-foreground/50 prose-blockquote:text-[15px]
                 prose-blockquote:my-12 prose-blockquote:leading-[2]
 
                 /* Lists */
-                prose-li:text-white/55 prose-li:leading-[1.9] prose-li:text-[15px] prose-li:my-2
+                prose-li:text-foreground/70 prose-li:leading-[1.9] prose-li:text-[15px] prose-li:my-2
                 prose-ul:my-8 prose-ol:my-8
 
                 /* HR */
-                prose-hr:border-white/[0.05] prose-hr:my-16
+                prose-hr:border-border prose-hr:my-16
 
                 /* Images */
-                prose-img:rounded-2xl prose-img:border prose-img:border-white/[0.06] prose-img:shadow-2xl prose-img:my-12
+                prose-img:rounded-2xl prose-img:border prose-img:border-border prose-img:shadow-2xl prose-img:my-12
 
                 /* Inline code */
-                prose-code:text-emerald-400/80 prose-code:bg-emerald-950/30 prose-code:px-2
+                prose-code:text-primary prose-code:bg-primary/5 prose-code:px-2
                 prose-code:py-0.5 prose-code:rounded prose-code:text-[13px] prose-code:font-mono
                 prose-code:before:content-none prose-code:after:content-none
 
                 /* Tables */
                 prose-table:text-sm prose-table:border-collapse
-                prose-th:text-white/40 prose-th:font-medium prose-th:tracking-wide
-                prose-th:border-b prose-th:border-white/[0.08] prose-th:pb-3 prose-th:text-left
-                prose-td:text-white/50 prose-td:border-b prose-td:border-white/[0.04] prose-td:py-3
+                prose-th:text-foreground/60 prose-th:font-medium prose-th:tracking-wide
+                prose-th:border-b prose-th:border-border prose-th:pb-3 prose-th:text-left
+                prose-td:text-foreground/50 prose-td:border-b prose-td:border-border/50 prose-td:py-3
               ">
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
@@ -307,7 +367,7 @@ const BlogPost = () => {
                     h2: ({ children, ...props }: any) => {
                       const text = typeof children === "string" ? children : Array.isArray(children) ? children.map((c: any) => (typeof c === "string" ? c : "")).join("") : "";
                       const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-                      return <h2 id={id} className="text-3xl font-light text-white/90 mt-20 mb-6 pb-5 border-b border-white/[0.06] scroll-mt-24" {...props}>{children}</h2>;
+                      return <h2 id={id} className="text-3xl font-light text-foreground/90 mt-20 mb-6 pb-5 border-b border-foreground/[0.06] scroll-mt-24" {...props}>{children}</h2>;
                     },
                     h3: ({ children, ...props }: any) => {
                       const text = typeof children === "string" ? children : Array.isArray(children) ? children.map((c: any) => (typeof c === "string" ? c : "")).join("") : "";
@@ -316,9 +376,9 @@ const BlogPost = () => {
                       const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
                       
                       if (isSectionLabel) {
-                        return <h3 id={id} className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/25 !mt-16 !mb-4 !leading-none uppercase scroll-mt-24" {...props}>{children}</h3>;
+                        return <h3 id={id} className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/25 !mt-16 !mb-4 !leading-none uppercase scroll-mt-24" {...props}>{children}</h3>;
                       }
-                      return <h3 id={id} className="text-xl font-light text-white/75 mt-14 mb-4 scroll-mt-24" {...props}>{children}</h3>;
+                      return <h3 id={id} className="text-xl font-light text-foreground/75 mt-14 mb-4 scroll-mt-24" {...props}>{children}</h3>;
                     },
                     pre: ({ children }: any) => (
                       <CodeBlock>{(children as any)?.props?.children}</CodeBlock>
@@ -334,7 +394,7 @@ const BlogPost = () => {
                       const sectionKeywords = ["Problema", "Contexto", "Estratégia", "Resultados", "Solução", "Objetivo", "Tecnologias", "Arquitetura", "Conclusão", "Próximos Passos", "Impacto", "Insights"];
                       
                       if (sectionKeywords.includes(text.trim()) && text.trim().length < 30) {
-                        return <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-white/25 !mt-16 !mb-4 !leading-none">{children}</p>;
+                        return <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/25 !mt-16 !mb-4 !leading-none">{children}</p>;
                       }
                       return <p {...props}>{children}</p>;
                     },
@@ -354,9 +414,9 @@ const BlogPost = () => {
               {/* Table of Contents */}
               {post.markdown && <TableOfContents markdown={post.markdown} />}
 
-              <div className="py-8 border-t border-white/[0.06]">
-                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Sobre o Autor</p>
-                <p className="text-sm text-white/40 leading-relaxed mb-6">
+              <div className="py-8 border-t border-foreground/[0.06]">
+                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-4">Sobre o Autor</p>
+                <p className="text-sm text-foreground/40 leading-relaxed mb-6">
                   Analista de Dados | BI | Gosto de transformar dados em insights que ajudam negócios a tomar decisões melhores.
                 </p>
                 <Link to="/about" className="text-[10px] font-bold tracking-widest uppercase text-primary hover:text-primary/80 transition-colors">
@@ -364,15 +424,15 @@ const BlogPost = () => {
                 </Link>
               </div>
 
-              <div className="py-8 border-t border-white/[0.06]">
-                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-white/20 mb-4">Compartilhar</p>
+              <div className="py-8 border-t border-foreground/[0.06]">
+                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-4">Compartilhar</p>
                 <div className="flex gap-4">
                   <button 
                     onClick={() => {
                       const url = encodeURIComponent(window.location.href);
                       window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
                     }}
-                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                    className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
                     aria-label="Compartilhar no LinkedIn"
                   >
                     <span className="text-xs">Li</span>
@@ -383,7 +443,7 @@ const BlogPost = () => {
                       const text = encodeURIComponent(post.title);
                       window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
                     }}
-                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                    className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
                     aria-label="Compartilhar no Twitter"
                   >
                     <span className="text-xs">Tw</span>
@@ -392,7 +452,7 @@ const BlogPost = () => {
                     onClick={() => {
                       navigator.clipboard.writeText(window.location.href);
                     }}
-                    className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-white hover:border-white/30 transition-all"
+                    className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
                     aria-label="Copiar link"
                   >
                     <Share2 className="w-3.5 h-3.5" />
@@ -403,16 +463,20 @@ const BlogPost = () => {
           </aside>
         </div>
       </div>
+      {/* RELATED ARTICLES */}
+      {post.category && (
+        <RelatedArticles category={post.category} currentPostId={post.id} />
+      )}
       
       {/* FOOTER CTA */}
-      <footer className="border-t border-white/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-8">
+      <footer className="border-t border-foreground/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-8">
         <div>
-          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/20 mb-2">Continue lendo</p>
-          <p className="text-2xl font-light text-white/70">Explore outros insights no blog.</p>
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/20 mb-2">Continue lendo</p>
+          <p className="text-2xl font-light text-foreground/70">Explore outros insights no blog.</p>
         </div>
         <Link
           to="/blog"
-          className="px-8 py-3 border border-white/15 rounded-full text-sm text-white/60 hover:border-white/40 hover:text-white transition-colors"
+          className="px-8 py-3 border border-foreground/15 rounded-full text-sm text-foreground/60 hover:border-foreground/40 hover:text-foreground transition-colors"
         >
           Voltar ao Blog
         </Link>

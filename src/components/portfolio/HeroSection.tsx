@@ -65,7 +65,7 @@ const HeroSection = () => {
           <p className="stat-number">5+</p>
           <p className="stat-label">Anos de Experiência</p>
         </div>
-        <div className="stat-item col-span-2 flex items-center justify-center bg-card/30 rounded-2xl border border-white/5 p-4">
+        <div className="stat-item col-span-2 flex items-center justify-center bg-card/30 rounded-2xl border border-foreground/5 p-4">
           <p className="stat-number-small">
             Data is the <span className="line-through text-muted-foreground font-normal mx-1">Future</span> Present.
           </p>
