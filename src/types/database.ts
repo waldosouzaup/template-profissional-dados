@@ -114,6 +114,7 @@ export const ProfileSchema = z.object({
   hero_phrase_start: z.string().default("Data is the"),
   hero_phrase_strike: z.string().default("Future"),
   hero_phrase_end: z.string().default("Present."),
+  contact_form_key: z.string().optional(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;

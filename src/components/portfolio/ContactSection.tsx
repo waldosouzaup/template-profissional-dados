@@ -25,8 +25,9 @@ const ContactSection = () => {
   }
 
   const email = profile?.email || "";
+  const contactKey = profile?.contact_form_key || "";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!formData.name || !formData.email || !formData.message) {
@@ -36,18 +37,53 @@ const ContactSection = () => {
 
     setIsSending(true);
 
-    const subject = encodeURIComponent(`Contato via Portfólio - ${formData.name}`);
-    const body = encodeURIComponent(
-      `Nome: ${formData.name}\nEmail: ${formData.email}\n\nMensagem:\n${formData.message}`
-    );
-    
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-    
-    setTimeout(() => {
-      setIsSending(false);
-      setFormData({ name: "", email: "", message: "" });
-      toast.success("Cliente de email aberto! Envie sua mensagem.");
-    }, 1000);
+    if (contactKey) {
+      try {
+        const response = await fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: JSON.stringify({
+            access_key: contactKey,
+            name: formData.name,
+            email: formData.email,
+            message: formData.message,
+            subject: `Contato via Portfólio - ${formData.name}`,
+            from_name: formData.name,
+            replyto: formData.email,
+          }),
+        });
+
+        const result = await response.json();
+        if (result.success) {
+          toast.success("Mensagem enviada com sucesso!");
+          setFormData({ name: "", email: "", message: "" });
+        } else {
+          toast.error("Erro ao enviar mensagem. Tente novamente.");
+        }
+      } catch (error) {
+        console.error("Error sending form:", error);
+        toast.error("Erro de conexão. Verifique sua internet.");
+      } finally {
+        setIsSending(false);
+      }
+    } else {
+      // Fallback to mailto if no key is configured
+      const subject = encodeURIComponent(`Contato via Portfólio - ${formData.name}`);
+      const body = encodeURIComponent(
+        `Nome: ${formData.name}\nEmail: ${formData.email}\n\nMensagem:\n${formData.message}`
+      );
+      
+      window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+      
+      setTimeout(() => {
+        setIsSending(false);
+        setFormData({ name: "", email: "", message: "" });
+        toast.success("Cliente de email aberto! Envie sua mensagem.");
+      }, 1000);
+    }
   };
 
   return (
@@ -138,7 +174,7 @@ const ContactSection = () => {
           className="btn-primary w-full sm:w-auto justify-center"
         >
           <Send className="w-4 h-4" />
-          {isSending ? "Abrindo email..." : "Enviar mensagem"}
+          {isSending ? "Enviando..." : "Enviar mensagem"}
         </button>
       </form>
     </section>

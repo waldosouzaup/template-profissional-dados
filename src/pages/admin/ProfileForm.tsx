@@ -32,6 +32,7 @@ export default function ProfileForm() {
     hero_phrase_start: "",
     hero_phrase_strike: "",
     hero_phrase_end: "",
+    contact_form_key: "",
   });
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export default function ProfileForm() {
         hero_phrase_start: profile.hero_phrase_start || "",
         hero_phrase_strike: profile.hero_phrase_strike || "",
         hero_phrase_end: profile.hero_phrase_end || "",
+        contact_form_key: profile.contact_form_key || "",
       });
     }
   }, [profile]);
@@ -153,6 +155,19 @@ export default function ProfileForm() {
                 />
                 <p className="text-[10px] text-muted-foreground mt-1">
                   Cole aqui o link do PDF do seu currículo. Este link será usado no botão CV da página inicial.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-sm font-medium text-foreground">Chave de Acesso Web3Forms (Para o Form de Contato)</label>
+                <Input
+                  value={formData.contact_form_key}
+                  onChange={(e) => setFormData({ ...formData, contact_form_key: e.target.value })}
+                  placeholder="Seu Access Key do Web3Forms"
+                  className="mt-1"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Para que o formulário de contato envie e-mails diretamente, crie uma chave gratuita em <a href="https://web3forms.com/" target="_blank" className="text-primary hover:underline">web3forms.com</a>.
                 </p>
               </div>
             </div>
