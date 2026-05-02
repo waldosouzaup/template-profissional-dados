@@ -64,12 +64,9 @@ const SkillsSection = () => {
     );
   }
 
-  // Fallback to defaults if no skills found in DB
-  const displaySkills = skills.length > 0 ? skills : [
-    { icon: Zap, name: "IA & Automação", description: "Agentes e fluxos n8n", color: "text-orange-400" },
-    { icon: Code, name: "Web / SaaS", description: "Desenvolvimento Fullstack", color: "text-pink-400" },
-    { icon: Database, name: "Eng. Dados", description: "Arquitetura e Supabase", color: "text-emerald-400" },
-  ];
+  const displaySkills = skills;
+
+  if (displaySkills.length === 0) return null;
 
   return (
     <section className="animate-fade-up delay-400 mt-16">

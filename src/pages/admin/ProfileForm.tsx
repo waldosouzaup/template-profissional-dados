@@ -25,6 +25,13 @@ export default function ProfileForm() {
     cv_url: "",
     favicon_url: "",
     hero_title: "",
+    stat_1_number: "",
+    stat_1_label: "",
+    stat_2_number: "",
+    stat_2_label: "",
+    hero_phrase_start: "",
+    hero_phrase_strike: "",
+    hero_phrase_end: "",
   });
 
   useEffect(() => {
@@ -41,6 +48,13 @@ export default function ProfileForm() {
         cv_url: profile.cv_url || "",
         favicon_url: profile.favicon_url || "",
         hero_title: profile.hero_title || "",
+        stat_1_number: profile.stat_1_number || "",
+        stat_1_label: profile.stat_1_label || "",
+        stat_2_number: profile.stat_2_number || "",
+        stat_2_label: profile.stat_2_label || "",
+        hero_phrase_start: profile.hero_phrase_start || "",
+        hero_phrase_strike: profile.hero_phrase_strike || "",
+        hero_phrase_end: profile.hero_phrase_end || "",
       });
     }
   }, [profile]);
@@ -175,6 +189,67 @@ export default function ProfileForm() {
                   placeholder="Título da página Sobre"
                   className="mt-1"
                 />
+              </div>
+            </div>
+
+            {/* ESTATÍSTICAS E FRASE (HERO) */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium border-b border-border pb-2">Estatísticas e Frase (Hero)</h3>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Estatística 1 (Número)</label>
+                  <Input
+                    value={formData.stat_1_number}
+                    onChange={(e) => setFormData({ ...formData, stat_1_number: e.target.value })}
+                    placeholder="Ex: +15"
+                  />
+                  <label className="text-sm font-medium text-foreground">Estatística 1 (Label)</label>
+                  <Input
+                    value={formData.stat_1_label}
+                    onChange={(e) => setFormData({ ...formData, stat_1_label: e.target.value })}
+                    placeholder="Ex: Projetos Ativos"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-foreground">Estatística 2 (Número)</label>
+                  <Input
+                    value={formData.stat_2_number}
+                    onChange={(e) => setFormData({ ...formData, stat_2_number: e.target.value })}
+                    placeholder="Ex: 5+"
+                  />
+                  <label className="text-sm font-medium text-foreground">Estatística 2 (Label)</label>
+                  <Input
+                    value={formData.stat_2_label}
+                    onChange={(e) => setFormData({ ...formData, stat_2_label: e.target.value })}
+                    placeholder="Ex: Anos de Experiência"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2 pt-2">
+                <label className="text-sm font-medium text-foreground">Frase do Hero (Efeito de Risco)</label>
+                <div className="grid grid-cols-3 gap-2">
+                  <Input
+                    value={formData.hero_phrase_start}
+                    onChange={(e) => setFormData({ ...formData, hero_phrase_start: e.target.value })}
+                    placeholder="Ex: Data is the"
+                  />
+                  <Input
+                    value={formData.hero_phrase_strike}
+                    onChange={(e) => setFormData({ ...formData, hero_phrase_strike: e.target.value })}
+                    placeholder="Ex: Future"
+                  />
+                  <Input
+                    value={formData.hero_phrase_end}
+                    onChange={(e) => setFormData({ ...formData, hero_phrase_end: e.target.value })}
+                    placeholder="Ex: Present."
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  A frase será montada como: [Início] [Riscado] [Fim]
+                </p>
               </div>
             </div>
 

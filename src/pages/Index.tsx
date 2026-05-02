@@ -7,19 +7,27 @@ import ContactSection from "@/components/portfolio/ContactSection";
 import FooterSection from "@/components/portfolio/FooterSection";
 import SEOHead from "@/components/SEOHead";
 
+import { useProfiles } from "@/hooks/useProfile";
+
 const Index = () => {
+  const { data: profiles = [] } = useProfiles();
+  const profile = profiles[0];
+  
+  const siteTitle = profile?.full_name ? `${profile.full_name} | ${profile.current_focus || "Especialista"}` : "Waldo Eller | Especialista em Dados, Tecnologia e IA";
+  const siteDescription = profile?.bio_summary || "Portfolio e Blog de Waldo Eller, Especialista em Dados, Tecnologia e IA.";
+
   return (
     <div className="min-h-screen bg-background pt-16">
       <SEOHead
-        title="Waldo Eller | Especialista em Dados, Tecnologia e IA"
-        description="Portfolio e Blog de Waldo Eller, Especialista em Dados, Tecnologia e IA. Fundador da NoCode StartUp e criador do maior ecossistema de NoCode IA do Brasil."
+        title={siteTitle}
+        description={siteDescription}
         canonical="https://waldoeller.com/"
         ogType="website"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Person",
-          name: "Waldo Eller",
-          jobTitle: "Especialista em Dados, Tecnologia e IA",
+          name: profile?.full_name || "Waldo Eller",
+          jobTitle: profile?.current_focus || "Especialista em Dados, Tecnologia e IA",
           url: "https://waldoeller.com",
           sameAs: [],
           knowsAbout: ["Dados", "Inteligência Artificial", "Tecnologia", "NoCode"],

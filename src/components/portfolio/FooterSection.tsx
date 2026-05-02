@@ -9,11 +9,22 @@ const socialLinks = [
 ];
 
 const FooterSection = () => {
-  const { data: profiles = [] } = useProfiles();
+  const { data: profiles = [], isLoading } = useProfiles();
   const profile = profiles[0];
   
-  const profileName = profile?.full_name || "Waldo Eller";
-  const currentFocus = profile?.current_focus || "Data, Technology & AI";
+  if (isLoading) {
+    return (
+      <footer className="animate-pulse mt-20 pt-10 border-t border-border">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="h-6 w-32 bg-secondary rounded" />
+          <div className="h-6 w-48 bg-secondary rounded" />
+        </div>
+      </footer>
+    );
+  }
+
+  const profileName = profile?.full_name || "";
+  const currentFocus = profile?.current_focus || "";
 
   return (
     <footer className="animate-fade-up delay-500 mt-20 pt-10 border-t border-border">

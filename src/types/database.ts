@@ -107,6 +107,13 @@ export const ProfileSchema = z.object({
   navbar_icon: z.string().optional(),
   theme: z.enum(["dark", "light"]).default("dark"),
   primary_color: z.string().default("142 71% 45%"),
+  stat_1_number: z.string().default("+15"),
+  stat_1_label: z.string().default("Projetos Ativos"),
+  stat_2_number: z.string().default("5+"),
+  stat_2_label: z.string().default("Anos de Experiência"),
+  hero_phrase_start: z.string().default("Data is the"),
+  hero_phrase_strike: z.string().default("Future"),
+  hero_phrase_end: z.string().default("Present."),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;

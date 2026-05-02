@@ -14,7 +14,7 @@ const ProfileCard = () => {
   const profile = profiles[0];
   
   const avatarUrl = profile?.avatar_url || profilePhoto;
-  const profileName = profile?.full_name || "Waldo Eller";
+  const profileName = profile?.full_name || "";
 
   if (isLoading) {
     return (

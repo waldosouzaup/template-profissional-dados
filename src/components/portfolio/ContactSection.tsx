@@ -4,17 +4,27 @@ import { useProfiles } from "@/hooks/useProfile";
 import { toast } from "sonner";
 
 const ContactSection = () => {
-  const { data: profiles = [] } = useProfiles();
+  const { data: profiles = [], isLoading } = useProfiles();
   const profile = profiles[0];
   
-  const email = profile?.email || "contato@waldoeller.com";
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
   const [isSending, setIsSending] = useState(false);
+
+  if (isLoading) {
+    return (
+      <section className="animate-pulse mt-20">
+        <div className="h-8 bg-secondary rounded w-48 mb-6" />
+        <div className="h-12 bg-secondary rounded-xl w-full mb-4" />
+        <div className="h-40 bg-secondary rounded-xl w-full" />
+      </section>
+    );
+  }
+
+  const email = profile?.email || "";
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -14,6 +14,7 @@ Este projeto é um **template profissional de Portfólio e Blog**, construído c
 - 📝 **Blog Integrado com Categorias**: Sistema de blog completo com suporte a Markdown, categorias filtráveis, tempo de leitura estimado e índice interativo.
 - 📂 **Arquivos do Post**: Campo dedicado para vincular pastas do Google Drive com arquivos de apoio diretamente nos posts do blog.
 - 🏠 **Branding Dinâmico**: Altere o ícone de logo da Navbar diretamente no perfil usando qualquer ícone da biblioteca Lucide.
+- 📊 **Estatísticas Personalizáveis**: Configure números de projetos, anos de experiência e frases de impacto diretamente pelo painel administrativo na seção Hero.
 - 📚 **Biblioteca & Certificações**: Seções dinâmicas para exibir livros que você recomenda e cursos/certificações extras.
 - 🛠️ **Painel Administrativo**: Gestão completa com autenticação Supabase para gerenciar Portfólio, Experiências, Educação, Livros, Cursos, Páginas Customizadas e Configurações de Perfil (incluindo Favicon).
 - 🔍 **SEO Otimizado**: Meta tags dinâmicas, Microdados Estruturados (JSON-LD) e geração pronta para sitemap para garantir visibilidade máxima nos motores de busca.
@@ -71,7 +72,14 @@ create table profiles (
   hero_title text,
   navbar_icon text default 'Database',
   theme text default 'dark',
-  primary_color text default '142 71% 45%'
+  primary_color text default '142 71% 45%',
+  stat_1_number text default '+15',
+  stat_1_label text default 'Projetos Ativos',
+  stat_2_number text default '5+',
+  stat_2_label text default 'Anos de Experiência',
+  hero_phrase_start text default 'Data is the',
+  hero_phrase_strike text default 'Future',
+  hero_phrase_end text default 'Present.'
 );
 
 -- TABELA DE PROJETOS (PROJECTS)
