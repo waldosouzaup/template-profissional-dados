@@ -15,6 +15,7 @@ Este projeto é um **template profissional de Portfólio e Blog**, construído c
 - 📂 **Arquivos do Post**: Campo dedicado para vincular pastas do Google Drive com arquivos de apoio diretamente nos posts do blog.
 - 🏠 **Branding Dinâmico**: Altere o ícone de logo da Navbar diretamente no perfil usando qualquer ícone da biblioteca Lucide.
 - 📊 **Estatísticas Personalizáveis**: Configure números de projetos, anos de experiência e frases de impacto diretamente pelo painel administrativo na seção Hero.
+- ✉️ **Formulário de Contato Direto**: Envio de e-mails diretamente pelo site usando a integração com Web3Forms (configurável via Admin).
 - 📚 **Biblioteca & Certificações**: Seções dinâmicas para exibir livros que você recomenda e cursos/certificações extras.
 - 🛠️ **Painel Administrativo**: Gestão completa com autenticação Supabase para gerenciar Portfólio, Experiências, Educação, Livros, Cursos, Páginas Customizadas e Configurações de Perfil (incluindo Favicon).
 - 🔍 **SEO Otimizado**: Meta tags dinâmicas, Microdados Estruturados (JSON-LD) e geração pronta para sitemap para garantir visibilidade máxima nos motores de busca.
@@ -79,7 +80,8 @@ create table profiles (
   stat_2_label text default 'Anos de Experiência',
   hero_phrase_start text default 'Data is the',
   hero_phrase_strike text default 'Future',
-  hero_phrase_end text default 'Present.'
+  hero_phrase_end text default 'Present.',
+  contact_form_key text
 );
 
 -- TABELA DE PROJETOS (PROJECTS)
@@ -247,11 +249,22 @@ Fazer o deploy para a nuvem é rápido e gratuito com plataformas como a Netlify
 
 Seu portfólio está configurado e responsivo, pronto para brilhar online.
 
-## 👨‍💻 Criador
+## ✉️ Configuração do Formulário de Contato (Web3Forms)
 
-Este projeto foi desenvolvido e é mantido por **Waldo Eller**. Se você gostou deste template ou deseja conhecer mais do meu trabalho, visite meu site oficial:
+O formulário de contato do portfólio está integrado ao **Web3Forms**, permitindo que você receba mensagens diretamente no seu e-mail sem a necessidade de um backend próprio. 
 
-👉 [**www.waldoeller.com**](https://www.waldoeller.com)
+Para ativar o envio direto de e-mails:
+
+1. Acesse [web3forms.com](https://web3forms.com/).
+2. Digite seu e-mail no campo principal e clique em **"Create Access Key"**.
+3. Você receberá uma chave (Access Key) única no seu e-mail.
+4. No painel administrativo do seu portfólio, acesse a aba **Perfil**.
+5. No campo **"Chave de Acesso Web3Forms"**, cole a chave que você recebeu.
+6. Clique em **Salvar Alterações**.
+
+A partir de agora, todas as mensagens enviadas através da seção "Vamos Conversar" do seu site serão entregues diretamente na sua caixa de entrada!
+
+*Nota: Se a chave não for configurada, o formulário utilizará o comportamento padrão (mailto), abrindo o aplicativo de e-mail local do usuário.*
 
 ---
 
@@ -294,3 +307,9 @@ A seção de Tecnologias da página inicial possui um renderizador dinâmico ext
 Este projeto está sob a licença MIT. Sinta-se à vontade para clonar, modificar as estéticas e usar livremente para a sua própria apresentação técnica! No painel de administração, as ferramentas se tornam dinâmicas e de fácil uso.
 
 Desenvolvido por Waldo Eller para ajudar profissionais de tecnologia a apresentarem o que fazem de melhor aos recrutadores e clientes.
+
+## 👨‍💻 Criador
+
+Este projeto foi desenvolvido e é mantido por **Waldo Eller**. Se você gostou deste template visite meu site oficial:
+
+👉 [**www.waldoeller.com**](https://www.waldoeller.com)
