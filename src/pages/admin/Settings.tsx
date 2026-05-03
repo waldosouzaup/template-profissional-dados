@@ -58,9 +58,19 @@ export default function Settings() {
             </section>
 
             <section>
-              <h3 className="text-foreground">Configurações de SEO</h3>
+              <h3 className="text-foreground flex items-center gap-2">
+                <Info className="w-4 h-4" />
+                Configurações de SEO e Branding
+              </h3>
               <p>
-                Na aba <strong>Perfil</strong>, você pode alterar o título do site e o <strong>Favicon</strong> (o ícone que aparece na aba do navegador).
+                Na aba <strong>Perfil</strong>, você pode gerenciar a identidade visual do seu site:
+              </p>
+              <ul className="list-disc pl-5 space-y-1">
+                <li><strong>Favicon:</strong> O ícone que aparece na aba do navegador. Recomenda-se PNG 512x512px.</li>
+                <li><strong>Logo da Navbar:</strong> Você pode fazer o upload de uma imagem para ser sua logo principal no topo do site.</li>
+                <li><strong>Ícone da Navbar:</strong> Caso não queira usar uma imagem, pode escolher um nome de ícone da biblioteca Lucide (ex: Database, Code). Ele servirá como fallback se não houver logo.</li>
+              </ul>
+              <p className="mt-2 text-xs">
                 Certifique-se de preencher a bio resumida para que as redes sociais e o Google exibam a descrição correta do seu site.
               </p>
             </section>

@@ -33,6 +33,8 @@ export default function ProfileForm() {
     hero_phrase_strike: "",
     hero_phrase_end: "",
     contact_form_key: "",
+    navbar_icon: "",
+    navbar_logo_url: "",
   });
 
   useEffect(() => {
@@ -57,6 +59,8 @@ export default function ProfileForm() {
         hero_phrase_strike: profile.hero_phrase_strike || "",
         hero_phrase_end: profile.hero_phrase_end || "",
         contact_form_key: profile.contact_form_key || "",
+        navbar_icon: profile.navbar_icon || "",
+        navbar_logo_url: profile.navbar_logo_url || "",
       });
     }
   }, [profile]);
@@ -292,8 +296,20 @@ export default function ProfileForm() {
                 </p>
               </div>
 
+              <div className="pt-4">
+                <ImageUpload
+                  label="Logo da Navbar"
+                  value={formData.navbar_logo_url}
+                  onChange={(url) => setFormData({ ...formData, navbar_logo_url: url })}
+                  path="portfolio"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  Se enviado, a logo substituirá o ícone na barra de navegação.
+                </p>
+              </div>
+
               <div>
-                <label className="text-sm font-medium text-foreground">Ícone da Navbar (Logo)</label>
+                <label className="text-sm font-medium text-foreground">Ícone da Navbar (Fallback)</label>
                 <Input
                   value={formData.navbar_icon}
                   onChange={(e) => setFormData({ ...formData, navbar_icon: e.target.value })}
@@ -301,7 +317,7 @@ export default function ProfileForm() {
                   className="mt-1"
                 />
                 <p className="text-xs text-muted-foreground mt-1">
-                  Nome do ícone da biblioteca Lucide React (em PascalCase). Ex: Database, Code, Terminal.
+                  Nome do ícone da biblioteca Lucide React (em PascalCase). Usado se não houver logo.
                 </p>
               </div>
             </div>

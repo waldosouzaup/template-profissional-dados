@@ -13,7 +13,7 @@ Este projeto é um **template profissional de Portfólio e Blog**, construído c
 - 🏷️ **Páginas Customizadas (CMS)**: Crie novas páginas dinâmicas com suporte a Markdown diretamente pelo admin (ex: `/p/seu-link`).
 - 📝 **Blog Integrado com Categorias**: Sistema de blog completo com suporte a Markdown, categorias filtráveis, tempo de leitura estimado e índice interativo.
 - 📂 **Arquivos do Post**: Campo dedicado para vincular pastas do Google Drive com arquivos de apoio diretamente nos posts do blog.
-- 🏠 **Branding Dinâmico**: Altere o ícone de logo da Navbar diretamente no perfil usando qualquer ícone da biblioteca Lucide.
+- 🏠 **Branding Dinâmico**: Faça o upload da sua própria logo ou escolha um ícone da biblioteca Lucide para a Navbar diretamente no painel administrativo.
 - 📊 **Estatísticas Personalizáveis**: Configure números de projetos, anos de experiência e frases de impacto diretamente pelo painel administrativo na seção Hero.
 - ✉️ **Formulário de Contato Direto**: Envio de e-mails diretamente pelo site usando a integração com Web3Forms (configurável via Admin).
 - 📚 **Biblioteca & Certificações**: Seções dinâmicas para exibir livros que você recomenda e cursos/certificações extras.
@@ -72,6 +72,7 @@ create table profiles (
   favicon_url text,
   hero_title text,
   navbar_icon text default 'Database',
+  navbar_logo_url text,
   theme text default 'dark',
   primary_color text default '142 71% 45%',
   stat_1_number text default '+15',

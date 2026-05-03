@@ -34,9 +34,17 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl text-foreground group">
-            <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center group-hover:bg-primary/25 transition-colors">
-              <DynamicIcon className="w-4 h-4 text-primary" />
-            </div>
+            {profile?.navbar_logo_url ? (
+              <img 
+                src={profile.navbar_logo_url} 
+                alt="Logo" 
+                className="h-8 w-auto object-contain transition-transform group-hover:scale-105" 
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-lg bg-primary/15 border border-primary/30 flex items-center justify-center group-hover:bg-primary/25 transition-colors">
+                <DynamicIcon className="w-4 h-4 text-primary" />
+              </div>
+            )}
           </Link>
 
           <button
