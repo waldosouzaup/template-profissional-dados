@@ -1,41 +1,87 @@
-# 🚀 Template para Profissionais de Dados & IA & TI
+# Template Profissional de Portfólio, Blog e CMS
 
----
+Aplicação React para portfólio profissional com blog, painel administrativo, CMS de páginas customizadas, upload de imagens, SEO dinâmico, tema configurável e integração com Supabase.
 
-Este projeto é um **template profissional de Portfólio e Blog**, construído com tecnologias modernas para oferecer uma experiência de "Dark Mode" elegante, gestão administrativa integrada e alta performance. Ideal para engenheiros de dados, desenvolvedores e entusiastas de IA que desejam uma presença online de impacto.
+O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimento que precisam de uma presença digital elegante, editável e pronta para produção.
 
 ![Template](https://ltgqjjxhkqunuiqxmfvl.supabase.co/storage/v1/object/public/portfolio/00-template.png)
 
-### ✨ Funcionalidades
+## Funcionalidades
 
-- 🌑 **Dark/Light Mode Premium**: Suporte total a temas claros e escuros, configurável via painel administrativo.
-- 🎨 **Personalização de Cores**: Escolha entre 6 paletas de cores de destaque premium (Verde, Azul, Roxo, Laranja, Rosa, Amarelo) que alteram instantaneamente a estética de todo o site.
-- 🏷️ **Páginas Customizadas (CMS)**: Crie novas páginas dinâmicas com suporte a Markdown diretamente pelo admin (ex: `/p/seu-link`).
-- 📝 **Blog Integrado com Categorias**: Sistema de blog completo com suporte a Markdown, categorias filtráveis, tempo de leitura estimado e índice interativo.
-- 📂 **Arquivos do Post**: Campo dedicado para vincular pastas do Google Drive com arquivos de apoio diretamente nos posts do blog.
-- 🏠 **Branding Dinâmico**: Faça o upload da sua própria logo ou escolha um ícone da biblioteca Lucide para a Navbar diretamente no painel administrativo.
-- 📊 **Estatísticas Personalizáveis**: Configure números de projetos, anos de experiência e frases de impacto diretamente pelo painel administrativo na seção Hero.
-- ✉️ **Formulário de Contato Direto**: Envio de e-mails diretamente pelo site usando a integração com Web3Forms (configurável via Admin).
-- 📚 **Biblioteca & Certificações**: Seções dinâmicas para exibir livros que você recomenda e cursos/certificações extras.
-- 🛠️ **Painel Administrativo**: Gestão completa com autenticação Supabase para gerenciar Portfólio, Experiências, Educação, Livros, Cursos, Páginas Customizadas e Configurações de Perfil (incluindo Favicon).
-- 🔍 **SEO Otimizado**: Meta tags dinâmicas, Microdados Estruturados (JSON-LD) e geração pronta para sitemap para garantir visibilidade máxima nos motores de busca.
-- ⚡ **Performance Ultra**: Construído com Vite + React para carregamento instantâneo.
+- Portfólio com projetos categorizados por Dados, Web e IA.
+- Blog com Markdown, categorias, imagem de capa, slug e arquivos complementares via Google Drive.
+- Página exclusiva de contato em `/contact`, com formulário Web3Forms ou fallback por `mailto`.
+- Painel administrativo protegido por Supabase Auth.
+- CMS de páginas customizadas em `/p/:slug`.
+- Tema claro/escuro e cor de destaque configuráveis no admin.
+- Branding dinâmico com favicon, logo da navbar e ícone fallback Lucide.
+- Estatísticas e frases do Hero editáveis pelo painel.
+- Biblioteca de livros, cursos/certificações, experiência, formação e timeline de jornada.
+- Upload de imagens no Supabase Storage.
+- SEO dinâmico com meta tags, canonical, Open Graph e JSON-LD.
+- Sitemap gerado automaticamente no build.
+- Campo administrativo para tags de rastreamento como Google Tag, Google Analytics, GTM e Pixel da Meta.
 
-### 🛠️ Tecnologias
+## Stack
 
-- **Frontend**: React 18, TypeScript, Tailwind CSS, Shadcn UI, Lucide React, Framer Motion (animações).
-- **Backend/Database**: Supabase (PostgreSQL, Auth, Storage).
-- **Gerenciamento de Estado**: TanStack Query (React Query) e Zustand.
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui e Radix UI
+- Lucide React
+- React Icons
+- React Router
+- TanStack Query
+- React Hook Form e Zod
+- React Markdown e remark-gfm
+- Supabase Auth, Database e Storage
+- Web3Forms para formulário de contato
+- Vitest
+- Netlify-ready
 
----
+## Rotas Públicas
 
-## 🚀 Guia Completo de Setup & Instalação
+| Rota | Descrição |
+| --- | --- |
+| `/` | Home com perfil, Hero, projetos destacados e skills |
+| `/projects` | Galeria de projetos |
+| `/projects/:id` | Detalhe de projeto |
+| `/about` | Página sobre, jornada, experiência, formação, livros e cursos |
+| `/blog` | Listagem de posts |
+| `/blog/:idOrSlug` | Post individual |
+| `/contact` | Página dedicada de contato |
+| `/p/:slug` | Página customizada criada pelo CMS |
 
-Siga este passo a passo detalhado para clonar e rodar o seu próprio portfólio.
+## Painel Administrativo
 
-### 1. Clonar e Instalar as Dependências
+O painel fica em `/admin` e usa autenticação do Supabase.
 
-Primeiro, obtenha o código fonte do repositório:
+Módulos disponíveis:
+
+- Projetos
+- Jornada
+- Livros
+- Conteúdos/Blog
+- Formação
+- Cursos
+- Experiências
+- Páginas customizadas
+- Perfil
+- Tecnologias
+- Configurações
+
+Na aba `Configurações`, o administrador pode ajustar aparência e inserir tags de rastreamento. Na aba `Perfil`, é possível editar identidade, contato, Hero, favicon, logo da navbar e chave Web3Forms.
+
+## Pré-requisitos
+
+- Node.js 20 ou superior
+- npm
+- Projeto Supabase ativo
+- Bucket público `portfolio` no Supabase Storage
+- Usuário admin criado no Supabase Auth
+
+## Instalação
 
 ```bash
 git clone https://github.com/waldosouzaup/template-profissional-dados.git
@@ -43,274 +89,216 @@ cd dark-mode-mirror
 npm install
 ```
 
-### 2. Configurar o Supabase (Banco de Dados e Auth)
-
-Este projeto usa o **Supabase** como backend.
-
-1. Crie uma conta no [Supabase](https://supabase.com/) e crie um novo projeto.
-2. Vá no portal do seu projeto Supabase, acesse **Project Settings > API** e anote a sua **Project URL** e a sua **"anon" public API key**.
-
-#### Criando as Tabelas (Database Schema)
-
-Vá até o menu **SQL Editor** no painel do Supabase, crie um novo script e execute o seguinte código SQL para construir estruturalmente o banco de dados e habilitar o sistema de segurança (RLS):
-
-```sql
--- TABELA DE PERFIS (PROFILES)
-create table profiles (
-  id uuid references auth.users on delete cascade primary key,
-  updated_at timestamp with time zone,
-  full_name text,
-  bio_summary text,
-  bio_detailed text,
-  phone text default '(61) 9 9116-1854',
-  email text,
-  avatar_url text,
-  location text default 'Brasília, DF',
-  current_focus text default 'Engenharia de Dados',
-  about_title text,
-  cv_url text,
-  favicon_url text,
-  hero_title text,
-  navbar_icon text default 'Database',
-  navbar_logo_url text,
-  theme text default 'dark',
-  primary_color text default '142 71% 45%',
-  stat_1_number text default '+15',
-  stat_1_label text default 'Projetos Ativos',
-  stat_2_number text default '5+',
-  stat_2_label text default 'Anos de Experiência',
-  hero_phrase_start text default 'Data is the',
-  hero_phrase_strike text default 'Future',
-  hero_phrase_end text default 'Present.',
-  contact_form_key text
-);
-
--- TABELA DE PROJETOS (PROJECTS)
-create table projects (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  category text check (category in ('Dados', 'Web', 'IA')),
-  description text not null,
-  technologies text[] default '{}',
-  image_url text,
-  business_problem text,
-  context text,
-  premises text[] default '{}',
-  strategy text[] default '{}',
-  insights text[] default '{}',
-  results text[] default '{}',
-  next_steps text[] default '{}',
-  github_url text,
-  demo_url text,
-  display_order integer default 0,
-  is_published boolean default true,
-  markdown text,
-  created_at timestamp with time zone default now()
-);
-
--- TABELA DE EDUCAÇÃO (EDUCATION)
-create table education (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  institution text not null,
-  period text,
-  description text,
-  display_order integer default 0,
-  created_at timestamp with time zone default now()
-);
-
--- TABELA DE EXPERIÊNCIAS (EXPERIENCE)
-create table experience (
-  id uuid default gen_random_uuid() primary key,
-  type text check (type in ('profissional', 'embaixador', 'projeto', 'outros')),
-  icon_type text check (icon_type in ('rocket', 'award', 'briefcase')) default 'rocket',
-  title text not null,
-  institution text not null,
-  description text,
-  period text,
-  display_order integer default 0,
-  created_at timestamp with time zone default now()
-);
-
--- TABELA DE CONTEÚDO / BLOG (CONTENTS)
-create table contents (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  description text,
-  markdown text,
-  image_url text,
-  category text,
-  drive_folder_url text,
-  created_at timestamp with time zone default now()
-);
-
--- TABELA DE PÁGINAS CUSTOMIZADAS (CUSTOM_PAGES)
-create table custom_pages (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  slug text not null unique,
-  markdown text,
-  created_at timestamp with time zone default now()
-);
-
--- TABELA DE LIVROS (BOOKS)
-create table books (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  author text,
-  description text,
-  image_url text,
-  created_at timestamp with time zone default now()
-);
-
--- TABELA DE CURSOS (COURSES)
-create table courses (
-  id uuid default gen_random_uuid() primary key,
-  title text not null,
-  period text,
-  certificate_url text,
-  description text,
-  topics text[] default '{}',
-  created_at timestamp with time zone default now()
-);
-
--- Habilitar RLS (Row Level Security)
-alter table profiles enable row level security;
-alter table projects enable row level security;
-alter table education enable row level security;
-alter table experience enable row level security;
-alter table contents enable row level security;
-alter table custom_pages enable row level security;
-alter table books enable row level security;
-alter table courses enable row level security;
-
--- Políticas de Acesso de Leitura Pública
-create policy "Allow public read access" on profiles for select using (true);
-create policy "Allow public read access" on projects for select using (true);
-create policy "Allow public read access" on education for select using (true);
-create policy "Allow public read access" on experience for select using (true);
-create policy "Allow public read access" on contents for select using (true);
-create policy "Allow public read access" on custom_pages for select using (true);
-create policy "Allow public read access" on books for select using (true);
-create policy "Allow public read access" on courses for select using (true);
-
--- Políticas Básicas de Escrita para Usuários Autenticados (Admin)
-create policy "Allow authenticated CRUD" on profiles for all to authenticated using (true) with check (true);
-create policy "Allow authenticated CRUD" on projects for all to authenticated using (true) with check (true);
-create policy "Allow authenticated CRUD" on education for all to authenticated using (true) with check (true);
-create policy "Allow authenticated CRUD" on experience for all to authenticated using (true) with check (true);
-create policy "Allow authenticated CRUD" on contents for all to authenticated using (true) with check (true);
-create policy "Allow authenticated CRUD" on custom_pages for all to authenticated using (true) with check (true);
-create policy "Allow authenticated CRUD" on books for all to authenticated using (true) with check (true);
-create policy "Allow authenticated CRUD" on courses for all to authenticated using (true) with check (true);
-```
-
-#### Criação do Usuário Administrador
-
-Ainda no Supabase Dashboard, navegue até a guia **Authentication > Users** e clique em **Add user** (Adicionar Usuário). 
-Crie a sua conta de Email e Senha. Este será o login que você usará para acessar o `/admin` do portfólio.
-
-#### 📂 Configurando o Storage (Imagens)
-
-Para que o upload de fotos de perfil e capas de projetos funcione:
-1. No painel do Supabase, vá em **Storage**.
-2. Clique em **New Bucket** e crie um bucket chamado `portfolio`.
-3. Certifique-se de marcar a opção **Public bucket** para que as imagens fiquem visíveis no seu site.
-
-### 3. Configurar as Variáveis de Ambiente Locais
-
-Crie um novo arquivo chamado `.env.local` na pasta raiz do projeto clonado, e preencha com as credenciais que você anotou no Passo 2:
+Crie o arquivo `.env.local` na raiz:
 
 ```env
-VITE_SUPABASE_URL=sua_url_do_supabase_aqui
-VITE_SUPABASE_ANON_KEY=sua_chave_anon_do_supabase_aqui
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anon_publica
 ```
 
-### 4. Rodando o Projeto
-
-Agora que o banco está configurado e as chaves injetadas, basta rodar o servidor de desenvolvimento:
+Rode o projeto:
 
 ```bash
 npm run dev
 ```
 
-Acesse `http://localhost:8080/admin` (ou a porta exibida no seu console) e faça o login com o e-mail e senha criados. Após o login, você poderá cadastrar seus projetos, experiências e livros!
+Acesse:
 
-### 5. Deploy em Produção (Vercel ou Netlify)
+- Site: `http://localhost:8080`
+- Admin: `http://localhost:8080/admin`
 
-Fazer o deploy para a nuvem é rápido e gratuito com plataformas como a Netlify ou a Vercel.
+## Scripts
 
-1. Suba o seu código push no GitHub.
-2. Acesse a **Netlify** (ou **Vercel**), crie um novo site importando o seu repositório.
-3. Nas configurações de deploy da plataforma, garanta as seguintes regras:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-4. Na página de configuração das **Environment Variables** da Vercel/Netlify, certifique-se de preencher as chaves `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY`.
-5. Clique em Deploy.
+```bash
+npm run dev
+npm run build
+npm run build:dev
+npm run preview
+npm run lint
+npm run test
+npm run test:watch
+```
 
-Seu portfólio está configurado e responsivo, pronto para brilhar online.
+O comando `npm run build` executa `scripts/generate-sitemap.js` antes do build para atualizar `public/sitemap.xml`.
 
-## ✉️ Configuração do Formulário de Contato (Web3Forms)
+## Banco de Dados
 
-O formulário de contato do portfólio está integrado ao **Web3Forms**, permitindo que você receba mensagens diretamente no seu e-mail sem a necessidade de um backend próprio. 
+O projeto usa Supabase/PostgreSQL. As tabelas principais são:
 
-Para ativar o envio direto de e-mails:
+- `profiles`
+- `projects`
+- `contents`
+- `custom_pages`
+- `books`
+- `courses`
+- `education`
+- `experience`
+- `journey_items`
+- `technologies`
 
-1. Acesse [web3forms.com](https://web3forms.com/).
-2. Digite seu e-mail no campo principal e clique em **"Create Access Key"**.
-3. Você receberá uma chave (Access Key) única no seu e-mail.
-4. No painel administrativo do seu portfólio, acesse a aba **Perfil**.
-5. No campo **"Chave de Acesso Web3Forms"**, cole a chave que você recebeu.
-6. Clique em **Salvar Alterações**.
+As políticas esperadas são:
 
-A partir de agora, todas as mensagens enviadas através da seção "Vamos Conversar" do seu site serão entregues diretamente na sua caixa de entrada!
+- leitura pública para conteúdo exibido no site;
+- CRUD para usuários autenticados no painel administrativo.
 
-*Nota: Se a chave não for configurada, o formulário utilizará o comportamento padrão (mailto), abrindo o aplicativo de e-mail local do usuário.*
+## SQL Para Tags de Rastreamento
 
----
+Execute no SQL Editor do Supabase:
 
-## 🎨 Gestão de Ícones (Experiências e Skills)
+```sql
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS tracking_tags TEXT;
 
-Este template foi projetado para oferecer flexibilidade total na renderização de ícones para as suas tecnologias e experiências. Abaixo, explicamos como gerenciar e utilizar os ícones através do Painel Administrativo.
+COMMENT ON COLUMN public.profiles.tracking_tags IS
+'Snippets HTML/JavaScript de rastreamento, como Google Tag, Google Analytics, GTM ou Meta Pixel.';
+```
 
-### Seção 'Experiências'
-Na seção de Experiências profissionais, o sistema utiliza a biblioteca **Lucide React**.
-No momento do cadastro de uma nova experiência no painel de administração (`/admin/experiences`), você deve selecionar o tipo da experiência que define o ícone padrão, ou inserir o nome do ícone diretamente. 
+O mesmo comando está disponível em:
 
-Os ícones padrão suportados na aba de experiência são:
-- `rocket`: Ideal para experiências profissionais e lançamentos.
-- `award`: Ideal para prêmios, reconhecimentos ou posições de destaque.
-- `briefcase`: Ideal para experiência corporativa, trabalhos formais ou projetos de longo prazo.
+```text
+add_tracking_tags_to_profiles.sql
+```
 
-*(Se necessário adicionar novos ícones na experiência, basta adicionar novos nomes no schema do banco de dados na constante `IconTypeEnum` e injetar o ícone correspondente no frontend via Lucide).*
+Depois de aplicar o SQL, acesse `/admin/settings`, cole os snippets no campo `Tags de Rastreamento` e salve.
 
-### Seção 'Skills & Tecnologias'
-A seção de Tecnologias da página inicial possui um renderizador dinâmico extremamente robusto, que mapeia ícones diretamente das bibliotecas `react-icons/si` (Simple Icons) e `lucide-react`.
+## Como Usar Tags de Rastreamento
 
-1. **Como Inserir o Ícone no Painel**:
-   No painel administrativo de Tecnologias (`/admin/technologies`), há um campo chamado **"Ícone"**. Neste campo, você deve digitar o nome exato do componente de ícone desejado da biblioteca Simple Icons.
-   Exemplos comuns:
-   - Para Python: digite `SiPython`
-   - Para React: digite `SiReact`
-   - Para Docker: digite `SiDocker`
-   - Para AWS: digite `SiAmazonaws` ou use o fallback configurado.
+Cole o snippet completo fornecido pela ferramenta. Exemplo:
 
-2. **Fallbacks Internos Automáticos**:
-   O sistema foi configurado com um mapeamento automático (Fallback) para tecnologias famosas que as vezes possuem nomes complexos ou não estão disponíveis. Caso a string não seja encontrada exatamente no repositório do `react-icons`, o sistema tentará renderizar ícones baseados no `lucide-react` para garantir que o layout nunca quebre (Ex: Azure, Power BI, AWS, Databricks).
+```html
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+```
 
-3. **Pesquisa de Ícones**:
-   Para consultar o nome exato de um ícone que você queira usar na seção de skills, visite o site oficial do [React Icons - Simple Icons](https://react-icons.github.io/react-icons/icons/si/) e busque pela tecnologia. Lembre-se sempre de copiar o nome completo com o prefixo `Si` (Exemplo: `SiPostgresql`).
+Também são aceitos snippets com `<noscript>`, como os usados pelo Google Tag Manager e Pixel da Meta. Cole apenas códigos de provedores confiáveis.
 
----
+## Storage
 
-## 📄 Licença (License)
+Crie no Supabase um bucket público chamado:
 
-Este projeto está sob a licença MIT. Sinta-se à vontade para clonar, modificar as estéticas e usar livremente para a sua própria apresentação técnica! No painel de administração, as ferramentas se tornam dinâmicas e de fácil uso.
+```text
+portfolio
+```
 
-Desenvolvido por Waldo Eller para ajudar profissionais de tecnologia a apresentarem o que fazem de melhor aos recrutadores e clientes.
+Ele é usado para:
 
-## 👨‍💻 Criador
+- foto de perfil;
+- favicon;
+- logo da navbar;
+- capas de projetos;
+- imagens de posts;
+- livros;
+- certificados;
+- imagens auxiliares do portfólio.
 
-Este projeto foi desenvolvido e é mantido por **Waldo Eller**. Se você gostou deste template visite meu site oficial:
+## Formulário de Contato
 
-👉 [**www.waldoeller.com**](https://www.waldoeller.com)
+A página `/contact` usa a chave `contact_form_key` salva no perfil.
+
+Para configurar:
+
+1. Acesse `https://web3forms.com/`.
+2. Gere uma Access Key.
+3. Entre em `/admin/profiles`.
+4. Cole a chave em `Chave de Acesso Web3Forms`.
+5. Salve.
+
+Se a chave não estiver configurada, o formulário abre o cliente de email do visitante usando `mailto`.
+
+## Branding e Aparência
+
+No painel administrativo é possível configurar:
+
+- tema claro ou escuro;
+- cor de destaque;
+- favicon;
+- logo da navbar;
+- ícone fallback da navbar;
+- nome, foco profissional, telefone, email e links;
+- textos do Hero;
+- estatísticas do Hero;
+- frase de impacto.
+
+## Tecnologias e Ícones
+
+O módulo de Tecnologias aceita ícones de:
+
+- `lucide-react`
+- `react-icons/si`
+
+Exemplos:
+
+```text
+SiPython
+SiReact
+SiDocker
+Database
+Cloud
+Zap
+```
+
+Há fallbacks internos para tecnologias comuns como Power BI, Azure e AWS.
+
+## SEO
+
+O componente `SEOHead` atualiza dinamicamente:
+
+- `title`
+- `description`
+- canonical
+- Open Graph
+- Twitter tags
+- JSON-LD
+
+O sitemap inclui rotas fixas e conteúdos dinâmicos de projetos e blog durante o build.
+
+## Deploy
+
+### Netlify
+
+O arquivo `netlify.toml` já define:
+
+```toml
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+
+Configure as variáveis de ambiente na plataforma:
+
+```env
+VITE_SUPABASE_URL=sua_url_do_supabase
+VITE_SUPABASE_ANON_KEY=sua_chave_anon_publica
+```
+
+## Qualidade
+
+Antes de publicar alterações:
+
+```bash
+npm run build
+npm run test
+```
+
+O projeto possui configuração de Vitest com ambiente `jsdom`.
+
+## Licença
+
+MIT.
+
+## Autor
+
+Desenvolvido por Waldo Eller.
+
+Site oficial: [www.waldoeller.com](https://www.waldoeller.com)

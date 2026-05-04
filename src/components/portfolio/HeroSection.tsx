@@ -63,10 +63,10 @@ const HeroSection = () => {
             CV
           </span>
         )}
-        <a href="#contact" className="btn-secondary">
+        <Link to="/contact" className="btn-secondary">
           <MessageCircle className="w-5 h-5" />
           Contato
-        </a>
+        </Link>
         <Link to="/about" className="btn-secondary">
           <Info className="w-5 h-5" />
           Sobre

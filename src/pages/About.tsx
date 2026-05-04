@@ -243,7 +243,7 @@ const About = () => {
             Vamos transformar dados em <span className="text-primary">resultados</span> juntos.
           </h3>
           <Link
-            to="/#contact"
+            to="/contact"
             className="group relative inline-flex items-center gap-3 px-10 py-4 rounded-full text-sm font-medium transition-all duration-500 hover:scale-105"
             style={{
               background: 'linear-gradient(135deg, hsl(142 71% 45%) 0%, hsl(142 60% 35%) 100%)',

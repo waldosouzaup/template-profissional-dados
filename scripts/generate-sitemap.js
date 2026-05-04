@@ -33,6 +33,7 @@ async function generateSitemap() {
       '/about',
       '/projects',
       '/blog',
+      '/contact',
     ];
 
     if (projects) {

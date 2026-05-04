@@ -10,7 +10,7 @@ const navItems = [
   { path: "/projects", label: "Portfólio", icon: FolderOpen },
   { path: "/about", label: "Sobre", icon: User },
   { path: "/blog", label: "Blog", icon: BookOpen },
-  { path: "/#contact", label: "Contato", icon: Mail },
+  { path: "/contact", label: "Contato", icon: Mail },
 ];
 
 const Navbar = () => {
@@ -18,7 +18,6 @@ const Navbar = () => {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === "/#contact") return false;
     return location.pathname === path;
   };
 

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Book, HelpCircle, Info, Settings as SettingsIcon, Palette, Moon, Sun, Loader2 } from "lucide-react";
+import { Book, Code2, HelpCircle, Info, Settings as SettingsIcon, Palette, Moon, Sun, Loader2 } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfile";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function Settings() {
   return (
@@ -18,6 +19,7 @@ export default function Settings() {
       </div>
 
       <ThemeSettings />
+      <TrackingSettings />
 
       <Card>
         <CardHeader>
@@ -81,6 +83,18 @@ export default function Settings() {
                 Ao enviar imagens, procure usar formatos otimizados (WebP ou JPG) para garantir que seu site carregue rapidamente para os visitantes.
               </p>
             </section>
+
+            <section>
+              <h3 className="text-foreground flex items-center gap-2">
+                <Code2 className="w-4 h-4" />
+                Tags de Rastreamento
+              </h3>
+              <p>
+                Na aba <strong>Configurações</strong>, cole snippets completos de Google Tag,
+                Google Analytics, Google Tag Manager, Pixel da Meta ou tags equivalentes. Os
+                scripts serão aplicados automaticamente no site público após salvar.
+              </p>
+            </section>
           </div>
         </CardContent>
       </Card>
@@ -96,6 +110,65 @@ const THEME_COLORS = [
   { name: "Rosa", value: "346 87% 43%", hex: "#e11d48" },
   { name: "Amarelo", value: "45 93% 47%", hex: "#eab308" },
 ];
+
+function TrackingSettings() {
+  const { data: profiles = [], updateProfile, isUpdating } = useProfiles();
+  const profile = profiles[0];
+  const [trackingTags, setTrackingTags] = useState("");
+
+  useEffect(() => {
+    if (profile) {
+      setTrackingTags(profile.tracking_tags || "");
+    }
+  }, [profile]);
+
+  const handleSave = async () => {
+    if (!profile) return;
+
+    await updateProfile({
+      ...profile,
+      tracking_tags: trackingTags,
+    });
+  };
+
+  if (!profile) return null;
+
+  return (
+    <Card className="border-border">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Code2 className="w-5 h-5 text-primary" />
+          Tags de Rastreamento
+        </CardTitle>
+        <CardDescription>
+          Insira snippets completos de ferramentas como Google Tag, Google Analytics, Google Tag
+          Manager, Pixel da Meta ou plataformas semelhantes.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="tracking-tags">Snippets HTML/JavaScript</Label>
+          <Textarea
+            id="tracking-tags"
+            value={trackingTags}
+            onChange={(event) => setTrackingTags(event.target.value)}
+            placeholder={`<!-- Google tag (gtag.js) -->\n<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){dataLayer.push(arguments);}\n  gtag('js', new Date());\n  gtag('config', 'G-XXXXXXXXXX');\n</script>`}
+            className="min-h-[260px] font-mono text-xs"
+          />
+          <p className="text-xs text-muted-foreground">
+            Cole apenas tags de provedores confiáveis. Este conteúdo será injetado no site público
+            para habilitar mensuração, remarketing e pixels.
+          </p>
+        </div>
+
+        <Button onClick={handleSave} disabled={isUpdating} className="w-full sm:w-auto">
+          {isUpdating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+          Salvar Tags
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 function ThemeSettings() {
   const { data: profiles = [], updateProfile, isUpdating } = useProfiles();

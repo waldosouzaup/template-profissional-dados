@@ -10,6 +10,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Contact from "./pages/Contact";
 import Navbar from "./components/portfolio/Navbar";
 
 // Admin
@@ -37,6 +38,7 @@ import CustomPagesDashboard from "./pages/admin/CustomPagesDashboard";
 import CustomPageForm from "./pages/admin/CustomPageForm";
 import CustomPageView from "./pages/CustomPageView";
 import useDynamicFavicon from "./hooks/useDynamicFavicon";
+import TrackingTags from "./components/TrackingTags";
 
 const queryClient = new QueryClient();
 
@@ -55,6 +57,7 @@ const App = () => (
       <BrowserRouter>
         <FaviconUpdater />
         <ThemeProvider />
+        <TrackingTags />
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
@@ -63,6 +66,7 @@ const App = () => (
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:idOrSlug" element={<BlogPost />} />
+          <Route path="/contact" element={<Contact />} />
           <Route path="/p/:slug" element={<CustomPageView />} />
           
           {/* Admin Routes */}
