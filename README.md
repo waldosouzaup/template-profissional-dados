@@ -141,6 +141,238 @@ As políticas esperadas são:
 - leitura pública para conteúdo exibido no site;
 - CRUD para usuários autenticados no painel administrativo.
 
+Execute o SQL abaixo no **SQL Editor** do Supabase para criar a estrutura principal do banco de dados:
+
+```sql
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+CREATE TABLE IF NOT EXISTS public.profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  full_name TEXT,
+  bio_summary TEXT,
+  bio_detailed TEXT,
+  phone TEXT DEFAULT '(61) 9 9116-1854',
+  email TEXT,
+  avatar_url TEXT,
+  location TEXT DEFAULT 'Brasilia, DF',
+  current_focus TEXT DEFAULT 'Engenharia de Dados',
+  about_title TEXT,
+  cv_url TEXT,
+  favicon_url TEXT,
+  hero_title TEXT,
+  navbar_icon TEXT DEFAULT 'Database',
+  navbar_logo_url TEXT,
+  theme TEXT DEFAULT 'dark',
+  primary_color TEXT DEFAULT '142 71% 45%',
+  stat_1_number TEXT DEFAULT '+15',
+  stat_1_label TEXT DEFAULT 'Projetos Ativos',
+  stat_2_number TEXT DEFAULT '5+',
+  stat_2_label TEXT DEFAULT 'Anos de Experiencia',
+  hero_phrase_start TEXT DEFAULT 'Data is the',
+  hero_phrase_strike TEXT DEFAULT 'Future',
+  hero_phrase_end TEXT DEFAULT 'Present.',
+  contact_form_key TEXT,
+  tracking_tags TEXT
+);
+
+CREATE TABLE IF NOT EXISTS public.projects (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  category TEXT CHECK (category IN ('Dados', 'Web', 'IA')),
+  description TEXT NOT NULL,
+  technologies TEXT[] DEFAULT '{}',
+  image_url TEXT,
+  business_problem TEXT,
+  context TEXT,
+  premises TEXT[] DEFAULT '{}',
+  strategy TEXT[] DEFAULT '{}',
+  insights TEXT[] DEFAULT '{}',
+  results TEXT[] DEFAULT '{}',
+  next_steps TEXT[] DEFAULT '{}',
+  github_url TEXT,
+  demo_url TEXT,
+  display_order INTEGER DEFAULT 0,
+  is_published BOOLEAN DEFAULT true,
+  business_problem_image TEXT,
+  context_image TEXT,
+  premises_image TEXT,
+  strategy_image TEXT,
+  results_image TEXT,
+  next_steps_image TEXT,
+  gallery_images TEXT[] DEFAULT '{}',
+  markdown TEXT,
+  card_problem TEXT,
+  card_solution TEXT,
+  card_result TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.contents (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE,
+  description TEXT,
+  markdown TEXT,
+  category TEXT,
+  image_url TEXT,
+  drive_folder_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.custom_pages (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  markdown TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.books (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  author TEXT,
+  description TEXT,
+  image_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.courses (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  period TEXT,
+  certificate_url TEXT,
+  description TEXT,
+  topics TEXT[] DEFAULT '{}',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.education (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  institution TEXT NOT NULL,
+  period TEXT,
+  description TEXT,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.experience (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  type TEXT CHECK (type IN ('profissional', 'embaixador', 'projeto', 'outros')),
+  icon_type TEXT CHECK (icon_type IN ('rocket', 'award', 'briefcase')) DEFAULT 'rocket',
+  title TEXT NOT NULL,
+  institution TEXT NOT NULL,
+  description TEXT,
+  period TEXT,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.journey_items (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  year TEXT NOT NULL,
+  title TEXT NOT NULL,
+  description TEXT,
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS public.technologies (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  items TEXT[] DEFAULT '{}',
+  description TEXT,
+  icon TEXT DEFAULT 'Zap',
+  color TEXT DEFAULT 'text-primary',
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.contents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.custom_pages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.books ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.courses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.education ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.experience ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.journey_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.technologies ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.profiles;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.profiles;
+CREATE POLICY "Allow public read access" ON public.profiles FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.profiles FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.projects;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.projects;
+CREATE POLICY "Allow public read access" ON public.projects FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.projects FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.contents;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.contents;
+CREATE POLICY "Allow public read access" ON public.contents FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.contents FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.custom_pages;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.custom_pages;
+CREATE POLICY "Allow public read access" ON public.custom_pages FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.custom_pages FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.books;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.books;
+CREATE POLICY "Allow public read access" ON public.books FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.books FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.courses;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.courses;
+CREATE POLICY "Allow public read access" ON public.courses FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.courses FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.education;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.education;
+CREATE POLICY "Allow public read access" ON public.education FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.education FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.experience;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.experience;
+CREATE POLICY "Allow public read access" ON public.experience FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.experience FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.journey_items;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.journey_items;
+CREATE POLICY "Allow public read access" ON public.journey_items FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.journey_items FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Allow public read access" ON public.technologies;
+DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.technologies;
+CREATE POLICY "Allow public read access" ON public.technologies FOR SELECT USING (true);
+CREATE POLICY "Allow authenticated CRUD" ON public.technologies FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+COMMENT ON COLUMN public.profiles.tracking_tags IS
+'Snippets HTML/JavaScript de rastreamento, como Google Tag, Google Analytics, GTM ou Meta Pixel.';
+```
+
+Depois de criar o usuário administrador em **Authentication > Users**, insira o perfil inicial substituindo o `id` pelo UUID do usuário criado:
+
+```sql
+INSERT INTO public.profiles (
+  id,
+  full_name,
+  email,
+  bio_summary,
+  bio_detailed,
+  current_focus
+) VALUES (
+  'UUID_DO_USUARIO_AUTH',
+  'Seu Nome',
+  'seu@email.com',
+  'Resumo curto para o card de perfil.',
+  'Texto completo da pagina sobre.',
+  'Engenharia de Dados'
+) ON CONFLICT (id) DO NOTHING;
+```
+
 ## SQL Para Tags de Rastreamento
 
 Execute no SQL Editor do Supabase:

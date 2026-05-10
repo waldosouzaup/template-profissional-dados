@@ -109,9 +109,11 @@ export const useProjects = () => {
   const createMutation = useMutation({
     mutationFn: async (newProject: Project) => {
       const snakeCaseData = mapToSnakeCase(newProject);
+      // Remove id so the database auto-generates a valid UUID
+      const { id: _omit, ...insertData } = snakeCaseData;
       const { data, error } = await supabase
         .from("projects")
-        .insert([snakeCaseData])
+        .insert([insertData])
         .select()
         .single();
         

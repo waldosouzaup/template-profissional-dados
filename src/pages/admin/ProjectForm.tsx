@@ -8,10 +8,12 @@ import { ProjectSchema, Project, projectCategories, ProjectCategory } from "@/ty
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/admin/ImageUpload";
-import { ArrowLeft, Loader2, Plus, Trash2, Layout, Image as ImageIcon, Link as LinkIcon, FileText, BarChart, Settings } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, Trash2, BarChart2, Image as ImageIcon, FileText, Settings } from "lucide-react";
 
 // Form schema adapting arrays to comma-separated strings for simpler UI
+// id is optional here: omitted on creation (DB auto-generates UUID), present on edit
 const FormSchema = ProjectSchema.extend({
+  id: z.string().optional(),
   tags: z.string(),
   stack: z.string(),
   galleryImages: z.string(),
@@ -70,6 +72,7 @@ export default function AdminProjectForm() {
     },
   });
 
+
   const { fields: statFields, append: appendStat, remove: removeStat } = useFieldArray({
     control: form.control,
     name: "stats",
@@ -95,6 +98,12 @@ export default function AdminProjectForm() {
   const onSubmit = async (values: FormValues) => {
     const splitComma = (str: string) => str.split(",").map((s) => s.trim()).filter(Boolean);
     
+    // Convert stats fieldArray → results format ("value: label") for DB persistence
+    // This is the source of truth for Métricas Visuais; the text field 'results' is unused.
+    const statsAsResults = (values.stats || [])
+      .filter((s) => s.value?.trim() || s.label?.trim())
+      .map((s) => `${s.value?.trim()}: ${s.label?.trim()}`);
+
     // Transform back to actual Project payload
     const payload: Project = {
       ...values,
@@ -104,7 +113,7 @@ export default function AdminProjectForm() {
       premises: splitComma(values.premises),
       strategy: splitComma(values.strategy),
       insights: splitComma(values.insights),
-      results: splitComma(values.results),
+      results: statsAsResults,   // ← stats fieldArray drives the DB results column
       nextSteps: splitComma(values.nextSteps),
     };
 
@@ -161,11 +170,12 @@ export default function AdminProjectForm() {
             <h2>Identificação e Status</h2>
           </div>
           <div className="glass-panel p-6 rounded-2xl grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-1">
-              <label className="block text-sm font-medium mb-1">ID (Slug único)*</label>
-              <Input {...form.register("id")} placeholder="ex: nocode-match" disabled={isEditing} />
-              {form.formState.errors.id && <p className="text-red-500 text-xs mt-1">{form.formState.errors.id.message}</p>}
-            </div>
+            {isEditing && (
+              <div className="md:col-span-1">
+                <label className="block text-sm font-medium mb-1">ID (UUID)</label>
+                <Input {...form.register("id")} disabled className="font-mono text-xs text-muted-foreground" />
+              </div>
+            )}
             <div className="md:col-span-1">
               <label className="block text-sm font-medium mb-1">Título*</label>
               <Input {...form.register("title")} placeholder="Ex: NoCode Match" />
@@ -234,54 +244,7 @@ export default function AdminProjectForm() {
           </div>
         </section>
 
-        {/* Seção 3: Detalhamento Técnico e Metodologia */}
-        <section className="space-y-4">
-          <div className="flex items-center gap-2 text-primary font-semibold mb-2">
-            <Layout className="w-5 h-5" />
-            <h2>Metodologia e Detalhes</h2>
-          </div>
-          <div className="glass-panel p-6 rounded-2xl space-y-6">
-            <div>
-              <label className="block text-sm font-medium mb-1">Contexto</label>
-              <textarea {...form.register("context")} rows={2} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-1">Premissas (sep. por vírgula)</label>
-                <Input {...form.register("premises")} placeholder="Premissa 1, Premissa 2..." />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Estratégia (sep. por vírgula)</label>
-                <Input {...form.register("strategy")} placeholder="Fase 1, Fase 2..." />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Insights (sep. por vírgula)</label>
-                <Input {...form.register("insights")} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Próximos Passos (sep. por vírgula)</label>
-                <Input {...form.register("nextSteps")} />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Resultados (sep. por vírgula)</label>
-              <Input {...form.register("results")} placeholder="10%: Redução de custos, +50k: Usuários..." />
-              <p className="text-[10px] text-muted-foreground mt-1">Dica: Use 'Valor: Descrição' para gerar métricas automáticas no site.</p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-1">Technologies (Tags)</label>
-                <Input {...form.register("tags")} />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Stack Secundária</label>
-                <Input {...form.register("stack")} />
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Seção 4: Links e Media */}
+        {/* Seção 3: Mídia e URLs */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 text-primary font-semibold mb-2">
             <ImageIcon className="w-5 h-5" />
@@ -407,48 +370,66 @@ export default function AdminProjectForm() {
           </div>
         </section>
 
-        {/* Seção 5: Cartões (Briefing Rápido) */}
+
+        {/* Seção 4: Métricas Visuais */}
         <section className="space-y-4">
           <div className="flex items-center gap-2 text-primary font-semibold mb-2">
-            <BarChart className="w-5 h-5" />
-            <h2>Estatísticas e Cartões Rápidos</h2>
+            <BarChart2 className="w-5 h-5" />
+            <h2>Métricas Visuais</h2>
           </div>
-          <div className="glass-panel p-6 rounded-2xl space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium mb-1">Card: Problema</label>
-                <textarea {...form.register("cardProblem")} rows={2} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Card: Solução</label>
-                <textarea {...form.register("cardSolution")} rows={2} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Card: Resultado</label>
-                <textarea {...form.register("cardResult")} rows={2} className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm" />
-              </div>
-            </div>
-
-            <hr className="border-border" />
-
+          <div className="glass-panel p-6 rounded-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium">Métricas Visuais (Legacy Stats)</h3>
-              <Button type="button" variant="outline" size="sm" onClick={() => appendStat({ label: "", value: "" })}>
+              <p className="text-sm text-muted-foreground">Adicione pares Valor / Descrição que aparecem como indicadores no site.</p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => appendStat({ label: "", value: "" })}
+              >
                 <Plus className="w-4 h-4 mr-2" /> Adicionar Métrica
               </Button>
             </div>
 
+            {statFields.length === 0 && (
+              <p className="text-center text-sm text-muted-foreground py-6 border border-dashed border-border rounded-lg">
+                Nenhuma métrica adicionada ainda.
+              </p>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {statFields.map((field, index) => (
-                <div key={field.id} className="flex items-end gap-3 p-3 rounded-lg border border-dashed border-border">
-                  <div className="flex-1">
-                    <Input {...form.register(`stats.${index}.label`)} placeholder="Ex: Eficiência" />
+                <div
+                  key={field.id}
+                  className="flex items-end gap-3 p-4 rounded-lg border border-dashed border-border bg-background/50"
+                >
+                  <div className="flex-1 space-y-1">
+                    <label className="block text-xs font-medium text-muted-foreground">Valor (ex: +15%)</label>
+                    <Input
+                      {...form.register(`stats.${index}.value`)}
+                      placeholder="+15%"
+                    />
+                    {form.formState.errors.stats?.[index]?.value && (
+                      <p className="text-red-500 text-xs">{form.formState.errors.stats[index]?.value?.message}</p>
+                    )}
                   </div>
-                  <div className="flex-1">
-                    <Input {...form.register(`stats.${index}.value`)} placeholder="Ex: +15%" />
+                  <div className="flex-1 space-y-1">
+                    <label className="block text-xs font-medium text-muted-foreground">Descrição (ex: Eficiência)</label>
+                    <Input
+                      {...form.register(`stats.${index}.label`)}
+                      placeholder="Eficiência"
+                    />
+                    {form.formState.errors.stats?.[index]?.label && (
+                      <p className="text-red-500 text-xs">{form.formState.errors.stats[index]?.label?.message}</p>
+                    )}
                   </div>
-                  <Button type="button" variant="ghost" size="icon" onClick={() => removeStat(index)}>
-                    <Trash2 className="w-4 h-4 text-destructive" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                    onClick={() => removeStat(index)}
+                  >
+                    <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               ))}

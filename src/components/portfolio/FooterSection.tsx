@@ -45,14 +45,11 @@ const FooterSection = () => {
           ))}
         </div>
 
-        {/* Copyright & Admin Link */}
+        {/* Copyright */}
         <div className="flex flex-col items-center sm:items-end gap-2 text-right">
           <p className="text-sm text-muted-foreground">
             © 2026 {profileName} | {currentFocus}
           </p>
-          <Link to="/admin/login" className="text-[10px] text-muted-foreground/50 hover:text-primary transition-colors">
-            Acesso Administrativo
-          </Link>
         </div>
       </div>
     </footer>

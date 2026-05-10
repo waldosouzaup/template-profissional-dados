@@ -12,7 +12,7 @@ import {
   Share2,
   FolderOpen
 } from "lucide-react";
-import { useContent, useRelatedContents } from "@/hooks/useContents";
+import { useContent, useRelatedContents, useContents } from "@/hooks/useContents";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import remarkGfm from "remark-gfm";
@@ -136,8 +136,50 @@ const estimateReadingTime = (text?: string): number => {
 };
 
 /* ─────────────────────────────────────────────
+   CATEGORIES LIST
+  ───────────────────────────────────────────── */
+const CategoriesList = () => {
+  const { data: allContents = [], isLoading } = useContents();
+
+  if (isLoading) return null;
+
+  const categories = Array.from(
+    new Set(allContents.map((post) => post.category).filter(Boolean))
+  ) as string[];
+
+  if (categories.length === 0) return null;
+
+  const categoryCounts = allContents.reduce((acc, post) => {
+    if (post.category) {
+      acc[post.category] = (acc[post.category] || 0) + 1;
+    }
+    return acc;
+  }, {} as Record<string, number>);
+
+  return (
+    <div className="py-8 border-t border-foreground/[0.06]">
+      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-5">Categorias</p>
+      <div className="flex flex-wrap gap-2">
+        {categories.map((category) => (
+          <Link
+            key={category}
+            to={`/blog?category=${encodeURIComponent(category)}`}
+            className="flex items-center gap-2 px-4 py-2.5 bg-primary/5 border border-primary/10 rounded-full text-[11px] font-bold tracking-widest uppercase text-primary hover:bg-primary/15 hover:border-primary/30 transition-all duration-300"
+          >
+            {category}
+            <span className="px-1.5 py-0.5 bg-primary/10 rounded-full text-[9px]">
+              {categoryCounts[category]}
+            </span>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────────
    RELATED ARTICLES
- ───────────────────────────────────────────── */
+  ───────────────────────────────────────────── */
 const RelatedArticles = ({ category, currentPostId }: { category: string; currentPostId: string }) => {
   const { data: relatedPosts, isLoading } = useRelatedContents(category, currentPostId);
 
@@ -429,8 +471,8 @@ const BlogPost = () => {
                 <div className="flex gap-4">
                   <button 
                     onClick={() => {
-                      const url = encodeURIComponent(window.location.href);
-                      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+                      const url = window.location.href;
+                      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
                     }}
                     className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
                     aria-label="Compartilhar no LinkedIn"
@@ -439,9 +481,9 @@ const BlogPost = () => {
                   </button>
                   <button 
                     onClick={() => {
-                      const url = encodeURIComponent(window.location.href);
-                      const text = encodeURIComponent(post.title);
-                      window.open(`https://twitter.com/intent/tweet?url=${url}&text=${text}`, '_blank');
+                      const url = window.location.href;
+                      const text = post.title;
+                      window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
                     }}
                     className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
                     aria-label="Compartilhar no Twitter"
@@ -459,6 +501,8 @@ const BlogPost = () => {
                   </button>
                 </div>
               </div>
+
+              <CategoriesList />
             </div>
           </aside>
         </div>
