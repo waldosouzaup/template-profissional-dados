@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useProjects, useProject } from "@/hooks/useProjects";
@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { slugify } from "@/lib/slug";
-import { ArrowLeft, Loader2, Plus, Trash2, BarChart2, Image as ImageIcon, FileText, Settings } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Images, FileText, Settings } from "lucide-react";
 
 // Form schema adapting arrays to comma-separated strings for simpler UI
 // id is optional here: omitted on creation (DB auto-generates UUID), present on edit
@@ -26,6 +26,15 @@ const FormSchema = ProjectSchema.extend({
 });
 
 type FormValues = z.infer<typeof FormSchema>;
+
+const SECTION_IMAGE_FIELDS = [
+  { name: "businessProblemImage", label: "Img: Business Problem" },
+  { name: "contextImage", label: "Img: Context" },
+  { name: "premisesImage", label: "Img: Premises" },
+  { name: "strategyImage", label: "Img: Strategy" },
+  { name: "resultsImage", label: "Img: Results" },
+  { name: "nextStepsImage", label: "Img: Next Steps" },
+] as const;
 
 export default function AdminProjectForm() {
   const { id } = useParams<{ id: string }>();
@@ -79,11 +88,6 @@ export default function AdminProjectForm() {
   const [slugEdited, setSlugEdited] = useState(isEditing);
   const slugPreview = slugify(form.watch("slug") || "");
 
-  const { fields: statFields, append: appendStat, remove: removeStat } = useFieldArray({
-    control: form.control,
-    name: "stats",
-  });
-
   // Load data if editing
   useEffect(() => {
     if (isEditing && projectData) {
@@ -104,12 +108,6 @@ export default function AdminProjectForm() {
   const onSubmit = async (values: FormValues) => {
     const splitComma = (str: string) => str.split(",").map((s) => s.trim()).filter(Boolean);
     
-    // Convert stats fieldArray → results format ("value: label") for DB persistence
-    // This is the source of truth for Métricas Visuais; the text field 'results' is unused.
-    const statsAsResults = (values.stats || [])
-      .filter((s) => s.value?.trim() || s.label?.trim())
-      .map((s) => `${s.value?.trim()}: ${s.label?.trim()}`);
-
     // Transform back to actual Project payload
     const payload: Project = {
       ...values,
@@ -119,7 +117,8 @@ export default function AdminProjectForm() {
       premises: splitComma(values.premises),
       strategy: splitComma(values.strategy),
       insights: splitComma(values.insights),
-      results: statsAsResults,   // ← stats fieldArray drives the DB results column
+      // Results are not edited in this form: keep the stored list untouched.
+      results: projectData?.results ?? [],
       nextSteps: splitComma(values.nextSteps),
     };
 
@@ -309,158 +308,30 @@ export default function AdminProjectForm() {
                 <p className="text-[10px] text-muted-foreground mt-1">Dica: Futuramente suportaremos upload múltiplo aqui. Por enquanto, use URLs separadas por vírgula.</p>
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <Controller
-                  control={form.control}
-                  name="businessProblemImage"
-                  render={({ field }) => (
-                    <ImageUpload 
-                      label="Img: Business Problem"
-                      value={field.value}
-                      onChange={field.onChange}
-                      path="projects/sections"
-                    />
-                  )}
-                />
-              </div>
-              <div>
-                <Controller
-                  control={form.control}
-                  name="contextImage"
-                  render={({ field }) => (
-                    <ImageUpload 
-                      label="Img: Context"
-                      value={field.value}
-                      onChange={field.onChange}
-                      path="projects/sections"
-                    />
-                  )}
-                />
-              </div>
-              <div>
-                <Controller
-                  control={form.control}
-                  name="premisesImage"
-                  render={({ field }) => (
-                    <ImageUpload 
-                      label="Img: Premises"
-                      value={field.value}
-                      onChange={field.onChange}
-                      path="projects/sections"
-                    />
-                  )}
-                />
-              </div>
-              <div>
-                <Controller
-                  control={form.control}
-                  name="strategyImage"
-                  render={({ field }) => (
-                    <ImageUpload 
-                      label="Img: Strategy"
-                      value={field.value}
-                      onChange={field.onChange}
-                      path="projects/sections"
-                    />
-                  )}
-                />
-              </div>
-              <div>
-                <Controller
-                  control={form.control}
-                  name="resultsImage"
-                  render={({ field }) => (
-                    <ImageUpload 
-                      label="Img: Results"
-                      value={field.value}
-                      onChange={field.onChange}
-                      path="projects/sections"
-                    />
-                  )}
-                />
-              </div>
-              <div>
-                <Controller
-                  control={form.control}
-                  name="nextStepsImage"
-                  render={({ field }) => (
-                    <ImageUpload 
-                      label="Img: Next Steps"
-                      value={field.value}
-                      onChange={field.onChange}
-                      path="projects/sections"
-                    />
-                  )}
-                />
-              </div>
-            </div>
           </div>
         </section>
 
 
-        {/* Seção 4: Métricas Visuais */}
-        <section className="space-y-4">
+        {/* Seção 4: Imagens das Seções */}
+        <section aria-labelledby="section-images-title" className="space-y-4">
           <div className="flex items-center gap-2 text-primary font-semibold mb-2">
-            <BarChart2 className="w-5 h-5" />
-            <h2>Métricas Visuais</h2>
+            <Images className="w-5 h-5" />
+            <h2 id="section-images-title">Imagens das Seções</h2>
           </div>
           <div className="glass-panel p-6 rounded-2xl space-y-4">
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Adicione pares Valor / Descrição que aparecem como indicadores no site.</p>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendStat({ label: "", value: "" })}
-              >
-                <Plus className="w-4 h-4 mr-2" /> Adicionar Métrica
-              </Button>
-            </div>
-
-            {statFields.length === 0 && (
-              <p className="text-center text-sm text-muted-foreground py-6 border border-dashed border-border rounded-lg">
-                Nenhuma métrica adicionada ainda.
-              </p>
-            )}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {statFields.map((field, index) => (
-                <div
-                  key={field.id}
-                  className="flex items-end gap-3 p-4 rounded-lg border border-dashed border-border bg-background/50"
-                >
-                  <div className="flex-1 space-y-1">
-                    <label className="block text-xs font-medium text-muted-foreground">Valor (ex: +15%)</label>
-                    <Input
-                      {...form.register(`stats.${index}.value`)}
-                      placeholder="+15%"
-                    />
-                    {form.formState.errors.stats?.[index]?.value && (
-                      <p className="text-red-500 text-xs">{form.formState.errors.stats[index]?.value?.message}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 space-y-1">
-                    <label className="block text-xs font-medium text-muted-foreground">Descrição (ex: Eficiência)</label>
-                    <Input
-                      {...form.register(`stats.${index}.label`)}
-                      placeholder="Eficiência"
-                    />
-                    {form.formState.errors.stats?.[index]?.label && (
-                      <p className="text-red-500 text-xs">{form.formState.errors.stats[index]?.label?.message}</p>
-                    )}
-                  </div>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    className="shrink-0 text-destructive hover:text-destructive hover:bg-destructive/10"
-                    onClick={() => removeStat(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+            <p className="text-sm text-muted-foreground">
+              Imagens que ilustram cada etapa do projeto. Clique na área para enviar; passe o mouse sobre a imagem para removê-la.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              {SECTION_IMAGE_FIELDS.map(({ name, label }) => (
+                <Controller
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <ImageUpload label={label} value={field.value} onChange={field.onChange} path="projects/sections" allowUrl={false} />
+                  )}
+                />
               ))}
             </div>
           </div>
