@@ -1,12 +1,12 @@
 import { z } from "zod";
 
-export const ProjectCategoryEnum = z.enum([
-  "Dados",
-  "Web",
-  "IA",
-]);
-
-export type ProjectCategory = z.infer<typeof ProjectCategoryEnum>;
+// Categories live in the project_categories table (editable in the admin); projects store the name.
+export interface ProjectCategory {
+  id: string;
+  name: string;
+  icon: string;
+  display_order: number;
+}
 
 export const StatSchema = z.object({
   label: z.string().min(1, "Label is required"),
@@ -65,9 +65,3 @@ export const ProjectSchema = z.object({
 });
 
 export type Project = z.infer<typeof ProjectSchema>;
-
-export const projectCategories: Record<ProjectCategory, { label: string; icon: string }> = {
-  Dados: { label: "Dados", icon: "Database" },
-  Web: { label: "Web", icon: "Globe" },
-  IA: { label: "IA", icon: "Brain" },
-};

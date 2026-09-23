@@ -1,5 +1,5 @@
 import { FolderOpen } from "lucide-react";
-import { Project, projectCategories } from "@/types/project";
+import { Project } from "@/types/project";
 import MediaCard from "@/components/portfolio/MediaCard";
 
 interface ProjectCardProps {
@@ -13,7 +13,7 @@ const ProjectCard = ({ project, style }: ProjectCardProps) => (
     image={project.coverImage}
     imageAlt={project.title}
     fallbackIcon={FolderOpen}
-    eyebrow={projectCategories[project.category]?.label || project.category}
+    eyebrow={project.category}
     title={project.title}
     description={project.shortDescription}
     details={

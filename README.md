@@ -8,7 +8,7 @@ O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimen
 
 ## Funcionalidades
 
-- Portfólio com projetos categorizados por Dados, Web e IA.
+- Portfólio com projetos organizados por categorias editáveis no painel (padrão: Dados, Web e IA).
 - Blog com Markdown, categorias, imagem de capa, slug e arquivos complementares via Google Drive.
 - Página exclusiva de contato em `/contact`, com formulário Web3Forms ou fallback por `mailto`.
 - Painel administrativo protegido por Supabase Auth.
@@ -146,8 +146,9 @@ Em um banco já existente, execute no **SQL Editor** do Supabase, nesta ordem, o
 
 1. `update_home_sections.sql` — textos de Skills e Certificações no perfil, categoria das skills e destaque de cursos na Home.
 2. `project_slugs.sql` — URLs amigáveis dos projetos (`slug`, `previous_slugs`, `updated_at`), com gatilho que normaliza e versiona os slugs.
+3. `project_categories.sql` — tabela `project_categories` (nome, ícone e ordem) usada pelas categorias editáveis; `projects.category` passa a referenciá-la (renomear atualiza os projetos; categorias em uso não podem ser excluídas).
 
-Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql`.
+Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql` e `project_categories.sql`.
 
 ### Instalação completa
 
@@ -488,6 +489,10 @@ No painel administrativo é possível configurar:
 - textos do Hero;
 - títulos, descrições e itens das seções Skills e Certificações da Home.
 
+## Categorias de projetos
+
+Em **Projetos → Editar Projeto**, o botão ao lado de *Categoria* abre **Categorias de projeto**: renomeie, troque o ícone, exclua (somente categorias sem projetos) ou adicione novas — uma categoria criada ali já fica selecionada no projeto. As abas da página `/projects` mostram apenas categorias com projetos, com o ícone escolhido.
+
 ## Skills e Certificações na Home
 
 Em bancos existentes, execute `update_home_sections.sql` no SQL Editor do Supabase antes de salvar os novos campos. O script pode ser executado novamente sem apagar dados. Instalações novas já incluem esses campos no SQL completo acima.
@@ -584,9 +589,12 @@ Aplique as migrações pendentes (seção **Migrações**) **antes** de publicar
 Antes de publicar alterações:
 
 ```bash
+npm run typecheck
 npm run test
 npm run build
 ```
+
+Use `npm run typecheck` para checar tipos: o `tsconfig.json` da raiz só referencia os configs da aplicação, então `npx tsc --noEmit` sozinho não verifica nenhum arquivo.
 
 O projeto usa Vitest com ambiente `jsdom` e Testing Library. Os testes ficam em `src/test/` e cobrem as seções da Home, o painel (Perfil, Sobre, projetos), URLs amigáveis, sitemap/redirecionamentos, cards e navegação.
 

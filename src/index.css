@@ -389,3 +389,38 @@
     transform: translateY(0);
   }
 }
+
+@layer components {
+  /* Themed scrollbar for inner scroll areas (e.g. the post's table of contents).
+     Chromium/Safari get the fully styled WebKit bar; if the standard properties were also
+     set there, they would override it, so they are applied only where WebKit's is missing (Firefox). */
+  .scrollbar-themed::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.35);
+    border-radius: 9999px;
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.7);
+  }
+
+  .scrollbar-themed::-webkit-scrollbar-button,
+  .scrollbar-themed::-webkit-scrollbar-corner {
+    display: none;
+  }
+
+  @supports not selector(::-webkit-scrollbar) {
+    .scrollbar-themed {
+      scrollbar-width: thin;
+      scrollbar-color: hsl(var(--primary) / 0.45) transparent;
+    }
+  }
+}

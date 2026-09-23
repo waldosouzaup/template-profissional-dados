@@ -1,6 +1,4 @@
-import { Download, MessageCircle, Info, BookOpen } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfile";
-import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   const { data: profiles = [], isLoading } = useProfiles();
@@ -25,7 +23,6 @@ const HeroSection = () => {
   const heroTitle = profile?.hero_title || (profileName ? `Eu sou ${profileName.split(' ')[0]} ${profileName.split(' ')[1]},` : "");
   const currentFocus = profile?.current_focus || "";
   const bioSummary = profile?.bio_summary || "";
-  const cvUrl = profile?.cv_url || "";
 
   return (
     <section className="animate-fade-up delay-100">
@@ -42,33 +39,6 @@ const HeroSection = () => {
       <p className="text-lg text-muted-foreground mt-6 max-w-2xl leading-relaxed">
         {bioSummary}
       </p>
-
-      {/* Action Buttons */}
-      <div className="flex flex-wrap gap-4 mt-8">
-        {cvUrl ? (
-          <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="btn-primary">
-            <Download className="w-5 h-5" />
-            CV
-          </a>
-        ) : (
-          <span className="btn-primary opacity-50 cursor-not-allowed">
-            <Download className="w-5 h-5" />
-            CV
-          </span>
-        )}
-        <Link to="/contact" className="btn-secondary">
-          <MessageCircle className="w-5 h-5" />
-          Contato
-        </Link>
-        <Link to="/about" className="btn-secondary">
-          <Info className="w-5 h-5" />
-          Sobre
-        </Link>
-        <Link to="/blog" className="btn-secondary">
-          <BookOpen className="w-5 h-5" />
-          Blog
-        </Link>
-      </div>
     </section>
   );
 };

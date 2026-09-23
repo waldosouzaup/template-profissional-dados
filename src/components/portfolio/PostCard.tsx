@@ -3,16 +3,12 @@ import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import type { Content } from "@/types/database";
 import MediaCard from "@/components/portfolio/MediaCard";
+import { readingMinutes, stripInlineMarkdown } from "@/lib/text";
 
 interface PostCardProps {
   post: Content;
   style?: React.CSSProperties;
 }
-
-const stripInlineMarkdown = (text: string) => text.replace(/\*\*|__|\*|`/g, "");
-
-const readingMinutes = (markdown?: string) =>
-  markdown ? Math.max(1, Math.ceil(markdown.trim().split(/\s+/).length / 200)) : 1;
 
 const PostCard = ({ post, style }: PostCardProps) => (
   <MediaCard

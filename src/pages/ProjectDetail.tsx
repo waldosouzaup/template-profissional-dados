@@ -9,7 +9,6 @@ import {
   Check,
   ChevronRight,
 } from "lucide-react";
-import { projectCategories } from "@/types/project";
 import { useProject } from "@/hooks/useProjects";
 import SEOHead from "@/components/SEOHead";
 import remarkGfm from "remark-gfm";
@@ -182,7 +181,6 @@ const ProjectDetail = () => {
   }
 
   const canonicalUrl = `https://waldoeller.com/projects/${project.slug || project.id}`;
-  const categoryInfo = projectCategories[project.category];
   const hasStats = project.stats && project.stats.length > 0;
   const hasPremises = project.premises && project.premises.length > 0;
   const hasStrategy = project.strategy && project.strategy.length > 0;
@@ -230,7 +228,7 @@ const ProjectDetail = () => {
 
         {/* Category pill */}
         <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/25 hidden sm:block">
-          {categoryInfo?.label || project.category}
+          {project.category}
         </span>
 
         {/* CTA links */}
@@ -274,7 +272,7 @@ const ProjectDetail = () => {
             {/* Title overlay on image */}
             <div className="absolute bottom-0 left-0 right-0 px-6 sm:px-10 pb-6 sm:pb-10">
               <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/40 mb-2 sm:mb-3">
-                {categoryInfo?.label || project.category}
+                {project.category}
               </p>
               <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground leading-[1.05]">
                 {project.title}
@@ -287,7 +285,7 @@ const ProjectDetail = () => {
         {!project.coverImage && (
           <div className="mb-20 pt-8">
             <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30 mb-4">
-              {categoryInfo?.label || project.category}
+              {project.category}
             </p>
             <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-foreground leading-[1.05] max-w-3xl">
               {project.title}

@@ -1,25 +1,14 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Database,
-  Globe,
-  Brain,
-  FolderOpen,
-  ArrowLeft
-} from "lucide-react";
-import { ProjectCategory, projectCategories } from "@/types/project";
+import { FolderOpen, ArrowLeft } from "lucide-react";
 import { useProjects } from "@/hooks/useProjects";
+import { useProjectCategories } from "@/hooks/useProjectCategories";
+import { getCategoryIcon } from "@/lib/category-icons";
 import SEOHead from "@/components/SEOHead";
 import ProjectCard from "@/components/portfolio/ProjectCard";
 
-const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
-  Database,
-  Globe,
-  Brain,
-};
-
 const ProjectsGallery = () => {
-  const [activeCategory, setActiveCategory] = useState<ProjectCategory | "all">("all");
+  const [activeCategory, setActiveCategory] = useState<string>("all");
 
   const { data: allProjects = [], isLoading } = useProjects();
   
@@ -27,7 +16,9 @@ const ProjectsGallery = () => {
     ? allProjects 
     : allProjects.filter(p => p.category === activeCategory);
 
-  const categories = Object.keys(projectCategories) as ProjectCategory[];
+  const { data: allCategories = [] } = useProjectCategories();
+  // Only categories that actually have projects become tabs.
+  const categories = allCategories.filter((category) => allProjects.some((p) => p.category === category.name));
 
   return (
     <div className="min-h-screen bg-background pt-16">
@@ -65,7 +56,7 @@ const ProjectsGallery = () => {
             </h1>
           </div>
           <p className="text-muted-foreground mt-4 max-w-2xl text-lg">
-            Explore os projetos desenvolvidos utilizando tecnologias NoCode e IA.
+            Explore os projetos desenvolvidos utilizando tecnologias do mercado.
           </p>
         </div>
 
@@ -77,18 +68,16 @@ const ProjectsGallery = () => {
           >
             Todos
           </button>
-          {categories.map((cat) => {
-            const catInfo = projectCategories[cat];
-            if (!catInfo) return null;
-            const Icon = iconMap[catInfo.icon] || Database;
+          {categories.map((category) => {
+            const Icon = getCategoryIcon(category.icon);
             return (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`category-tab ${activeCategory === cat ? "active" : ""}`}
+                key={category.id}
+                onClick={() => setActiveCategory(category.name)}
+                className={`category-tab ${activeCategory === category.name ? "active" : ""}`}
               >
-                <Icon className="w-4 h-4" />
-                {catInfo.label}
+                <Icon className="w-4 h-4" aria-hidden="true" />
+                {category.name}
               </button>
             );
           })}

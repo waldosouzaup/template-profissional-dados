@@ -15,6 +15,12 @@ const mocks = vi.hoisted(() => ({
     contextImage: "https://example.com/context.png",
   },
 }));
+vi.mock("@/hooks/useProjectCategories", () => ({
+  useProjectCategories: () => ({
+    data: [{ id: "c1", name: "Dados", icon: "Database", display_order: 1 }, { id: "c3", name: "IA", icon: "Brain", display_order: 3 }],
+    isLoading: false,
+  }),
+}));
 vi.mock("@/hooks/useProjects", () => ({
   useProjects: () => ({ createProject: vi.fn(), updateProject: mocks.updateProject }),
   useProject: () => ({ data: mocks.project, isLoading: false }),

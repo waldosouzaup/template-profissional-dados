@@ -17,7 +17,7 @@ export interface EntityManagerLabels<T> {
   deleteDescription: (item: T) => string;
 }
 
-interface EntityManagerProps<T extends { id: string }> {
+interface EntityManagerProps<T extends { id?: string }> {
   items: T[];
   isLoading?: boolean;
   primary: (item: T) => string;
@@ -30,7 +30,7 @@ interface EntityManagerProps<T extends { id: string }> {
 }
 
 // List + create/edit dialog + delete confirmation. Items are saved by their own editor, immediately.
-export default function EntityManager<T extends { id: string }>({
+export default function EntityManager<T extends { id?: string }>({
   items, isLoading, primary, secondary, leading, hint, labels, renderEditor, onDelete,
 }: EntityManagerProps<T>) {
   const [editing, setEditing] = useState<T | "new" | null>(null);

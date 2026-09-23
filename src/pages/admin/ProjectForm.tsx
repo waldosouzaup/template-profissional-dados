@@ -4,12 +4,14 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useProjects, useProject } from "@/hooks/useProjects";
-import { ProjectSchema, Project, projectCategories, ProjectCategory } from "@/types/project";
+import { ProjectSchema, Project } from "@/types/project";
+import { useProjectCategories } from "@/hooks/useProjectCategories";
+import ProjectCategoriesDialog from "@/components/admin/ProjectCategoriesDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { slugify } from "@/lib/slug";
-import { ArrowLeft, Loader2, Image as ImageIcon, Images, FileText, Settings } from "lucide-react";
+import { ArrowLeft, Loader2, Image as ImageIcon, Images, FileText, Settings, Tags } from "lucide-react";
 
 // Form schema adapting arrays to comma-separated strings for simpler UI
 // id is optional here: omitted on creation (DB auto-generates UUID), present on edit
@@ -42,6 +44,8 @@ export default function AdminProjectForm() {
   const navigate = useNavigate();
 
   const { createProject, updateProject, isCreating, isUpdating } = useProjects();
+  const { data: categories = [] } = useProjectCategories();
+  const [categoriesOpen, setCategoriesOpen] = useState(false);
   const { data: projectData, isLoading: isLoadingProject } = useProject(id);
 
   const form = useForm<FormValues>({
@@ -193,16 +197,37 @@ export default function AdminProjectForm() {
               />
             </div>
             <div className="md:col-span-1">
-              <label className="block text-sm font-medium mb-1">Categoria*</label>
-              <select
-                {...form.register("category")}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <option value="">Selecione uma categoria</option>
-                {Object.entries(projectCategories).map(([key, { label }]) => (
-                  <option key={key} value={key}>{label}</option>
-                ))}
-              </select>
+              <label htmlFor="project-category" className="block text-sm font-medium mb-1">Categoria*</label>
+              <div className="flex gap-2">
+                {/* Controlled so a category created or renamed in the dialog shows up as soon as the list refreshes */}
+                <Controller
+                  control={form.control}
+                  name="category"
+                  render={({ field }) => (
+                    <select
+                      id="project-category"
+                      {...field}
+                      className="flex h-10 w-full min-w-0 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      <option value="">Selecione uma categoria</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.name}>{category.name}</option>
+                      ))}
+                    </select>
+                  )}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="h-10 w-10 shrink-0"
+                  onClick={() => setCategoriesOpen(true)}
+                  aria-label="Gerenciar categorias"
+                  title="Gerenciar categorias"
+                >
+                  <Tags className="h-4 w-4" />
+                </Button>
+              </div>
               {form.formState.errors.category && <p className="text-red-500 text-xs mt-1">{form.formState.errors.category.message}</p>}
             </div>
             <div className="md:col-span-3">
@@ -347,6 +372,15 @@ export default function AdminProjectForm() {
           </Button>
         </div>
       </form>
+
+      <ProjectCategoriesDialog
+        open={categoriesOpen}
+        onOpenChange={setCategoriesOpen}
+        onCreated={(name) => form.setValue("category", name, { shouldDirty: true, shouldValidate: true })}
+        onRenamed={(oldName, newName) => {
+          if (form.getValues("category") === oldName) form.setValue("category", newName, { shouldDirty: true });
+        }}
+      />
     </div>
   );
 }

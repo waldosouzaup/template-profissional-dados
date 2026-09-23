@@ -1,22 +1,17 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import { 
-  ArrowLeft, 
-  Calendar, 
-  User, 
-  Copy, 
-  Check, 
-  ChevronRight,
-  Clock,
-  Share2,
-  FolderOpen
-} from "lucide-react";
+import { ArrowLeft, Calendar, Copy, Check, Clock, FolderOpen, Linkedin, Link2 } from "lucide-react";
+import { SiX } from "react-icons/si";
 import { useContent, useRelatedContents, useContents } from "@/hooks/useContents";
+import { useProfiles } from "@/hooks/useProfile";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import remarkGfm from "remark-gfm";
 import SEOHead from "@/components/SEOHead";
+import PostCard from "@/components/portfolio/PostCard";
+import { readingMinutes, stripInlineMarkdown } from "@/lib/text";
+import profilePhoto from "@/assets/profile-photo.jpg";
 
 /* ─────────────────────────────────────────────
    SCROLL PROGRESS BAR
@@ -88,6 +83,10 @@ const CodeBlock = ({
   );
 };
 
+const SidebarLabel = ({ children }: { children: React.ReactNode }) => (
+  <p className="mb-4 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">{children}</p>
+);
+
 /* ─────────────────────────────────────────────
    TABLE OF CONTENTS
  ───────────────────────────────────────────── */
@@ -109,15 +108,15 @@ const TableOfContents = ({ markdown }: { markdown: string }) => {
   if (headings.length < 2) return null;
 
   return (
-    <div className="py-8 border-t border-foreground/[0.06]">
-      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-4">Neste Artigo</p>
-      <nav className="space-y-2">
+    <div className="pb-8">
+      <SidebarLabel>Neste artigo</SidebarLabel>
+      <nav aria-label="Neste artigo" className="scrollbar-themed max-h-[40vh] space-y-1 overflow-y-auto overscroll-contain border-l border-border pr-3">
         {headings.map((h, i) => (
           <a
             key={i}
             href={`#${h.id}`}
-            className={`block text-[13px] leading-snug transition-colors hover:text-foreground/80 ${
-              h.level === 2 ? "text-foreground/45 font-medium" : "text-foreground/25 pl-3"
+            className={`-ml-px block border-l border-transparent py-1 text-[13px] leading-snug transition-colors hover:border-primary hover:text-foreground ${
+              h.level === 2 ? "pl-4 text-foreground/60" : "pl-7 text-foreground/40"
             }`}
           >
             {h.text}
@@ -126,13 +125,6 @@ const TableOfContents = ({ markdown }: { markdown: string }) => {
       </nav>
     </div>
   );
-};
-
-/** Estimate reading time from markdown text */
-const estimateReadingTime = (text?: string): number => {
-  if (!text) return 1;
-  const words = text.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / 200));
 };
 
 /* ─────────────────────────────────────────────
@@ -158,13 +150,13 @@ const CategoriesList = () => {
 
   return (
     <div className="py-8 border-t border-foreground/[0.06]">
-      <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-5">Categorias</p>
+      <SidebarLabel>Temas</SidebarLabel>
       <div className="flex flex-wrap gap-2">
         {categories.map((category) => (
           <Link
             key={category}
             to={`/blog?category=${encodeURIComponent(category)}`}
-            className="flex items-center gap-2 px-4 py-2.5 bg-primary/5 border border-primary/10 rounded-full text-[11px] font-bold tracking-widest uppercase text-primary hover:bg-primary/15 hover:border-primary/30 transition-all duration-300"
+            className="flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-[11px] font-bold tracking-widest uppercase text-primary hover:bg-primary/15 hover:border-primary/30 transition-all duration-300"
           >
             {category}
             <span className="px-1.5 py-0.5 bg-primary/10 rounded-full text-[9px]">
@@ -178,6 +170,70 @@ const CategoriesList = () => {
 };
 
 /* ─────────────────────────────────────────────
+   SHARE
+  ───────────────────────────────────────────── */
+const shareButton =
+  "flex h-10 w-10 items-center justify-center rounded-full border border-foreground/10 text-foreground/60 transition-all hover:border-primary/40 hover:text-primary";
+
+const ShareButtons = ({ title }: { title: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2500);
+  };
+
+  return (
+    <div className="py-8 border-t border-foreground/[0.06]">
+      <SidebarLabel>Compartilhar</SidebarLabel>
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`, "_blank")}
+          className={shareButton}
+          aria-label="Compartilhar no LinkedIn"
+        >
+          <Linkedin className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={() => window.open(`https://x.com/intent/post?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(title)}`, "_blank")}
+          className={shareButton}
+          aria-label="Compartilhar no X"
+        >
+          <SiX className="h-3.5 w-3.5" />
+        </button>
+        <button type="button" onClick={copyLink} className={shareButton} aria-label="Copiar link">
+          {copied ? <Check className="h-4 w-4 text-primary" /> : <Link2 className="h-4 w-4" />}
+        </button>
+        {copied && <span role="status" className="text-xs text-primary">Link copiado</span>}
+      </div>
+    </div>
+  );
+};
+
+/* ─────────────────────────────────────────────
+   COVER
+  ───────────────────────────────────────────── */
+// Natural aspect ratio (no letterboxing); a blurred copy behind it adds an ambient glow in the image's own colors.
+const PostCover = ({ src, alt }: { src: string; alt: string }) => (
+  <figure className="relative isolate mb-14">
+    <img
+      src={src}
+      alt=""
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 -z-10 h-full w-full scale-95 rounded-3xl object-cover opacity-40 blur-3xl"
+    />
+    <img
+      src={src}
+      alt={alt}
+      className="block h-auto w-full rounded-2xl border border-foreground/10 shadow-2xl shadow-black/40 sm:rounded-3xl"
+    />
+  </figure>
+);
+
+/* ─────────────────────────────────────────────
    RELATED ARTICLES
   ───────────────────────────────────────────── */
 const RelatedArticles = ({ category, currentPostId }: { category: string; currentPostId: string }) => {
@@ -186,61 +242,23 @@ const RelatedArticles = ({ category, currentPostId }: { category: string; curren
   if (isLoading || !relatedPosts || relatedPosts.length === 0) return null;
 
   return (
-    <div className="border-t border-foreground/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
-      <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/20 mb-8">Artigos Relacionados</p>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {relatedPosts.map((post) => {
-          const readingTime = estimateReadingTime(post.markdown);
-          return (
-            <Link
-              key={post.id}
-              to={`/blog/${post.slug || post.id}`}
-              className="group relative bg-foreground/[0.015] border border-foreground/[0.04] rounded-2xl overflow-hidden hover:border-foreground/10 hover:bg-foreground/[0.025] transition-all duration-500 flex flex-col"
-            >
-              <div className="aspect-[16/9] w-full overflow-hidden bg-foreground/[0.02]">
-                {post.image_url ? (
-                  <img
-                    src={post.image_url}
-                    alt={post.title}
-                    loading="lazy"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/[0.02] to-white/[0.005]">
-                    <div className="w-8 h-8 rounded-full bg-foreground/5" />
-                  </div>
-                )}
-              </div>
-              <div className="p-6 flex-1 flex flex-col">
-                <div className="flex items-center gap-3 mb-3 flex-wrap">
-                  <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-primary border border-primary/20 bg-primary/5 px-2 py-1 rounded-sm">
-                    {post.category || "Post"}
-                  </span>
-                  <div className="flex items-center gap-1 text-[9px] text-foreground/20 uppercase tracking-widest">
-                    <Clock className="w-3 h-3" />
-                    {readingTime} min
-                  </div>
-                </div>
-                <h3 className="text-lg font-light text-foreground group-hover:text-primary transition-colors mb-3 leading-tight line-clamp-2">
-                  {post.title}
-                </h3>
-                <div className="mt-auto flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-foreground/40 group-hover:text-foreground transition-colors">
-                  Ler artigo
-                  <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+    <section aria-labelledby="related-title" className="border-t border-foreground/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
+      <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-foreground/30">Continue no tema</p>
+      <h2 id="related-title" className="mb-10 text-2xl font-light text-foreground">Artigos relacionados</h2>
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {relatedPosts.map((post, index) => (
+          <PostCard key={post.id} post={post} style={{ animationDelay: `${index * 100}ms` }} />
+        ))}
       </div>
-    </div>
+    </section>
   );
 };
-
 
 const BlogPost = () => {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { data: post, isLoading } = useContent(idOrSlug);
+  const { data: profiles = [] } = useProfiles();
+  const author = profiles[0];
   const articleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -258,9 +276,19 @@ const BlogPost = () => {
     );
   }
 
-  if (!post) return null;
+  if (!post) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-8 pt-16 text-center">
+        <SEOHead title="Artigo não encontrado" noindex />
+        <h1 className="text-3xl font-light text-foreground">Artigo não encontrado</h1>
+        <p className="text-foreground/50">O endereço pode ter mudado ou o artigo não está mais publicado.</p>
+        <Link to="/blog" className="text-primary hover:underline">Ver todos os artigos</Link>
+      </div>
+    );
+  }
 
-  const readingTime = estimateReadingTime(post.markdown);
+  const readingTime = readingMinutes(post.markdown);
+  const authorName = author?.full_name || "Waldo Eller";
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 pt-16">
@@ -279,12 +307,12 @@ const BlogPost = () => {
           url: `https://waldoeller.com/blog/${post.slug || post.id}`,
           author: {
             "@type": "Person",
-            name: "Waldo Eller",
+            name: authorName,
             url: "https://waldoeller.com/about",
           },
           publisher: {
             "@type": "Person",
-            name: "Waldo Eller",
+            name: authorName,
           },
           ...(post.image_url && { image: post.image_url }),
           wordCount: post.markdown?.split(/\s+/).length,
@@ -293,70 +321,81 @@ const BlogPost = () => {
       />
       <ScrollProgress />
 
-      {/* HERO */}
-      <section className="pt-24 pb-10 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
-        {post.image_url && (
-          <div className="relative w-full rounded-2xl overflow-hidden mb-16 border border-border shadow-2xl bg-card">
-            <img
-              src={post.image_url}
-              alt={post.title}
-              className="w-full h-auto block max-h-[600px] object-contain"
-            />
-          </div>
-        )}
+      {/* HEADER */}
+      <header className="pt-16 sm:pt-20 pb-14 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
+        <div className="max-w-4xl">
+          <Link
+            to="/blog"
+            className="group mb-10 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary shadow-[0_0_15px_hsl(var(--primary)/0.1)] transition-all duration-300 hover:border-primary/50 hover:bg-primary/10"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+            Blog
+          </Link>
 
-        <div className="flex flex-col max-w-4xl">
-          <div className="flex flex-wrap items-center gap-6 mb-8 text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30">
+          <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
             {post.category && (
-              <span className="text-primary border border-primary/20 bg-primary/5 px-3 py-1.5 rounded-sm">
+              <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
                 {post.category}
               </span>
             )}
-            <div className="flex items-center gap-2">
-              <Calendar className="w-3.5 h-3.5" />
-              {post.created_at ? format(new Date(post.created_at), "dd 'de' MMMM, yyyy", { locale: ptBR }) : "--"}
-            </div>
-            <div className="flex items-center gap-2">
-              <User className="w-3.5 h-3.5" />
-              Waldo Eller
-            </div>
-            <div className="flex items-center gap-2">
-              <Clock className="w-3.5 h-3.5" />
+            {post.created_at && (
+              <span className="inline-flex items-center gap-1.5">
+                <Calendar className="h-3.5 w-3.5" />
+                <time dateTime={post.created_at}>{format(new Date(post.created_at), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</time>
+              </span>
+            )}
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="h-3.5 w-3.5" />
               {readingTime} min de leitura
-            </div>
+            </span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-foreground leading-[1.05] mb-8">
-            {post.title}
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground leading-[1.08]">
+            {post.title.trim()}
           </h1>
 
-          <p className="text-xl text-foreground/40 font-light leading-relaxed max-w-2xl border-l-[3px] border-primary/30 pl-8 mb-8">
-            {post.description}
-          </p>
+          {post.description && (
+            <p className="mt-6 max-w-3xl text-lg sm:text-xl font-light leading-relaxed text-foreground/60">
+              {stripInlineMarkdown(post.description)}
+            </p>
+          )}
 
-          {post.drive_folder_url && (
-            <div>
-              <a 
+          <div className="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-foreground/[0.06] pt-6">
+            <div className="flex items-center gap-3">
+              <img
+                src={author?.avatar_url || profilePhoto}
+                alt=""
+                className="h-11 w-11 rounded-full border border-foreground/10 object-cover"
+              />
+              <div>
+                <p className="text-sm font-medium text-foreground">{authorName}</p>
+                {author?.current_focus && <p className="text-xs text-muted-foreground">{author.current_focus}</p>}
+              </div>
+            </div>
+            {post.drive_folder_url && (
+              <a
                 href={post.drive_folder_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:border-primary/40 rounded-full text-sm font-medium transition-all"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 hover:border-primary/40 rounded-full text-sm font-medium transition-all"
               >
                 <FolderOpen className="w-4 h-4" />
-                Ver Arquivos
+                Ver arquivos
               </a>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </section>
+      </header>
 
       {/* CONTENT */}
-      <div className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 pb-40">
-        <div className="lg:grid lg:grid-cols-[1fr_300px] gap-20">
+      <div className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 pb-32">
+        <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_280px] gap-16 xl:gap-20">
           <main className="min-w-0">
+            {post.image_url && <PostCover src={post.image_url} alt={post.title.trim()} />}
+
             <div ref={articleRef}>
               <article className="
-                prose dark:prose-invert max-w-none
+                prose dark:prose-invert max-w-3xl
 
                 /* Headings */
                 prose-headings:font-light prose-headings:tracking-tight
@@ -366,7 +405,7 @@ const BlogPost = () => {
                 prose-h4:text-base prose-h4:text-foreground/60 prose-h4:mt-10 prose-h4:mb-3 prose-h4:tracking-wide
 
                 /* Body text */
-                prose-p:text-foreground/70 prose-p:leading-[2] prose-p:text-[16px] prose-p:my-6
+                prose-p:text-foreground/75 prose-p:leading-[1.9] prose-p:text-[17px] prose-p:my-6
 
                 /* Links */
                 prose-a:text-primary prose-a:no-underline prose-a:border-b prose-a:border-primary/20
@@ -377,13 +416,13 @@ const BlogPost = () => {
                 prose-em:text-foreground/60 prose-em:not-italic prose-em:font-light
 
                 /* Blockquote */
-                prose-blockquote:border-l-[3px] prose-blockquote:border-primary/20
+                prose-blockquote:border-l-[3px] prose-blockquote:border-primary/30
                 prose-blockquote:pl-7 prose-blockquote:not-italic
-                prose-blockquote:text-foreground/50 prose-blockquote:text-[15px]
-                prose-blockquote:my-12 prose-blockquote:leading-[2]
+                prose-blockquote:text-foreground/60 prose-blockquote:text-[16px]
+                prose-blockquote:my-12 prose-blockquote:leading-[1.9]
 
                 /* Lists */
-                prose-li:text-foreground/70 prose-li:leading-[1.9] prose-li:text-[15px] prose-li:my-2
+                prose-li:text-foreground/75 prose-li:leading-[1.85] prose-li:text-[16px] prose-li:my-2
                 prose-ul:my-8 prose-ol:my-8
 
                 /* HR */
@@ -394,7 +433,7 @@ const BlogPost = () => {
 
                 /* Inline code */
                 prose-code:text-primary prose-code:bg-primary/5 prose-code:px-2
-                prose-code:py-0.5 prose-code:rounded prose-code:text-[13px] prose-code:font-mono
+                prose-code:py-0.5 prose-code:rounded prose-code:text-[14px] prose-code:font-mono
                 prose-code:before:content-none prose-code:after:content-none
 
                 /* Tables */
@@ -416,7 +455,7 @@ const BlogPost = () => {
                       const sectionKeywords = ["Problema", "Contexto", "Estratégia", "Resultados", "Solução", "Objetivo", "Tecnologias", "Arquitetura", "Conclusão", "Próximos Passos", "Impacto", "Insights"];
                       const isSectionLabel = sectionKeywords.includes(text.trim());
                       const id = text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-");
-                      
+
                       if (isSectionLabel) {
                         return <h3 id={id} className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/25 !mt-16 !mb-4 !leading-none uppercase scroll-mt-24" {...props}>{children}</h3>;
                       }
@@ -434,7 +473,7 @@ const BlogPost = () => {
                     p: ({ children, ...props }: any) => {
                       const text = typeof children === "string" ? children : Array.isArray(children) ? children.map((c: any) => (typeof c === "string" ? c : "")).join("") : "";
                       const sectionKeywords = ["Problema", "Contexto", "Estratégia", "Resultados", "Solução", "Objetivo", "Tecnologias", "Arquitetura", "Conclusão", "Próximos Passos", "Impacto", "Insights"];
-                      
+
                       if (sectionKeywords.includes(text.trim()) && text.trim().length < 30) {
                         return <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/25 !mt-16 !mb-4 !leading-none">{children}</p>;
                       }
@@ -452,71 +491,36 @@ const BlogPost = () => {
           </main>
 
           <aside className="hidden lg:block">
-            <div className="sticky top-28 space-y-0">
-              {/* Table of Contents */}
+            <div className="sticky top-28">
               {post.markdown && <TableOfContents markdown={post.markdown} />}
 
-              <div className="py-8 border-t border-foreground/[0.06]">
-                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-4">Sobre o Autor</p>
-                <p className="text-sm text-foreground/40 leading-relaxed mb-6">
-                  Analista de Dados | BI | Gosto de transformar dados em insights que ajudam negócios a tomar decisões melhores.
-                </p>
-                <Link to="/about" className="text-[10px] font-bold tracking-widest uppercase text-primary hover:text-primary/80 transition-colors">
-                  Ver Perfil Completo →
-                </Link>
-              </div>
-
-              <div className="py-8 border-t border-foreground/[0.06]">
-                <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/20 mb-4">Compartilhar</p>
-                <div className="flex gap-4">
-                  <button 
-                    onClick={() => {
-                      const url = window.location.href;
-                      window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
-                    }}
-                    className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
-                    aria-label="Compartilhar no LinkedIn"
-                  >
-                    <span className="text-xs">Li</span>
-                  </button>
-                  <button 
-                    onClick={() => {
-                      const url = window.location.href;
-                      const text = post.title;
-                      window.open(`https://twitter.com/intent/tweet?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`, '_blank');
-                    }}
-                    className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
-                    aria-label="Compartilhar no Twitter"
-                  >
-                    <span className="text-xs">Tw</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      navigator.clipboard.writeText(window.location.href);
-                    }}
-                    className="w-10 h-10 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/40 hover:text-foreground hover:border-foreground/30 transition-all"
-                    aria-label="Copiar link"
-                  >
-                    <Share2 className="w-3.5 h-3.5" />
-                  </button>
+              {author?.bio_summary && (
+                <div className="py-8 border-t border-foreground/[0.06]">
+                  <SidebarLabel>Sobre o autor</SidebarLabel>
+                  <p className="text-sm text-foreground/60 leading-relaxed mb-5">{author.bio_summary}</p>
+                  <Link to="/about" className="text-xs font-semibold uppercase tracking-widest text-primary hover:text-primary/80 transition-colors">
+                    Ver perfil completo →
+                  </Link>
                 </div>
-              </div>
+              )}
 
+              <ShareButtons title={post.title} />
               <CategoriesList />
             </div>
           </aside>
         </div>
       </div>
+
       {/* RELATED ARTICLES */}
       {post.category && (
         <RelatedArticles category={post.category} currentPostId={post.id} />
       )}
-      
+
       {/* FOOTER CTA */}
       <footer className="border-t border-foreground/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-8">
         <div>
-          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/20 mb-2">Continue lendo</p>
-          <p className="text-2xl font-light text-foreground/70">Explore outros insights no blog.</p>
+          <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/30 mb-2">Continue lendo</p>
+          <p className="text-2xl font-light text-foreground/70">Explore outros artigos no blog.</p>
         </div>
         <Link
           to="/blog"

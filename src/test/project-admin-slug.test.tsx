@@ -7,6 +7,12 @@ const mocks = vi.hoisted(() => ({
   createProject: vi.fn(), updateProject: vi.fn(),
   existing: { id: "p1", slug: "rifa-online", title: "Rifa Online", category: "ia", tags: [], stack: [], galleryImages: [], premises: [], strategy: [], insights: [], results: [], nextSteps: [] },
 }));
+vi.mock("@/hooks/useProjectCategories", () => ({
+  useProjectCategories: () => ({
+    data: [{ id: "c1", name: "Dados", icon: "Database", display_order: 1 }, { id: "c3", name: "IA", icon: "Brain", display_order: 3 }],
+    isLoading: false,
+  }),
+}));
 vi.mock("@/hooks/useProjects", () => ({
   useProjects: () => ({ createProject: mocks.createProject, updateProject: mocks.updateProject }),
   useProject: (id?: string) => ({ data: id ? mocks.existing : undefined, isLoading: false }),
