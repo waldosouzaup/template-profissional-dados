@@ -38,6 +38,7 @@ export const useCourses = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
       toast.success("Curso criado com sucesso!");
     },
     onError: (error) => {
@@ -60,6 +61,7 @@ export const useCourses = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
       toast.success("Curso atualizado com sucesso!");
     },
     onError: (error) => {
@@ -74,6 +76,7 @@ export const useCourses = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["courses"] });
+      queryClient.invalidateQueries({ queryKey: ["course"] });
       toast.success("Curso excluído com sucesso!");
     },
     onError: (error) => {

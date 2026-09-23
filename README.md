@@ -15,11 +15,15 @@ O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimen
 - CMS de páginas customizadas em `/p/:slug`.
 - Tema claro/escuro e cor de destaque configuráveis no admin.
 - Branding dinâmico com favicon, logo da navbar e ícone fallback Lucide.
-- Estatísticas e frases do Hero editáveis pelo painel.
-- Biblioteca de livros, cursos/certificações, experiência, formação e timeline de jornada.
+- Hero da página inicial editável pelo painel (título, destaque, bio e link do CV).
+- URLs amigáveis para projetos (`/projects/<slug>`), com redirecionamento 301 das URLs antigas.
+- Cards de projetos e posts padronizados em todo o site (capa, categoria, resumo e chamada).
+- Botão flutuante de voltar ao topo nas páginas públicas.
+- Página Sobre com título, apresentação, formação acadêmica, experiências profissionais, livros e cursos complementares.
 - Upload de imagens no Supabase Storage.
 - SEO dinâmico com meta tags, canonical, Open Graph e JSON-LD.
-- Sitemap gerado automaticamente no build.
+- Sitemap e redirecionamentos (`_redirects`) gerados automaticamente no build.
+- Painel organizado por página do site: **Perfil (Home)** e **Sobre** com índice lateral, cadastros em janelas e salvamento imediato das listas.
 - Campo administrativo para tags de rastreamento como Google Tag, Google Analytics, GTM e Pixel da Meta.
 
 ## Stack
@@ -44,10 +48,10 @@ O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimen
 
 | Rota | Descrição |
 | --- | --- |
-| `/` | Home com perfil, Hero, projetos destacados e skills |
+| `/` | Home com perfil, Hero, projetos em destaque, skills e certificações |
 | `/projects` | Galeria de projetos |
-| `/projects/:id` | Detalhe de projeto |
-| `/about` | Página sobre, jornada, experiência, formação, livros e cursos |
+| `/projects/:slug` | Detalhe de projeto (URL amigável; links antigos por UUID redirecionam) |
+| `/about` | Página Sobre: título, apresentação, formação acadêmica, experiências profissionais, livros e cursos complementares |
 | `/blog` | Listagem de posts |
 | `/blog/:idOrSlug` | Post individual |
 | `/contact` | Página dedicada de contato |
@@ -59,19 +63,14 @@ O painel fica em `/admin` e usa autenticação do Supabase.
 
 Módulos disponíveis:
 
+- Perfil (Home)
+- Sobre (título e apresentação, formação acadêmica, experiências profissionais, livros e cursos complementares, na mesma ordem da página)
 - Projetos
-- Jornada
-- Livros
 - Conteúdos/Blog
-- Formação
-- Cursos
-- Experiências
 - Páginas customizadas
-- Perfil
-- Tecnologias
 - Configurações
 
-Na aba `Configurações`, o administrador pode ajustar aparência e inserir tags de rastreamento. Na aba `Perfil`, é possível editar identidade, contato, Hero, favicon, logo da navbar e chave Web3Forms.
+Na aba `Configurações`, o administrador pode ajustar aparência e inserir tags de rastreamento. Na aba `Perfil (Home)`, é possível editar identidade, marca (favicon, logo e ícone da navbar), Hero, contato, chave Web3Forms e, no mesmo lugar, cadastrar as skills e escolher as certificações exibidas na Home.
 
 ## Pré-requisitos
 
@@ -85,7 +84,7 @@ Na aba `Configurações`, o administrador pode ajustar aparência e inserir tags
 
 ```bash
 git clone https://github.com/waldosouzaup/template-profissional-dados.git
-cd dark-mode-mirror
+cd template-profissional-dados
 npm install
 ```
 
@@ -133,13 +132,24 @@ O projeto usa Supabase/PostgreSQL. As tabelas principais são:
 - `courses`
 - `education`
 - `experience`
-- `journey_items`
+- `journey_items` (legado: a Jornada não é mais exibida no site)
 - `technologies`
 
 As políticas esperadas são:
 
 - leitura pública para conteúdo exibido no site;
 - CRUD para usuários autenticados no painel administrativo.
+
+### Migrações
+
+Em um banco já existente, execute no **SQL Editor** do Supabase, nesta ordem, os scripts da raiz do projeto (ambos podem ser executados novamente sem apagar dados):
+
+1. `update_home_sections.sql` — textos de Skills e Certificações no perfil, categoria das skills e destaque de cursos na Home.
+2. `project_slugs.sql` — URLs amigáveis dos projetos (`slug`, `previous_slugs`, `updated_at`), com gatilho que normaliza e versiona os slugs.
+
+Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql`.
+
+### Instalação completa
 
 Execute o SQL abaixo no **SQL Editor** do Supabase para criar a estrutura principal do banco de dados:
 
@@ -173,7 +183,11 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   hero_phrase_strike TEXT DEFAULT 'Future',
   hero_phrase_end TEXT DEFAULT 'Present.',
   contact_form_key TEXT,
-  tracking_tags TEXT
+  tracking_tags TEXT,
+  skills_title TEXT DEFAULT 'Skills & Tecnologias',
+  skills_description TEXT DEFAULT 'Ferramentas e linguagens que uso no dia a dia para construir soluções pipelines confiáveis.',
+  certifications_title TEXT DEFAULT 'Certificações',
+  certifications_description TEXT DEFAULT 'Meu compromisso contínuo com a excelência técnica e o aprendizado constante.'
 );
 
 CREATE TABLE IF NOT EXISTS public.projects (
@@ -242,6 +256,7 @@ CREATE TABLE IF NOT EXISTS public.courses (
   title TEXT NOT NULL,
   period TEXT,
   certificate_url TEXT,
+  show_on_home BOOLEAN NOT NULL DEFAULT false,
   description TEXT,
   topics TEXT[] DEFAULT '{}',
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -279,6 +294,10 @@ CREATE TABLE IF NOT EXISTS public.journey_items (
 );
 
 CREATE TABLE IF NOT EXISTS public.technologies (
+  category TEXT NOT NULL DEFAULT 'Background & Outros' CHECK (category IN (
+    'Cloud & Big Data', 'Engenharia, Orquestração & Dados',
+    'Qualidade, DevOps & IA', 'Background & Outros'
+  )),
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
   items TEXT[] DEFAULT '{}',
@@ -349,9 +368,22 @@ DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.technologies;
 CREATE POLICY "Allow public read access" ON public.technologies FOR SELECT USING (true);
 CREATE POLICY "Allow authenticated CRUD" ON public.technologies FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
+-- Acesso da Data API (obrigatório em projetos Supabase criados a partir de 30/10/2026)
+GRANT SELECT ON
+  public.profiles, public.projects, public.contents, public.custom_pages, public.books,
+  public.courses, public.education, public.experience, public.journey_items, public.technologies
+TO anon;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON
+  public.profiles, public.projects, public.contents, public.custom_pages, public.books,
+  public.courses, public.education, public.experience, public.journey_items, public.technologies
+TO authenticated, service_role;
+
 COMMENT ON COLUMN public.profiles.tracking_tags IS
 'Snippets HTML/JavaScript de rastreamento, como Google Tag, Google Analytics, GTM ou Meta Pixel.';
 ```
+
+> **Permissões da Data API:** a partir de 30/10/2026 o Supabase deixa de liberar automaticamente o acesso da API a tabelas novas no schema `public`. Por isso o SQL acima termina com `GRANT`s explícitos. Toda migration futura que **criar** uma tabela precisa incluir, no mesmo script: `SELECT` para `anon` e `SELECT, INSERT, UPDATE, DELETE` para `authenticated` e `service_role`. Sem isso, a API responde *permission denied*. Scripts que apenas adicionam colunas (como `update_home_sections.sql`) não precisam de grants.
 
 Depois de criar o usuário administrador em **Authentication > Users**, insira o perfil inicial substituindo o `id` pelo UUID do usuário criado:
 
@@ -454,12 +486,31 @@ No painel administrativo é possível configurar:
 - ícone fallback da navbar;
 - nome, foco profissional, telefone, email e links;
 - textos do Hero;
-- estatísticas do Hero;
-- frase de impacto.
+- títulos, descrições e itens das seções Skills e Certificações da Home.
 
-## Tecnologias e Ícones
+## Skills e Certificações na Home
 
-O módulo de Tecnologias aceita ícones de:
+Em bancos existentes, execute `update_home_sections.sql` no SQL Editor do Supabase antes de salvar os novos campos. O script pode ser executado novamente sem apagar dados. Instalações novas já incluem esses campos no SQL completo acima.
+
+Tudo fica em **Perfil (Home) → Página inicial**:
+
+- **Skills & Tecnologias:** edite o título e a descrição da seção (salvos em *Salvar Alterações*) e, logo abaixo, cadastre, edite ou exclua cada skill numa janela, escolhendo a categoria: Cloud & Big Data; Engenharia, Orquestração & Dados; Qualidade, DevOps & IA; Background & Outros. A Home apresenta os grupos nessa ordem. As skills são salvas na hora.
+- **Certificações:** edite o título e a descrição da seção e veja todos os cursos com um interruptor **Na Home**. Ligue para destacar o curso na Home; desligar remove só o destaque, e o curso continua na página Sobre. **Adicionar certificação** já cria o curso marcado para a Home. Os cursos também podem ser gerenciados em **Sobre → Cursos Complementares**.
+
+Skills existentes ficam inicialmente em **Background & Outros** até serem categorizadas pelo painel. Cursos existentes não são publicados automaticamente na Home. Se não houver itens, a Home mantém os títulos e descrições e apresenta uma mensagem de lista vazia.
+
+## Página Sobre
+
+A página `/about` segue esta ordem, espelhada no painel em **Sobre** (página única com índice lateral):
+
+1. **Título e apresentação:** o título (a última palavra aparece destacada) e o texto de abertura, que aceita Markdown. Salvos pelo botão *Salvar título e apresentação*.
+2. **Formação Acadêmica**, 3. **Experiências Profissionais**, 4. **Livros** e 5. **Cursos Complementares:** cada lista tem *Adicionar*, editar e excluir em janela, com salvamento imediato. Formação e experiências são ordenadas pelo campo *Ordem*; cursos têm o interruptor **Na Home** para aparecer também em Certificações.
+
+Links antigos do painel (`/admin/education`, `/admin/experiences`, `/admin/books`, `/admin/courses`, `/admin/journey`) levam à seção correspondente. A seção Jornada foi removida do site; os itens de `journey_items` permanecem no banco.
+
+## Skills e Ícones
+
+O módulo de Skills aceita ícones de:
 
 - `lucide-react`
 - `react-icons/si`
@@ -488,7 +539,19 @@ O componente `SEOHead` atualiza dinamicamente:
 - Twitter tags
 - JSON-LD
 
-O sitemap inclui rotas fixas e conteúdos dinâmicos de projetos e blog durante o build.
+No build, `scripts/generate-sitemap.js` gera a partir do Supabase:
+
+- `public/sitemap.xml` com rotas fixas, projetos publicados, posts e páginas customizadas, sempre no domínio canônico `https://waldoeller.com` e com `lastmod` real dos projetos;
+- `public/_redirects` com redirecionamentos 301 da Netlify para URLs antigas de projetos (arquivo gerado, fora do Git).
+
+### URLs amigáveis de projetos
+
+Cada projeto é publicado em `/projects/<slug>`, por exemplo `/projects/rifa-online`.
+
+1. **Antes do deploy**, execute `project_slugs.sql` no SQL Editor do Supabase (vale também para instalações novas, depois do SQL completo acima). O script gera o slug dos projetos existentes a partir do título e pode ser executado novamente sem apagar dados.
+2. No admin, o campo **URL amigável (slug)** é sugerido a partir do título em projetos novos e pode ser editado. Mudar o título de um projeto existente não muda a URL.
+3. O banco normaliza o slug (sem acentos, minúsculas, hífens), resolve duplicados com sufixo (`-2`) e, quando o slug muda, guarda o anterior em `previous_slugs`.
+4. URLs antigas (por UUID ou slug anterior) respondem 301 para a atual via `_redirects`; a página também redireciona no navegador e usa o slug no canonical. Slug inexistente mostra "Projeto não encontrado" com `noindex`.
 
 ## Deploy
 
@@ -514,16 +577,18 @@ VITE_SUPABASE_URL=sua_url_do_supabase
 VITE_SUPABASE_ANON_KEY=sua_chave_anon_publica
 ```
 
+Aplique as migrações pendentes (seção **Migrações**) **antes** de publicar: o build consulta o banco para gerar o sitemap e os redirecionamentos, e o painel grava as colunas novas.
+
 ## Qualidade
 
 Antes de publicar alterações:
 
 ```bash
-npm run build
 npm run test
+npm run build
 ```
 
-O projeto possui configuração de Vitest com ambiente `jsdom`.
+O projeto usa Vitest com ambiente `jsdom` e Testing Library. Os testes ficam em `src/test/` e cobrem as seções da Home, o painel (Perfil, Sobre, projetos), URLs amigáveis, sitemap/redirecionamentos, cards e navegação.
 
 ## Licença
 

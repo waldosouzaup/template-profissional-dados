@@ -1,60 +1,27 @@
 import { GraduationCap } from "lucide-react";
-import { useEducationList } from "@/hooks/useEducation";
+import type { Education } from "@/types/database";
+import { AboutCard, AboutSection, PeriodPill } from "@/components/portfolio/AboutSection";
 
-const EducationSection = () => {
-  const { data: educationItems, isLoading } = useEducationList();
-
-  if (isLoading) {
-    return (
-      <div className="mt-16 animate-pulse">
-        <div className="h-8 w-48 bg-secondary rounded mb-8" />
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-32 bg-secondary/50 rounded-xl" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (!educationItems || educationItems.length === 0) return null;
+const EducationSection = ({ items }: { items: Education[] }) => {
+  if (items.length === 0) return null;
 
   return (
-    <section className="animate-fade-up delay-400 mt-16">
-      {/* Section Header */}
-      <div className="section-header">
-        <div className="section-icon">
-          <GraduationCap className="w-5 h-5 text-primary" />
-        </div>
-        <h3 className="text-xl font-semibold text-foreground">Formação</h3>
-      </div>
-
-      {/* Education Items */}
-      <div className="space-y-4">
-        {educationItems.map((edu, index) => (
-          <div
-            key={edu.id}
-            className="education-item"
-            style={{ animationDelay: `${(index + 4) * 100}ms` }}
-          >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-              <div>
-                <h4 className="text-lg font-semibold text-foreground">{edu.title}</h4>
-                <p className="text-muted-foreground">{edu.institution}</p>
+    <AboutSection id="formacao" icon={GraduationCap} eyebrow="Estudos" title="Formação Acadêmica">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {items.map((edu, index) => (
+          <AboutCard key={edu.id} style={{ animation: "fadeInUp 0.5s ease-out both", animationDelay: `${index * 80}ms` }}>
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h3 className="text-lg font-medium leading-snug text-foreground">{edu.title}</h3>
+                <p className="mt-1 text-sm text-foreground/50">{edu.institution}</p>
               </div>
-              {edu.period && (
-                <span className="badge-time shrink-0">{edu.period}</span>
-              )}
+              {edu.period && <PeriodPill period={edu.period} />}
             </div>
-            {edu.description && (
-              <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
-                {edu.description}
-              </p>
-            )}
-          </div>
+            {edu.description && <p className="mt-4 text-sm leading-relaxed text-foreground/60">{edu.description}</p>}
+          </AboutCard>
         ))}
       </div>
-    </section>
+    </AboutSection>
   );
 };
 

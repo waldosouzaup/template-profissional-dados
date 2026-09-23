@@ -7,8 +7,8 @@ import { useCustomPages } from "@/hooks/useCustomPages";
 
 const navItems = [
   { path: "/", label: "Início", icon: Home },
-  { path: "/projects", label: "Portfólio", icon: FolderOpen },
   { path: "/about", label: "Sobre", icon: User },
+  { path: "/projects", label: "Portfólio", icon: FolderOpen },
   { path: "/blog", label: "Blog", icon: BookOpen },
   { path: "/contact", label: "Contato", icon: Mail },
 ];

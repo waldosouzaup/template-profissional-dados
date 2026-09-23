@@ -15,6 +15,7 @@ export const StatSchema = z.object({
 
 export const ProjectSchema = z.object({
   id: z.string().min(1, "ID is required"),
+  slug: z.string().default(""),
   title: z.string().min(1, "Title is required"),
   category: z.string().min(1, "Category is required"),
   

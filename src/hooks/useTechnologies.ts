@@ -38,10 +38,11 @@ export const useTechnologies = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["technologies"] });
-      toast.success("Tecnologia criada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["technology"] });
+      toast.success("Skill criada com sucesso!");
     },
     onError: (error) => {
-      toast.error(`Erro ao criar tecnologia: ${error.message}`);
+      toast.error(`Erro ao criar skill: ${error.message}`);
     },
   });
 
@@ -60,10 +61,11 @@ export const useTechnologies = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["technologies"] });
-      toast.success("Tecnologia atualizada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["technology"] });
+      toast.success("Skill atualizada com sucesso!");
     },
     onError: (error) => {
-      toast.error(`Erro ao atualizar tecnologia: ${error.message}`);
+      toast.error(`Erro ao atualizar skill: ${error.message}`);
     },
   });
 
@@ -74,10 +76,11 @@ export const useTechnologies = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["technologies"] });
-      toast.success("Tecnologia excluída com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["technology"] });
+      toast.success("Skill excluída com sucesso!");
     },
     onError: (error) => {
-      toast.error(`Erro ao excluir tecnologia: ${error.message}`);
+      toast.error(`Erro ao excluir skill: ${error.message}`);
     },
   });
 

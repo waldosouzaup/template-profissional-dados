@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import ProjectsGallery from "./pages/ProjectsGallery";
@@ -12,27 +12,18 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import Navbar from "./components/portfolio/Navbar";
+import BackToTop from "./components/BackToTop";
 
 // Admin
 import AdminLogin from "./pages/admin/Login";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/Dashboard";
+import AboutAdmin from "./pages/admin/AboutAdmin";
+import { legacyAboutRoutes } from "./pages/admin/about-sections";
 import AdminProjectForm from "./pages/admin/ProjectForm";
-import JourneyDashboard from "./pages/admin/JourneyDashboard";
-import JourneyForm from "./pages/admin/JourneyForm";
-import BooksDashboard from "./pages/admin/BooksDashboard";
-import BookForm from "./pages/admin/BookForm";
 import ContentsDashboard from "./pages/admin/ContentsDashboard";
 import ContentForm from "./pages/admin/ContentForm";
-import CoursesDashboard from "./pages/admin/CoursesDashboard";
-import CourseForm from "./pages/admin/CourseForm";
-import ExperiencesDashboard from "./pages/admin/ExperiencesDashboard";
-import ExperienceForm from "./pages/admin/ExperienceForm";
 import ProfileForm from "./pages/admin/ProfileForm";
-import TechnologiesDashboard from "./pages/admin/TechnologiesDashboard";
-import TechnologyForm from "./pages/admin/TechnologyForm";
-import EducationDashboard from "./pages/admin/EducationDashboard";
-import EducationForm from "./pages/admin/EducationForm";
 import AdminSettings from "./pages/admin/Settings";
 import CustomPagesDashboard from "./pages/admin/CustomPagesDashboard";
 import CustomPageForm from "./pages/admin/CustomPageForm";
@@ -59,10 +50,11 @@ const App = () => (
         <ThemeProvider />
         <TrackingTags />
         <Navbar />
+        <BackToTop />
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/projects" element={<ProjectsGallery />} />
-          <Route path="/projects/:id" element={<ProjectDetail />} />
+          <Route path="/projects/:idOrSlug" element={<ProjectDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:idOrSlug" element={<BlogPost />} />
@@ -75,37 +67,16 @@ const App = () => (
             <Route index element={<AdminDashboard />} />
             <Route path="projects/new" element={<AdminProjectForm />} />
             <Route path="projects/:id" element={<AdminProjectForm />} />
-            
-            {/* Journey */}
-            <Route path="journey" element={<JourneyDashboard />} />
-            <Route path="journey/new" element={<JourneyForm />} />
-            <Route path="journey/:id" element={<JourneyForm />} />
-            
-            {/* Books */}
-            <Route path="books" element={<BooksDashboard />} />
-            <Route path="books/new" element={<BookForm />} />
-            <Route path="books/:id" element={<BookForm />} />
-            
+
+            {/* Sobre: one page mirroring /about; old list and form URLs land on its sections */}
+            <Route path="about" element={<AboutAdmin />} />
+            {legacyAboutRoutes()}
+
             {/* Contents */}
             <Route path="contents" element={<ContentsDashboard />} />
             <Route path="contents/new" element={<ContentForm />} />
             <Route path="contents/:id" element={<ContentForm />} />
             
-            {/* Courses */}
-            <Route path="courses" element={<CoursesDashboard />} />
-            <Route path="courses/new" element={<CourseForm />} />
-            <Route path="courses/:id" element={<CourseForm />} />
-            
-            {/* Experiences */}
-            <Route path="experiences" element={<ExperiencesDashboard />} />
-            <Route path="experiences/new" element={<ExperienceForm />} />
-            <Route path="experiences/:id" element={<ExperienceForm />} />
-            
-            {/* Education */}
-            <Route path="education" element={<EducationDashboard />} />
-            <Route path="education/new" element={<EducationForm />} />
-            <Route path="education/:id" element={<EducationForm />} />
-
             {/* Custom Pages */}
             <Route path="custom-pages" element={<CustomPagesDashboard />} />
             <Route path="custom-pages/new" element={<CustomPageForm />} />
@@ -114,10 +85,8 @@ const App = () => (
             {/* Profile */}
             <Route path="profiles" element={<ProfileForm />} />
             
-            {/* Technologies */}
-            <Route path="technologies" element={<TechnologiesDashboard />} />
-            <Route path="technologies/new" element={<TechnologyForm />} />
-            <Route path="technologies/:id" element={<TechnologyForm />} />
+            {/* Skills are managed inside Perfil (Home); old links land on that section */}
+            <Route path="technologies/*" element={<Navigate to="/admin/profiles#skills" replace />} />
             
             {/* Settings */}
             <Route path="settings" element={<AdminSettings />} />

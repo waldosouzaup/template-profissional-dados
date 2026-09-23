@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { TECHNOLOGY_CATEGORIES } from "@/lib/home-sections";
 
 export const BookSchema = z.object({
   id: z.string().uuid(),
@@ -63,6 +64,7 @@ export const CourseSchema = z.object({
   title: z.string().min(1, "Title is required"),
   period: z.string().optional(),
   certificate_url: z.string().optional(),
+  show_on_home: z.boolean().optional(),
   description: z.string().optional(),
   topics: z.array(z.string()).default([]),
   created_at: z.string().datetime().optional(),
@@ -117,6 +119,10 @@ export const ProfileSchema = z.object({
   hero_phrase_end: z.string().default("Present."),
   contact_form_key: z.string().optional(),
   tracking_tags: z.string().optional(),
+  skills_title: z.string().optional(),
+  skills_description: z.string().optional(),
+  certifications_title: z.string().optional(),
+  certifications_description: z.string().optional(),
 });
 
 export type Profile = z.infer<typeof ProfileSchema>;
@@ -159,6 +165,7 @@ export type Project = z.infer<typeof ProjectSchema>;
 export type ProjectCategory = z.infer<typeof ProjectCategoryEnum>;
 
 export const TechnologySchema = z.object({
+  category: z.enum(TECHNOLOGY_CATEGORIES).optional(),
   id: z.string().uuid(),
   title: z.string().min(1, "Title is required"),
   items: z.array(z.string()).default([]),

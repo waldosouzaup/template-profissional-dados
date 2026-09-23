@@ -1,21 +1,27 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
-import { User, Book as BookIcon, GraduationCap, ExternalLink, Calendar, Loader2, Mail, Phone, ArrowRight } from "lucide-react";
+import { User, Book as BookIcon, Award, ExternalLink, Loader2, Mail, Phone, ArrowRight } from "lucide-react";
 import { useProfiles } from "@/hooks/useProfile";
 import { useBooks } from "@/hooks/useBooks";
 import { useCourses } from "@/hooks/useCourses";
+import { useEducationList } from "@/hooks/useEducation";
+import { useExperiences } from "@/hooks/useExperiences";
 import SEOHead from "@/components/SEOHead";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import ExperienceSection from "@/components/portfolio/ExperienceSection";
 import EducationSection from "@/components/portfolio/EducationSection";
-import JourneySection from "@/components/portfolio/JourneySection";
+import { AboutCard, AboutSection, PeriodPill } from "@/components/portfolio/AboutSection";
 
 const About = () => {
   const { data: profiles = [], isLoading: loadingProfile } = useProfiles();
   const { data: books = [], isLoading: loadingBooks } = useBooks();
   const { data: courses = [], isLoading: loadingCourses } = useCourses();
+  const { data: education = [], isLoading: loadingEducation } = useEducationList();
+  const { data: experiences = [], isLoading: loadingExperiences } = useExperiences();
   
   const profile = profiles[0];
-  const isLoading = loadingProfile || loadingBooks || loadingCourses;
+  const isLoading = loadingProfile || loadingBooks || loadingCourses || loadingEducation || loadingExperiences;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -96,28 +102,21 @@ const About = () => {
             )}
           </div>
         )}
+
+        {profile?.bio_detailed && (
+          <div className="prose dark:prose-invert mt-12 max-w-3xl prose-p:text-foreground/70 prose-p:leading-[1.9] prose-strong:text-foreground prose-a:text-primary">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{profile.bio_detailed}</ReactMarkdown>
+          </div>
+        )}
       </section>
 
-      {/* JOURNEY, EXPERIENCE & EDUCATION */}
-      <div className="max-w-[1000px] mx-auto px-8 sm:px-12 lg:px-20 pb-20">
-        <JourneySection />
-        <ExperienceSection />
-        <EducationSection />
-      </div>
+      <EducationSection items={education} />
+      <ExperienceSection items={experiences} />
 
       {/* BOOKS SECTION */}
       {books.length > 0 && (
-        <section className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 py-20 border-t border-foreground/[0.04] animate-[fadeInUp_0.8s_ease-out_0.2s_both]">
-          <div className="flex items-center gap-4 mb-12">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <BookIcon className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30 mb-1">Inspiração</p>
-              <h2 className="text-2xl font-light text-foreground">Estante de Livros</h2>
-            </div>
-          </div>
-          
+        <AboutSection id="livros" icon={BookIcon} eyebrow="Inspiração" title="Livros">
+
           {/* Improved Book Grid — Bookshelf Style */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
             {books.map((book, index) => (
@@ -164,38 +163,24 @@ const About = () => {
               </div>
             ))}
           </div>
-        </section>
+        </AboutSection>
       )}
 
       {/* COURSES SECTION */}
       {courses.length > 0 && (
-        <section className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 py-20 border-t border-foreground/[0.04] bg-foreground/[0.01] animate-[fadeInUp_0.8s_ease-out_0.3s_both]">
-          <div className="flex items-center gap-4 mb-12">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30 mb-1">Certificações</p>
-              <h2 className="text-2xl font-light text-foreground">Cursos Extras</h2>
-            </div>
-          </div>
+        <AboutSection id="cursos" icon={Award} eyebrow="Certificações" title="Cursos Complementares" tinted>
 
           <div className="space-y-4">
             {courses.map((course, index) => (
-              <div
+              <AboutCard
                 key={course.id}
-                className="glass-panel p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-foreground/[0.03] transition-all duration-300 hover:border-foreground/[0.08]"
-                style={{ animationDelay: `${index * 80}ms`, animation: 'fadeInUp 0.5s ease-out both' }}
+                className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+                style={{ animation: "fadeInUp 0.5s ease-out both", animationDelay: `${index * 80}ms` }}
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h3 className="text-lg font-medium text-foreground">{course.title}</h3>
-                    {course.period && (
-                      <span className="flex items-center gap-1.5 px-3 py-1 bg-foreground/5 rounded-full text-[10px] font-medium tracking-wide text-foreground/40 uppercase">
-                        <Calendar className="w-3 h-3" />
-                        {course.period}
-                      </span>
-                    )}
+                    {course.period && <PeriodPill period={course.period} />}
                   </div>
                   {course.description && (
                     <p className="text-sm text-foreground/60 leading-relaxed mb-3">{course.description}</p>
@@ -222,10 +207,10 @@ const About = () => {
                     <ExternalLink className="w-4 h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </a>
                 )}
-              </div>
+              </AboutCard>
             ))}
           </div>
-        </section>
+        </AboutSection>
       )}
       
       {/* FOOTER CTA — Highlighted */}

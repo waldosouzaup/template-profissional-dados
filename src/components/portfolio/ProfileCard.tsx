@@ -1,12 +1,13 @@
-import { Github, Linkedin, Instagram, MessageCircle } from "lucide-react";
+import { Github, Linkedin, Instagram } from "lucide-react";
+import { SiWhatsapp } from "react-icons/si";
 import { useProfiles } from "@/hooks/useProfile";
 import profilePhoto from "@/assets/profile-photo.jpg";
 
 const socialLinks = [
-  { icon: Github, href: "https://github.com/waldosouzaup", label: "GitHub" },
   { icon: Linkedin, href: "https://linkedin.com/in/waldoeller", label: "LinkedIn" },
+  { icon: SiWhatsapp, href: "https://api.whatsapp.com/send/?phone=5531988447394&text=Ol%C3%A1+Waldo%2C+vi+seu+portf%C3%B3lio+e+gostaria+de+conversar+sobre+um+projeto.&type=phone_number&app_absent=0", label: "WhatsApp" },
+  { icon: Github, href: "https://github.com/waldosouzaup", label: "GitHub" },
   { icon: Instagram, href: "https://www.instagram.com/waldo.eller", label: "Instagram" },
-  { icon: MessageCircle, href: "https://api.whatsapp.com/send/?phone=5531988447394&text=Ol%C3%A1+Waldo%2C+vi+seu+portf%C3%B3lio+e+gostaria+de+conversar+sobre+um+projeto.&type=phone_number&app_absent=0", label: "WhatsApp" },
 ];
 
 const ProfileCard = () => {

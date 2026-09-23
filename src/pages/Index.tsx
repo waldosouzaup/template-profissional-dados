@@ -2,6 +2,7 @@ import ProfileCard from "@/components/portfolio/ProfileCard";
 import HeroSection from "@/components/portfolio/HeroSection";
 
 import ProjectsSection from "@/components/portfolio/ProjectsSection";
+import CertificationsSection from "@/components/portfolio/CertificationsSection";
 import SkillsSection from "@/components/portfolio/SkillsSection";
 import FooterSection from "@/components/portfolio/FooterSection";
 import SEOHead from "@/components/SEOHead";
@@ -45,6 +46,7 @@ const Index = () => {
 
             <ProjectsSection />
             <SkillsSection />
+            <CertificationsSection />
             <FooterSection />
           </main>
         </div>

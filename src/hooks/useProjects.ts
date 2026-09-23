@@ -1,11 +1,13 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Project, ProjectSchema } from "@/types/project";
+import { isUuid } from "@/lib/slug";
 import { toast } from "sonner";
 
 const mapToCamelCase = (data: any): Project => {
   return {
     id: data.id,
+    slug: data.slug || "",
     title: data.title,
     category: data.category,
     shortDescription: data.description || "",
@@ -52,6 +54,7 @@ const mapToCamelCase = (data: any): Project => {
 const mapToSnakeCase = (project: Project): any => {
   return {
     id: project.id,
+    slug: project.slug,
     title: project.title,
     category: project.category,
     description: project.shortDescription,
@@ -176,27 +179,29 @@ export const useProjects = () => {
   };
 };
 
-export const useProject = (id: string | undefined) => {
+export const useProject = (idOrSlug: string | undefined) => {
   const fetchProject = async (): Promise<Project | null> => {
-    if (!id) return null;
-    
-    const { data, error } = await supabase
-      .from("projects")
-      .select("*")
-      .eq("id", id)
-      .single();
-      
-    if (error) {
-      if (error.code === 'PGRST116') return null;
-      throw new Error(error.message);
+    if (!idOrSlug) return null;
+
+    // Old UUID links and renamed slugs still resolve; the page then redirects to the current slug.
+    const lookups = isUuid(idOrSlug)
+      ? [() => supabase.from("projects").select("*").eq("id", idOrSlug)]
+      : [
+          () => supabase.from("projects").select("*").eq("slug", idOrSlug),
+          () => supabase.from("projects").select("*").contains("previous_slugs", [idOrSlug]),
+        ];
+
+    for (const lookup of lookups) {
+      const { data, error } = await lookup().maybeSingle();
+      if (error) throw new Error(error.message);
+      if (data) return mapToCamelCase(data);
     }
-    
-    return mapToCamelCase(data);
+    return null;
   };
 
   return useQuery({
-    queryKey: ["project", id],
+    queryKey: ["project", idOrSlug],
     queryFn: fetchProject,
-    enabled: !!id,
+    enabled: !!idOrSlug,
   });
 };

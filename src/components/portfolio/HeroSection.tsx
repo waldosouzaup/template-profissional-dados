@@ -26,13 +26,6 @@ const HeroSection = () => {
   const currentFocus = profile?.current_focus || "";
   const bioSummary = profile?.bio_summary || "";
   const cvUrl = profile?.cv_url || "";
-  const stat1Number = profile?.stat_1_number || "+15";
-  const stat1Label = profile?.stat_1_label || "Projetos Ativos";
-  const stat2Number = profile?.stat_2_number || "5+";
-  const stat2Label = profile?.stat_2_label || "Anos de Experiência";
-  const phraseStart = profile?.hero_phrase_start || "Data is the";
-  const phraseStrike = profile?.hero_phrase_strike || "Future";
-  const phraseEnd = profile?.hero_phrase_end || "Present.";
 
   return (
     <section className="animate-fade-up delay-100">
@@ -75,23 +68,6 @@ const HeroSection = () => {
           <BookOpen className="w-5 h-5" />
           Blog
         </Link>
-      </div>
-      
-      {/* Stats */}
-      <div className="stats-grid mt-12">
-        <div className="stat-item">
-          <p className="stat-number">{stat1Number}</p>
-          <p className="stat-label">{stat1Label}</p>
-        </div>
-        <div className="stat-item">
-          <p className="stat-number">{stat2Number}</p>
-          <p className="stat-label">{stat2Label}</p>
-        </div>
-        <div className="stat-item col-span-2 flex items-center justify-center bg-card/30 rounded-2xl border border-foreground/5 p-4">
-          <p className="stat-number-small">
-            {phraseStart} <span className="line-through text-muted-foreground font-normal mx-1">{phraseStrike}</span> {phraseEnd}
-          </p>
-        </div>
       </div>
     </section>
   );

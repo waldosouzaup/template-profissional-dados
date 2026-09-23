@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import {
   ArrowLeft,
@@ -142,13 +142,13 @@ const StatCard = ({ value, label }: { value: string; label: string }) => (
    MAIN PAGE
 ───────────────────────────────────────────── */
 const ProjectDetail = () => {
-  const { id } = useParams<{ id: string }>();
-  const { data: project, isLoading } = useProject(id);
+  const { idOrSlug } = useParams<{ idOrSlug: string }>();
+  const { data: project, isLoading } = useProject(idOrSlug);
   const articleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [idOrSlug]);
 
   /* Loading */
   if (isLoading) {
@@ -164,8 +164,24 @@ const ProjectDetail = () => {
     );
   }
 
-  if (!project) return null;
+  if (!project) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-6 px-8 pt-16 text-center">
+        <SEOHead title="Projeto não encontrado" noindex />
+        <h1 className="text-3xl font-light text-foreground">Projeto não encontrado</h1>
+        <p className="text-foreground/50">O endereço pode ter mudado ou o projeto não está mais publicado.</p>
+        <Link to="/projects" className="text-primary hover:underline">
+          Ver todos os projetos
+        </Link>
+      </div>
+    );
+  }
 
+  if (project.slug && idOrSlug !== project.slug) {
+    return <Navigate to={`/projects/${project.slug}`} replace />;
+  }
+
+  const canonicalUrl = `https://waldoeller.com/projects/${project.slug || project.id}`;
   const categoryInfo = projectCategories[project.category];
   const hasStats = project.stats && project.stats.length > 0;
   const hasPremises = project.premises && project.premises.length > 0;
@@ -186,7 +202,7 @@ const ProjectDetail = () => {
       <SEOHead
         title={`${project.title} — Projeto`}
         description={project.description || `Projeto: ${project.title}`}
-        canonical={`https://waldoeller.com/projects/${project.id}`}
+        canonical={canonicalUrl}
         ogImage={project.coverImage}
         ogType="article"
         jsonLd={{
@@ -194,7 +210,7 @@ const ProjectDetail = () => {
           "@type": "CreativeWork",
           name: project.title,
           description: project.description,
-          url: `https://waldoeller.com/projects/${project.id}`,
+          url: canonicalUrl,
           author: { "@type": "Person", name: "Waldo Eller" },
           ...(project.coverImage && { image: project.coverImage }),
           keywords: project.tags?.join(", "),
@@ -206,7 +222,7 @@ const ProjectDetail = () => {
       <header className="fixed top-16 left-0 right-0 z-30 flex items-center justify-between px-8 py-3 bg-background/80 backdrop-blur-xl border-b border-foreground/[0.04]">
         <Link
           to="/projects"
-          className="flex items-center gap-2 text-sm text-foreground/40 hover:text-foreground/80 transition-colors group"
+          className="group flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Projetos

@@ -7,6 +7,7 @@ interface SEOHeadProps {
   ogImage?: string;
   ogType?: "website" | "article" | "profile";
   jsonLd?: Record<string, any>;
+  noindex?: boolean;
 }
 
 /**
@@ -20,6 +21,7 @@ const SEOHead = ({
   ogImage,
   ogType = "website",
   jsonLd,
+  noindex = false,
 }: SEOHeadProps) => {
   useEffect(() => {
     // Title
@@ -40,6 +42,7 @@ const SEOHead = ({
     };
 
     // Standard meta
+    setMeta("name", "robots", noindex ? "noindex, follow" : "index, follow");
     if (description) {
       setMeta("name", "description", description);
     }
@@ -86,7 +89,7 @@ const SEOHead = ({
       const existingScript = document.getElementById("seo-jsonld");
       if (existingScript) existingScript.remove();
     };
-  }, [title, description, canonical, ogImage, ogType, jsonLd]);
+  }, [title, description, canonical, ogImage, ogType, jsonLd, noindex]);
 
   return null;
 };

@@ -7,6 +7,8 @@ import {
   SiGooglecloud, SiN8N,
 } from "react-icons/si";
 import { useTechnologies } from "@/hooks/useTechnologies";
+import { useProfiles } from "@/hooks/useProfile";
+import { HOME_SECTION_DEFAULTS, TECHNOLOGY_CATEGORIES, getTechnologyCategory } from "@/lib/home-sections";
 
 const iconMap: Record<string, React.ElementType> = {
   // Lucide icons
@@ -45,53 +47,51 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 const SkillsSection = () => {
-  const { data: technologies = [], isLoading } = useTechnologies();
-
-  // Filter only technologies that have a description (these are the "Skills")
-  const skills = (technologies || [])
-    .map(tech => ({
-      icon: iconMap[tech.icon || "Zap"] || Zap,
-      name: tech.title,
-      description: tech.description,
-      color: tech.color || "text-primary",
-    }));
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  const displaySkills = skills;
-
-  if (displaySkills.length === 0) return null;
+  const { data: technologies = [], isLoading, isError } = useTechnologies();
+  const { data: profiles = [] } = useProfiles();
+  const profile = profiles[0];
 
   return (
-    <section className="animate-fade-up delay-400 mt-16">
-      {/* Section Header */}
+    <section aria-labelledby="skills-heading" className="animate-fade-up delay-400 mt-16">
       <div className="section-header">
-        <div className="section-icon">
-          <Zap className="w-5 h-5 text-primary" />
+        <div className="section-icon"><Zap className="w-5 h-5 text-primary" /></div>
+        <h2 id="skills-heading" className="text-xl font-semibold text-foreground">
+          {profile?.skills_title || HOME_SECTION_DEFAULTS.skills_title}
+        </h2>
+      </div>
+      <p className="mb-8 text-sm text-muted-foreground leading-relaxed">
+        {profile?.skills_description ?? HOME_SECTION_DEFAULTS.skills_description}
+      </p>
+      {isLoading ? (
+        <div role="status" className="flex justify-center py-10">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" /><span className="sr-only">Carregando tecnologias</span>
         </div>
-        <h3 className="text-xl font-semibold text-foreground">Skills & Tecnologias</h3>
-      </div>
-
-      {/* Skills Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {displaySkills.map((skill, index) => (
-          <div key={index} className="skill-card">
-            <div className="skill-icon">
-              <skill.icon className={`w-6 h-6 ${skill.color}`} />
-            </div>
-            <div>
-              <h4 className="font-semibold text-foreground">{skill.name}</h4>
-              <p className="text-sm text-muted-foreground">{skill.description}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      ) : isError ? (
+        <p role="alert" className="text-sm text-muted-foreground">Não foi possível carregar as tecnologias.</p>
+      ) : (
+        <div className="space-y-8">
+          {TECHNOLOGY_CATEGORIES.map((category) => {
+            const skills = technologies.filter((tech) => getTechnologyCategory(tech.category) === category);
+            return (
+              <div key={category}>
+                <h3 className="mb-4 text-lg font-bold text-primary">{category}</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                  {skills.map((skill) => {
+                    const Icon = iconMap[skill.icon || "Zap"] || Zap;
+                    return (
+                      <div key={skill.id} className="skill-card min-w-0">
+                        <div className="skill-icon shrink-0"><Icon className={`w-6 h-6 ${skill.color || "text-primary"}`} /></div>
+                        <h4 className="font-semibold text-sm text-foreground break-words">{skill.title}</h4>
+                      </div>
+                    );
+                  })}
+                </div>
+                {skills.length === 0 && <p className="text-sm text-muted-foreground">Nenhuma tecnologia cadastrada nesta categoria.</p>}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </section>
   );
 };

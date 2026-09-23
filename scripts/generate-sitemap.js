@@ -1,6 +1,7 @@
 import fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
+import { buildProjectRedirects, buildSitemap } from './seo-files.js';
 
 // Load environment variables
 // It will try to load .env.local for local testing
@@ -16,50 +17,37 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-const BASE_URL = 'https://www.waldoeller.com';
-
-async function generateSitemap() {
+async function generateSeoFiles() {
   try {
-    console.log("Generating sitemap...");
-    // Fetch dynamic content
-    const { data: projects, error: projectsError } = await supabase.from('projects').select('id').eq('is_published', true);
-    const { data: posts, error: postsError } = await supabase.from('contents').select('id');
+    console.log("Generating sitemap and redirects...");
+    const [projectsRes, postsRes, pagesRes] = await Promise.all([
+      supabase.from('projects').select('id, slug, previous_slugs, is_published, updated_at'),
+      supabase.from('contents').select('id, slug, created_at'),
+      supabase.from('custom_pages').select('slug, created_at'),
+    ]);
 
-    if (projectsError) console.error("Error fetching projects for sitemap:", projectsError);
-    if (postsError) console.error("Error fetching posts for sitemap:", postsError);
+    if (projectsRes.error) console.error("Error fetching projects for sitemap:", projectsRes.error);
+    if (postsRes.error) console.error("Error fetching posts for sitemap:", postsRes.error);
+    if (pagesRes.error) console.error("Error fetching custom pages for sitemap:", pagesRes.error);
 
-    const urls = [
-      '/',
-      '/about',
-      '/projects',
-      '/blog',
-      '/contact',
+    const projects = projectsRes.data ?? [];
+    const entries = [
+      { path: '/' },
+      { path: '/about' },
+      { path: '/projects' },
+      { path: '/blog' },
+      { path: '/contact' },
+      ...projects.filter(p => p.is_published).map(p => ({ path: `/projects/${p.slug}`, lastmod: p.updated_at })),
+      ...(postsRes.data ?? []).map(p => ({ path: `/blog/${p.slug || p.id}`, lastmod: p.created_at })),
+      ...(pagesRes.data ?? []).map(p => ({ path: `/p/${p.slug}`, lastmod: p.created_at })),
     ];
 
-    if (projects) {
-      projects.forEach(p => urls.push(`/projects/${p.id}`));
-    }
-
-    if (posts) {
-      posts.forEach(p => urls.push(`/blog/${p.id}`));
-    }
-
-    const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  ${urls.map(url => `
-  <url>
-    <loc>${BASE_URL}${url}</loc>
-    <lastmod>${new Date().toISOString()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>${url === '/' ? '1.0' : '0.8'}</priority>
-  </url>`).join('')}
-</urlset>`;
-
-    fs.writeFileSync('public/sitemap.xml', sitemapContent.trim());
-    console.log('Sitemap successfully generated at public/sitemap.xml');
+    fs.writeFileSync('public/sitemap.xml', buildSitemap(entries));
+    fs.writeFileSync('public/_redirects', buildProjectRedirects(projects));
+    console.log(`Sitemap (${entries.length} URLs) and _redirects (${projects.length} projects) written to public/`);
   } catch (error) {
-    console.error('Error generating sitemap:', error);
+    console.error('Error generating SEO files:', error);
   }
 }
 
-generateSitemap();
+generateSeoFiles();

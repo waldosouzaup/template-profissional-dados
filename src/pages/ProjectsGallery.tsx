@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { 
-  Database, 
-  Globe, 
+import {
+  Database,
+  Globe,
   Brain,
-  ArrowUpRight,
   FolderOpen,
   ArrowLeft
 } from "lucide-react";
 import { ProjectCategory, projectCategories } from "@/types/project";
 import { useProjects } from "@/hooks/useProjects";
 import SEOHead from "@/components/SEOHead";
+import ProjectCard from "@/components/portfolio/ProjectCard";
 
 const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Database,
@@ -48,11 +48,11 @@ const ProjectsGallery = () => {
         {/* Header */}
         <div className="animate-fade-up">
           {/* Back Button */}
-          <Link 
-            to="/" 
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors mb-6"
+          <Link
+            to="/"
+            className="group mb-8 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary shadow-[0_0_15px_hsl(var(--primary)/0.1)] transition-all duration-300 hover:border-primary/50 hover:bg-primary/10 hover:shadow-[0_0_20px_hsl(var(--primary)/0.2)]"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
             Voltar para home
           </Link>
 
@@ -102,53 +102,11 @@ const ProjectsGallery = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
           {filteredProjects.map((project, index) => (
-            <Link
+            <ProjectCard
               key={project.id}
-              to={`/projects/${project.id}`}
-              className="project-gallery-card group"
+              project={project}
               style={{ animationDelay: `${(index + 2) * 100}ms` }}
-            >
-              {/* Cover Image */}
-              <div className="aspect-[16/10] overflow-hidden rounded-t-2xl">
-                <img
-                  src={project.coverImage}
-                  alt={project.title}
-                  className="w-full h-full object-contain transition-transform duration-700"
-                />
-              </div>
-
-              {/* Content */}
-              <div className="p-5">
-                {/* Category Badge */}
-                <span className="badge-time text-xs mb-3 inline-block">
-                  {projectCategories[project.category]?.label || project.category}
-                </span>
-
-                {/* Title */}
-                <h3 className="text-xl font-semibold text-foreground group-hover:text-primary transition-colors">
-                  {project.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-muted-foreground mt-2 text-sm line-clamp-2">
-                  {project.shortDescription}
-                </p>
-
-                {/* Tags */}
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {project.tags.slice(0, 3).map((tag) => (
-                    <span key={tag} className="tag-mini">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Arrow */}
-                <div className="absolute top-4 right-4 w-10 h-10 rounded-full bg-background/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1 group-hover:-translate-y-1">
-                  <ArrowUpRight className="w-5 h-5 text-foreground" />
-                </div>
-              </div>
-            </Link>
+            />
           ))}
         </div>
         )}

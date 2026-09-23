@@ -1,0 +1,47 @@
+import { BookOpen, Calendar, Clock } from "lucide-react";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import type { Content } from "@/types/database";
+import MediaCard from "@/components/portfolio/MediaCard";
+
+interface PostCardProps {
+  post: Content;
+  style?: React.CSSProperties;
+}
+
+const stripInlineMarkdown = (text: string) => text.replace(/\*\*|__|\*|`/g, "");
+
+const readingMinutes = (markdown?: string) =>
+  markdown ? Math.max(1, Math.ceil(markdown.trim().split(/\s+/).length / 200)) : 1;
+
+const PostCard = ({ post, style }: PostCardProps) => (
+  <MediaCard
+    to={`/blog/${post.slug || post.id}`}
+    image={post.image_url}
+    imageAlt={post.title}
+    fallbackIcon={BookOpen}
+    eyebrow={post.category || "Artigo"}
+    title={post.title.trim()}
+    description={post.description ? stripInlineMarkdown(post.description) : undefined}
+    details={
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+        {post.created_at && (
+          <span className="inline-flex items-center gap-1.5">
+            <Calendar className="h-3.5 w-3.5" />
+            <time dateTime={post.created_at}>{format(new Date(post.created_at), "dd MMM yyyy", { locale: ptBR })}</time>
+          </span>
+        )}
+        <span className="inline-flex items-center gap-1.5">
+          <Clock className="h-3.5 w-3.5" />
+          {readingMinutes(post.markdown)} min de leitura
+        </span>
+      </div>
+    }
+    ctaLabel="Ler artigo"
+    // Blog covers are produced at 3:2; a 16:9 frame would crop their header and footer strips
+    imageAspectClass="aspect-[3/2]"
+    style={style}
+  />
+);
+
+export default PostCard;

@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,6 +8,7 @@ import { ProjectSchema, Project, projectCategories, ProjectCategory } from "@/ty
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { slugify } from "@/lib/slug";
 import { ArrowLeft, Loader2, Plus, Trash2, BarChart2, Image as ImageIcon, FileText, Settings } from "lucide-react";
 
 // Form schema adapting arrays to comma-separated strings for simpler UI
@@ -38,6 +39,7 @@ export default function AdminProjectForm() {
     resolver: zodResolver(FormSchema),
     defaultValues: {
       id: "",
+      slug: "",
       title: "",
       category: "",
       description: "",
@@ -72,6 +74,10 @@ export default function AdminProjectForm() {
     },
   });
 
+
+  // New projects follow the title until the slug is edited by hand; existing URLs never change on their own.
+  const [slugEdited, setSlugEdited] = useState(isEditing);
+  const slugPreview = slugify(form.watch("slug") || "");
 
   const { fields: statFields, append: appendStat, remove: removeStat } = useFieldArray({
     control: form.control,
@@ -178,7 +184,14 @@ export default function AdminProjectForm() {
             )}
             <div className="md:col-span-1">
               <label className="block text-sm font-medium mb-1">Título*</label>
-              <Input {...form.register("title")} placeholder="Ex: NoCode Match" />
+              <Input
+                {...form.register("title", {
+                  onChange: (e) => {
+                    if (!slugEdited) form.setValue("slug", slugify(e.target.value));
+                  },
+                })}
+                placeholder="Ex: NoCode Match"
+              />
             </div>
             <div className="md:col-span-1">
               <label className="block text-sm font-medium mb-1">Categoria*</label>
@@ -192,6 +205,22 @@ export default function AdminProjectForm() {
                 ))}
               </select>
               {form.formState.errors.category && <p className="text-red-500 text-xs mt-1">{form.formState.errors.category.message}</p>}
+            </div>
+            <div className="md:col-span-3">
+              <label htmlFor="project-slug" className="block text-sm font-medium mb-1">URL amigável (slug)</label>
+              <Input
+                id="project-slug"
+                {...form.register("slug", {
+                  onChange: () => setSlugEdited(true),
+                  onBlur: (e) => form.setValue("slug", slugify(e.target.value)),
+                })}
+                placeholder="gerado-a-partir-do-titulo"
+                className="font-mono text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                waldoeller.com/projects/<span className="text-foreground">{slugPreview || "…"}</span>
+                {isEditing && " · Se você alterar, o endereço antigo continua redirecionando para o novo."}
+              </p>
             </div>
             <div className="md:col-span-1">
               <label className="block text-sm font-medium mb-1">Ordem de Exibição</label>

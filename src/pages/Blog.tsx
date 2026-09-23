@@ -1,17 +1,8 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { BookOpen, Calendar, ChevronRight, Clock } from "lucide-react";
+import { BookOpen } from "lucide-react";
 import { useContents } from "@/hooks/useContents";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import SEOHead from "@/components/SEOHead";
-
-/** Estimate reading time from markdown text */
-const estimateReadingTime = (text?: string): number => {
-  if (!text) return 1;
-  const words = text.trim().split(/\s+/).length;
-  return Math.max(1, Math.ceil(words / 200));
-};
+import PostCard from "@/components/portfolio/PostCard";
 
 const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -129,66 +120,10 @@ const Blog = () => {
 
       {/* BLOG GRID */}
       <div className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 pb-40">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {filteredContents.map((post, index) => {
-            const readingTime = estimateReadingTime(post.markdown);
-            return (
-              <Link 
-                key={post.id} 
-                to={`/blog/${post.slug || post.id}`}
-                className="group relative bg-foreground/[0.015] border border-foreground/[0.04] rounded-2xl overflow-hidden hover:border-foreground/10 hover:bg-foreground/[0.025] transition-all duration-500 flex flex-col"
-                style={{ animation: `fadeInUp 0.5s ease-out ${index * 100}ms both` }}
-              >
-                {/* Image Container */}
-                <div className="aspect-[16/9] w-full overflow-hidden bg-foreground/[0.02]">
-                  {post.image_url ? (
-                    <img 
-                      src={post.image_url} 
-                      alt={post.title}
-                      loading="lazy"
-                      className="w-full h-full object-contain transition-transform duration-700"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-white/[0.02] to-white/[0.005]">
-                      <BookOpen className="w-12 h-12 text-foreground/5 opacity-20" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Content */}
-                <div className="p-8 flex-1 flex flex-col">
-                  <div className="flex items-center gap-3 mb-4 flex-wrap">
-                    <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-primary border border-primary/20 bg-primary/5 px-2 py-1 rounded-sm">
-                      {post.category || "Post"}
-                    </span>
-                    {post.created_at && (
-                      <div className="flex items-center gap-1.5 text-[9px] text-foreground/20 uppercase tracking-widest">
-                        <Calendar className="w-3 h-3" />
-                        {format(new Date(post.created_at), "dd MMM, yyyy", { locale: ptBR })}
-                      </div>
-                    )}
-                    <div className="flex items-center gap-1 text-[9px] text-foreground/20 uppercase tracking-widest">
-                      <Clock className="w-3 h-3" />
-                      {readingTime} min
-                    </div>
-                  </div>
-
-                  <h2 className="text-xl font-light text-foreground group-hover:text-primary transition-colors mb-4 leading-tight">
-                    {post.title}
-                  </h2>
-
-                  <p className="text-sm text-foreground/40 leading-relaxed mb-8 line-clamp-3">
-                    {post.description}
-                  </p>
-
-                  <div className="mt-auto flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-foreground/40 group-hover:text-foreground transition-colors">
-                    Ler artigo completo
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredContents.map((post, index) => (
+            <PostCard key={post.id} post={post} style={{ animationDelay: `${(index + 2) * 100}ms` }} />
+          ))}
         </div>
 
         {contents.length === 0 && (
