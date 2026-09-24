@@ -15,6 +15,7 @@ import ExperienceEditor from "@/components/admin/ExperienceEditor";
 import BookEditor from "@/components/admin/BookEditor";
 import CoursesManager from "@/components/admin/CoursesManager";
 import { Field, SectionCard, SectionIndex } from "@/components/admin/page-sections";
+import { findExperienceIcon } from "@/lib/experience-icons";
 import type { Book, Education, Experience } from "@/types/database";
 
 // Same order as the public /about page.
@@ -93,6 +94,14 @@ function ExperienceList() {
       isLoading={isLoading}
       primary={(item) => item.title}
       secondary={(item) => joinParts(item.institution, item.period)}
+      leading={(item) => {
+        const { icon: Icon, label } = findExperienceIcon(item.icon_type);
+        return (
+          <span title={label} className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/25">
+            <Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+          </span>
+        );
+      }}
       hint="Ordenadas pelo campo Ordem · alterações salvas na hora."
       labels={{
         add: "Adicionar experiência", newTitle: "Nova experiência", editTitle: "Editar experiência",

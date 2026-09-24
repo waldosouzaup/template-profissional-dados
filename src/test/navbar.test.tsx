@@ -8,9 +8,9 @@ vi.mock("@/hooks/useCustomPages", () => ({ useCustomPages: () => ({ data: [], is
 afterEach(cleanup);
 
 describe("Barra de navegação do site", () => {
-  it("segue a ordem Início, Sobre, Portfólio, Blog, Contato", () => {
+  it("segue a ordem Início, Sobre, Portfólio, Trilhas, Contato", () => {
     render(<MemoryRouter><Navbar /></MemoryRouter>);
-    const labels = ["Início", "Sobre", "Portfólio", "Blog", "Contato"];
+    const labels = ["Início", "Sobre", "Portfólio", "Trilhas", "Contato"];
     const order = screen.getAllByRole("link").map((a) => a.textContent?.trim()).filter((t) => labels.includes(t!));
     expect([...new Set(order)]).toEqual(labels);
   });

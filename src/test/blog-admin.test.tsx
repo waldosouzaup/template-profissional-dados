@@ -54,6 +54,7 @@ const renderAt = (path: string) => render(
 describe("Admin: trilhas de estudo", () => {
   it("lista as trilhas com endereço e quantidade de artigos", () => {
     renderAt("/admin/contents");
+    expect(screen.getByRole("heading", { level: 1, name: "Trilhas" })).toBeInTheDocument();
     expect(screen.getByText("/blog/trilha/linux-essentials-30-dias · 2 artigos")).toBeInTheDocument();
     expect(screen.getByText("/blog/trilha/ia · 1 artigo")).toBeInTheDocument();
   });

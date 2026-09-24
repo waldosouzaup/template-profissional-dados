@@ -14,7 +14,7 @@ const Index = () => {
   const profile = profiles[0];
   
   const siteTitle = profile?.full_name ? `${profile.full_name} | ${profile.current_focus || "Especialista"}` : "Waldo Eller | Especialista em Dados, Tecnologia e IA";
-  const siteDescription = profile?.bio_summary || "Portfolio e Blog de Waldo Eller, Especialista em Dados, Tecnologia e IA.";
+  const siteDescription = profile?.bio_summary || "Portfólio e Trilhas de estudo de Waldo Eller, Especialista em Dados, Tecnologia e IA.";
 
   return (
     <div className="min-h-screen bg-background pt-16">

@@ -1,8 +1,7 @@
-import { Award, Briefcase, Rocket } from "lucide-react";
+import { Briefcase } from "lucide-react";
 import type { Experience } from "@/types/database";
 import { AboutCard, AboutSection, PeriodPill } from "@/components/portfolio/AboutSection";
-
-const IconMap = { rocket: Rocket, award: Award, briefcase: Briefcase };
+import { findExperienceIcon } from "@/lib/experience-icons";
 
 const ExperienceSection = ({ items }: { items: Experience[] }) => {
   if (items.length === 0) return null;
@@ -12,7 +11,7 @@ const ExperienceSection = ({ items }: { items: Experience[] }) => {
       <ol className="relative space-y-6">
         <span aria-hidden="true" className="absolute left-5 top-6 bottom-6 w-px bg-gradient-to-b from-primary/40 via-foreground/10 to-transparent" />
         {items.map((exp, index) => {
-          const Icon = IconMap[exp.icon_type] ?? Briefcase;
+          const Icon = findExperienceIcon(exp.icon_type).icon;
           return (
             <li key={exp.id} className="relative pl-16" style={{ animation: "fadeInUp 0.5s ease-out both", animationDelay: `${index * 80}ms` }}>
               <span className="absolute left-0 top-6 flex h-10 w-10 items-center justify-center rounded-full border border-primary/25 bg-background">

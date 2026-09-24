@@ -105,11 +105,13 @@ describe("Página do post", () => {
     expect(data.position).toBe(2);
   });
 
-  it("artigo sem trilha volta para o blog e não mostra navegação de trilha", () => {
+  it("artigo sem trilha volta para Trilhas e não mostra navegação de trilha", () => {
     const original = s.post;
     s.post = { ...original!, trail_id: null };
     renderPost();
-    expect(screen.getByRole("link", { name: "Blog" })).toHaveAttribute("href", "/blog");
+    expect(screen.getByRole("link", { name: "Trilhas" })).toHaveAttribute("href", "/blog");
+    expect(screen.getByRole("link", { name: "Voltar às Trilhas" })).toHaveAttribute("href", "/blog");
+    expect(screen.queryByText(/\bBlog\b/)).not.toBeInTheDocument();
     expect(screen.queryByRole("navigation", { name: "Navegação da trilha" })).not.toBeInTheDocument();
     expect(screen.queryByText(/Etapa \d/)).not.toBeInTheDocument();
     s.post = original;

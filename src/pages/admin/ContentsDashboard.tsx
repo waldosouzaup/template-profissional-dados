@@ -46,8 +46,8 @@ export default function ContentsDashboard() {
     <div className="animate-fade-up">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Conteúdos</h1>
-          <p className="text-muted-foreground mt-1">Trilhas de estudo e artigos do blog.</p>
+          <h1 className="text-3xl font-bold text-foreground">Trilhas</h1>
+          <p className="text-muted-foreground mt-1">Trilhas de estudo e seus artigos.</p>
         </div>
         <Link to="/admin/contents/new">
           <Button className="gap-2">
@@ -89,7 +89,7 @@ export default function ContentsDashboard() {
               dialogDescription: "Nome, endereço, descrição e capa do card da trilha em /blog.",
               empty: "Nenhuma trilha ainda. Crie uma para organizar os artigos em sequência.",
               deleteTitle: "Excluir trilha?",
-              deleteDescription: (trail) => `“${trail.name}” deixa de aparecer no blog. Só é possível excluir trilhas sem artigos.`,
+              deleteDescription: (trail) => `“${trail.name}” deixa de aparecer em Trilhas. Só é possível excluir trilhas sem artigos.`,
             }}
             renderEditor={(trail, close) => (
               <TrailEditor

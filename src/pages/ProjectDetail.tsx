@@ -106,7 +106,7 @@ const ListBlock = ({
   return (
     <div className="py-8 border-t border-foreground/[0.06]">
       <div className="flex items-center gap-2 mb-5">
-        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+        <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
         <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/80">
           {title}
         </p>
@@ -220,7 +220,7 @@ const ProjectDetail = () => {
       <header className="fixed top-16 left-0 right-0 z-30 flex items-center justify-between px-8 py-3 bg-background/80 backdrop-blur-xl border-b border-foreground/[0.04]">
         <Link
           to="/projects"
-          className="group flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+          className="group flex items-center gap-2 text-xs sm:text-sm font-medium px-4 py-1.5 rounded-full border border-primary/30 text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-[0_0_15px_hsl(var(--primary)/0.1)] hover:shadow-[0_0_20px_hsl(var(--primary)/0.2)]"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           Projetos
@@ -249,7 +249,7 @@ const ProjectDetail = () => {
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs sm:text-sm px-4 py-1.5 border border-emerald-500/30 rounded-full text-emerald-400 hover:bg-emerald-500/10 hover:border-emerald-500/50 transition-all duration-300 shadow-[0_0_15px_rgba(16,185,129,0.1)] hover:shadow-[0_0_20px_rgba(16,185,129,0.2)]"
+              className="flex items-center gap-1.5 text-xs sm:text-sm px-4 py-1.5 border border-primary/30 rounded-full text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-300 shadow-[0_0_15px_hsl(var(--primary)/0.1)] hover:shadow-[0_0_20px_hsl(var(--primary)/0.2)]"
             >
               Demo
               <ExternalLink className="w-3.5 h-3.5" />
@@ -369,7 +369,7 @@ const ProjectDetail = () => {
                           if (isSectionLabel) {
                             return (
                               <div className="flex items-center gap-2 mt-16 mb-4">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
                                 <h3 className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/80 !m-0 !leading-none" {...props}>
                                   {children}
                                 </h3>
@@ -396,7 +396,7 @@ const ProjectDetail = () => {
                           if (sectionKeywords.includes(text.trim()) && text.trim().length < 30) {
                             return (
                               <div className="flex items-center gap-2 mt-16 mb-4">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                                <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
                                 <p className="!text-[10px] !font-bold !tracking-[0.25em] !uppercase !text-foreground/80 !m-0 !leading-none">
                                   {children}
                                 </p>
@@ -439,7 +439,7 @@ const ProjectDetail = () => {
                     {project.cardProblem && (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
                           <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                             Problema
                           </p>
@@ -452,7 +452,7 @@ const ProjectDetail = () => {
                     {project.cardSolution && (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
                           <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                             Solução
                           </p>
@@ -465,7 +465,7 @@ const ProjectDetail = () => {
                     {project.cardResult && (
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                          <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
                           <p className="text-[9px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                             Resultado
                           </p>
@@ -482,7 +482,7 @@ const ProjectDetail = () => {
                 {hasStats && (
                   <div className="border-t border-foreground/[0.06] py-6 mb-2 space-y-5">
                     <div className="flex items-center gap-2 mb-5">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
                       <p className="text-[9px] font-bold tracking-[0.2em] uppercase text-foreground/80">
                         Métricas
                       </p>
@@ -504,7 +504,7 @@ const ProjectDetail = () => {
                 {project.tags && project.tags.length > 0 && (
                   <div className="py-6 border-t border-foreground/[0.06]">
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60 shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary/60 shadow-[0_0_8px_hsl(var(--primary)/0.4)]" />
                       <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/80">
                         Tecnologias
                       </p>
@@ -545,20 +545,20 @@ const ProjectDetail = () => {
                       }}
                     >
                       {/* Background hover effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 to-emerald-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/10 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                       
                       <span className="relative z-10 flex items-center gap-2">
                         Ver Demo ao Vivo
                         <span className="flex h-2 w-2 relative">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
                         </span>
                       </span>
                       
-                      <ExternalLink className="relative z-10 w-4 h-4 text-emerald-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                      <ExternalLink className="relative z-10 w-4 h-4 text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
                       
                       {/* Subtle glow on hover */}
-                      <div className="absolute -inset-1 bg-emerald-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
+                      <div className="absolute -inset-1 bg-primary/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
                     </a>
                   )}
                   {project.githubUrl && (

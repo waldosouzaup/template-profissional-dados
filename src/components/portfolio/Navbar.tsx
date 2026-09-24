@@ -9,7 +9,7 @@ const navItems = [
   { path: "/", label: "Início", icon: Home },
   { path: "/about", label: "Sobre", icon: User },
   { path: "/projects", label: "Portfólio", icon: FolderOpen },
-  { path: "/blog", label: "Blog", icon: BookOpen },
+  { path: "/blog", label: "Trilhas", icon: BookOpen },
   { path: "/contact", label: "Contato", icon: Mail },
 ];
 

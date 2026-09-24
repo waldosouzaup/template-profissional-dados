@@ -8,7 +8,7 @@ const navItems = [
   { to: "/admin/profiles", icon: User, label: "Perfil (Home)" },
   { to: "/admin/about", icon: BookUser, label: "Sobre" },
   { to: "/admin", icon: FolderOpen, label: "Projetos" },
-  { to: "/admin/contents", icon: FileText, label: "Conteúdos" },
+  { to: "/admin/contents", icon: FileText, label: "Trilhas" },
   { to: "/admin/custom-pages", icon: FileText, label: "Páginas Custom." },
   { to: "/admin/settings", icon: SettingsIcon, label: "Configurações" },
 ];

@@ -13,7 +13,7 @@ import SEOHead from "@/components/SEOHead";
 import PostCard from "@/components/portfolio/PostCard";
 import { extractMarkdownImages, readingMinutes, stripInlineMarkdown } from "@/lib/text";
 import ImageLightbox, { type LightboxImage } from "@/components/blog/ImageLightbox";
-import { summarizeTrails, trailNeighbors, trailPath } from "@/lib/trails";
+import { summarizeTrails, trailNeighbors, trailPath, trailStep } from "@/lib/trails";
 import type { BlogTrail, Content } from "@/types/database";
 import profilePhoto from "@/assets/profile-photo.jpg";
 
@@ -326,12 +326,14 @@ const BlogPost = () => {
   const readingTime = readingMinutes(post.markdown);
   const authorName = author?.full_name || "Waldo Eller";
   const { index: stepIndex, previous, next, upNext } = trailNeighbors(trailList, post.id);
+  const { step, total } = trailStep(trailList, stepIndex);
+  const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 pt-16">
       <SEOHead
         title={post.title}
-        description={post.description || `Leia "${post.title}" no blog de Waldo Eller.`}
+        description={post.description || `Leia "${post.title}" nas trilhas de estudo de Waldo Eller.`}
         canonical={`https://waldoeller.com/blog/${post.slug || post.id}`}
         ogImage={post.image_url}
         ogType="article"
@@ -354,7 +356,7 @@ const BlogPost = () => {
           ...(post.image_url && { image: post.image_url }),
           ...(trail && {
             isPartOf: { "@type": "CollectionPage", name: trail.name, url: `https://waldoeller.com${trailPath(trail)}` },
-            ...(stepIndex >= 0 && { position: stepIndex + 1 }),
+            ...(stepIndex >= 0 && { position: step }),
           }),
           wordCount: post.markdown?.split(/\s+/).length,
           timeRequired: `PT${readingTime}M`,
@@ -365,19 +367,19 @@ const BlogPost = () => {
       {/* HEADER */}
       <header className="pt-16 sm:pt-20 pb-14 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         <div className="max-w-4xl">
-          {/* Back to the trail the post belongs to; posts outside a trail go back to the blog */}
+          {/* Back to the trail the post belongs to; posts outside a trail go back to the trails list */}
           <Link
             to={trail ? trailPath(trail) : "/blog"}
             className="group mb-10 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary shadow-[0_0_15px_hsl(var(--primary)/0.1)] transition-all duration-300 hover:border-primary/50 hover:bg-primary/10"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-            {trail ? trail.name : "Blog"}
+            {trail ? trail.name : "Trilhas"}
           </Link>
 
           <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
             {stepIndex >= 0 && (
               <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                Etapa {String(stepIndex + 1).padStart(2, "0")} de {String(trailList.length).padStart(2, "0")}
+                Etapa {pad(step)} de {pad(total)}
               </span>
             )}
             {post.created_at && (
@@ -588,7 +590,7 @@ const BlogPost = () => {
           to="/blog"
           className="px-8 py-3 border border-foreground/15 rounded-full text-sm text-foreground/60 hover:border-foreground/40 hover:text-foreground transition-colors"
         >
-          Voltar ao Blog
+          Voltar às Trilhas
         </Link>
       </footer>
     </div>

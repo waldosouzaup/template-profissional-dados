@@ -1,6 +1,6 @@
-# Template Profissional de Portfólio, Blog e CMS
+# Template Profissional de Portfólio, Trilhas de Estudo e CMS
 
-Aplicação React para portfólio profissional com blog, painel administrativo, CMS de páginas customizadas, upload de imagens, SEO dinâmico, tema configurável e integração com Supabase.
+Aplicação React para portfólio profissional com trilhas de estudo, painel administrativo, CMS de páginas customizadas, upload de imagens, SEO dinâmico, tema configurável e integração com Supabase.
 
 O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimento que precisam de uma presença digital elegante, editável e pronta para produção.
 
@@ -9,7 +9,7 @@ O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimen
 ## Funcionalidades
 
 - Portfólio com projetos organizados por categorias editáveis no painel (padrão: Dados, Web e IA).
-- Blog organizado em **trilhas de estudo**: `/blog` mostra um card por trilha e cada trilha lista seus artigos na ordem de estudo, com anterior/próximo em cada post. Posts em Markdown, com capa, slug, ampliação de imagens e arquivos complementares via Google Drive.
+- **Trilhas de estudo** (em `/blog`): a página mostra um card por trilha e cada trilha lista seus artigos na ordem de estudo, com anterior/próximo em cada post. Posts em Markdown, com capa, slug, ampliação de imagens e arquivos complementares via Google Drive.
 - Conteúdo legível por assistentes de IA e rastreadores sem JavaScript: cada página pública chega com título, meta tags, JSON-LD e o texto completo no HTML (Netlify Edge Function), além de `/llms.txt`.
 - Página exclusiva de contato em `/contact`, com formulário Web3Forms ou fallback por `mailto`.
 - Painel administrativo protegido por Supabase Auth.
@@ -69,7 +69,7 @@ Módulos disponíveis:
 - Perfil (Home)
 - Sobre (título e apresentação, formação acadêmica, experiências profissionais, livros e cursos complementares, na mesma ordem da página)
 - Projetos
-- Conteúdos/Blog (trilhas de estudo e artigos)
+- Trilhas (trilhas de estudo e seus artigos)
 - Páginas customizadas
 - Configurações
 
@@ -153,8 +153,10 @@ Em um banco já existente, execute no **SQL Editor** do Supabase, nesta ordem, o
 2. `project_slugs.sql` — URLs amigáveis dos projetos (`slug`, `previous_slugs`, `updated_at`), com gatilho que normaliza e versiona os slugs.
 3. `project_categories.sql` — tabela `project_categories` (nome, ícone e ordem) usada pelas categorias editáveis; `projects.category` passa a referenciá-la (renomear atualiza os projetos; categorias em uso não podem ser excluídas).
 4. `blog_trails.sql` — tabela `blog_trails` (nome, endereço, descrição, capa e ordem) e as colunas `contents.trail_id` e `contents.trail_position`. Cada categoria usada pelos posts vira uma trilha, e a posição vem do título ("Dia 05/30" → 5) ou da data. Trilhas com artigos não podem ser excluídas.
+5. `experience_icons.sql` — libera os ícones por cargo em Experiências Profissionais (remove a lista fixa `rocket`/`award`/`briefcase` da coluna `experience.icon_type`).
+6. `theme_preset.sql` — coluna `profiles.theme_preset`, com a versão de aparência escolhida em Configurações.
 
-Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql`, `project_categories.sql` e `blog_trails.sql`.
+Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql`, `project_categories.sql` e `blog_trails.sql` (o SQL completo já inclui as mudanças de `experience_icons.sql` e `theme_preset.sql`).
 
 ### Instalação completa
 
@@ -181,6 +183,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   navbar_icon TEXT DEFAULT 'Database',
   navbar_logo_url TEXT,
   theme TEXT DEFAULT 'dark',
+  theme_preset TEXT NOT NULL DEFAULT 'padrao',
   primary_color TEXT DEFAULT '142 71% 45%',
   stat_1_number TEXT DEFAULT '+15',
   stat_1_label TEXT DEFAULT 'Projetos Ativos',
@@ -282,7 +285,7 @@ CREATE TABLE IF NOT EXISTS public.education (
 CREATE TABLE IF NOT EXISTS public.experience (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   type TEXT CHECK (type IN ('profissional', 'embaixador', 'projeto', 'outros')),
-  icon_type TEXT CHECK (icon_type IN ('rocket', 'award', 'briefcase')) DEFAULT 'rocket',
+  icon_type TEXT DEFAULT 'briefcase',
   title TEXT NOT NULL,
   institution TEXT NOT NULL,
   description TEXT,
@@ -482,6 +485,23 @@ Para configurar:
 
 Se a chave não estiver configurada, o formulário abre o cliente de email do visitante usando `mailto`.
 
+## Versões de aparência
+
+Em **Configurações → Aparência do Portfólio**, escolha a versão visual do site, o modo e a cor de destaque:
+
+| Versão | Escuro | Claro | Títulos |
+| --- | --- | --- | --- |
+| Padrão | preto neutro, verde | branco, verde | Inter |
+| Obsidiana | vidro vulcânico, ouro champanhe | mármore, bronze | Fraunces |
+| Meia-noite | azul-marinho, ciano | gelo, cobalto | Red Hat Display |
+| Ametista | berinjela, lilás | lavanda, violeta | Sora |
+
+- Cada versão muda a paleta inteira (fundo, cards, bordas, textos e destaque) e a fonte dos títulos; o texto corrido continua em Inter. Todas as combinações de texto passam no contraste WCAG AA (verificado em `src/test/themes.test.ts`).
+- **Cor de destaque:** *Cor do tema* usa a cor da versão; as cores fixas a substituem.
+- As paletas ficam em `src/lib/themes.ts`. A Padrão também está em `src/index.css`, que pinta a primeira tela; um teste garante que as duas não divergem.
+- O navegador guarda a última aparência aplicada e o `index.html` a reaplica antes de o app carregar, então o site abre direto no tema escolhido, sem piscar o padrão.
+- Requer `theme_preset.sql` em bancos existentes.
+
 ## Branding e Aparência
 
 No painel administrativo é possível configurar:
@@ -517,22 +537,26 @@ A página `/about` segue esta ordem, espelhada no painel em **Sobre** (página �
 1. **Título e apresentação:** o título (a última palavra aparece destacada) e o texto de abertura, que aceita Markdown. Salvos pelo botão *Salvar título e apresentação*.
 2. **Formação Acadêmica**, 3. **Experiências Profissionais**, 4. **Livros** e 5. **Cursos Complementares:** cada lista tem *Adicionar*, editar e excluir em janela, com salvamento imediato. Formação e experiências são ordenadas pelo campo *Ordem*; cursos têm o interruptor **Na Home** para aparecer também em Certificações.
 
+Cada experiência tem um **ícone do cargo** (DevOps, Suporte técnico, Help Desk, Técnico em informática, Infraestrutura, Redes, Cloud, Linux, Desenvolvimento, Dados, Segurança, Automação, Qualidade, Design, Gestão e Ensino, além de maleta, foguete e prêmio), escolhido numa grade no painel e exibido na linha do tempo da página Sobre. O ícone é sugerido a partir do cargo digitado; em experiências já salvas, o botão **Usar sugestão** aplica a sugestão. A lista fica em `src/lib/experience-icons.ts`. Requer `experience_icons.sql` em bancos existentes.
+
 Links antigos do painel (`/admin/education`, `/admin/experiences`, `/admin/books`, `/admin/courses`, `/admin/journey`) levam à seção correspondente. A seção Jornada foi removida do site; os itens de `journey_items` permanecem no banco.
 
-## Blog: trilhas de estudo
+## Trilhas de estudo
 
-O blog é organizado em trilhas (por exemplo, *Linux Essentials 30 dias*):
+O conteúdo é organizado em trilhas (por exemplo, *Linux Essentials 30 dias*):
 
 - `/blog` mostra um card por trilha com capa, descrição, quantidade de artigos e tempo de leitura. Trilhas sem artigos não aparecem; posts sem trilha ficam em *Outros artigos*.
 - `/blog/trilha/<slug>` lista os artigos na ordem de estudo (Etapa 01, 02…), com o botão *Começar pela etapa 01*.
 - Cada post mostra a etapa ("Etapa 05 de 08"), volta para a sua trilha, leva ao artigo anterior e ao próximo e sugere os seguintes em *Continue na trilha*.
 
-No painel, em **Conteúdos**:
+No painel, no menu **Trilhas**:
 
 - **Trilhas de estudo:** crie, edite e exclua trilhas (nome, endereço, descrição, capa e ordem em `/blog`). Sem capa, o card usa a capa do primeiro artigo. Só é possível excluir trilhas sem artigos.
 - **Editar conteúdo:** escolha a *Trilha de estudo* e a *Posição na trilha*. Ao escolher uma trilha, a posição sugerida é a próxima livre.
 
 Depois de rodar `blog_trails.sql`, as trilhas têm o nome das categorias antigas (por exemplo, *Linux*); renomeie e descreva cada uma pelo painel.
+
+Se a ordem de estudo não bater com os títulos (posts publicados fora de ordem), rode `fix_trail_positions.sql` no SQL Editor: a etapa de cada artigo passa a ser o número do dia no título ("Dia 11/30" ou "11/30" → 11). O resultado lista o que mudou; artigos sem esse número e posts sem trilha não são alterados.
 
 ## Acesso para IAs e rastreadores
 
@@ -641,7 +665,7 @@ npm run build
 
 Use `npm run typecheck` para checar tipos: o `tsconfig.json` da raiz só referencia os configs da aplicação, então `npx tsc --noEmit` sozinho não verifica nenhum arquivo.
 
-O projeto usa Vitest com ambiente `jsdom` e Testing Library. Os testes ficam em `src/test/` e cobrem as seções da Home, o painel (Perfil, Sobre, projetos, trilhas), trilhas e posts do blog, a pré-renderização para IAs, URLs amigáveis, sitemap/redirecionamentos, cards e navegação.
+O projeto usa Vitest com ambiente `jsdom` e Testing Library. Os testes ficam em `src/test/` e cobrem as seções da Home, o painel (Perfil, Sobre, projetos, trilhas), trilhas e posts, a pré-renderização para IAs, URLs amigáveis, sitemap/redirecionamentos, cards e navegação.
 
 ## Licença
 

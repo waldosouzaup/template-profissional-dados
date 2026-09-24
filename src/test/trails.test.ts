@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stepLabel, summarizeTrails, trailNeighbors, trailPosts } from "@/lib/trails";
+import { stepLabel, summarizeTrails, trailNeighbors, trailPosts, trailStep } from "@/lib/trails";
 
 const post = (id: string, trail_id: string | null, trail_position: number | null, created_at: string, extra = {}) => ({
   id, title: id, trail_id, trail_position, created_at, ...extra,
@@ -61,5 +61,12 @@ describe("Ordem de estudo das trilhas", () => {
   it("a capa própria da trilha tem prioridade", () => {
     const [summary] = summarizeTrails([{ id: "linux", name: "Linux", slug: "linux", display_order: 0, image_url: "https://example.com/trilha.png" }], posts);
     expect(summary.cover).toBe("https://example.com/trilha.png");
+  });
+
+  it("etapa do post: a mesma do card, com total que cobre dias ainda fora da trilha", () => {
+    const withGap = [post("d1", "t", 1, "a"), post("d2", "t", 2, "b"), post("d28", "t", 28, "c"), post("d30", "t", 30, "d")];
+    expect(trailStep(withGap, 2)).toEqual({ step: 28, total: 30 });
+    const noPositions = [post("a", "t", null, "a"), post("b", "t", null, "b")];
+    expect(trailStep(noPositions, 1)).toEqual({ step: 2, total: 2 });
   });
 });

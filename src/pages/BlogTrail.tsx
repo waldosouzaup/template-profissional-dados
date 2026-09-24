@@ -63,7 +63,7 @@ const BlogTrail = () => {
           name: trail.name,
           description: trail.description || undefined,
           url,
-          isPartOf: { "@type": "Blog", name: "Blog — Waldo Eller", url: `${SITE_URL}/blog` },
+          isPartOf: { "@type": "Blog", name: "Trilhas de estudo — Waldo Eller", url: `${SITE_URL}/blog` },
           mainEntity: {
             "@type": "ItemList",
             itemListOrder: "https://schema.org/ItemListOrderAscending",
@@ -82,7 +82,7 @@ const BlogTrail = () => {
         <div className="max-w-4xl">
           <Link to="/blog" className={backLink}>
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-            Blog
+            Trilhas
           </Link>
 
           <div className="mb-6 flex items-center gap-3">

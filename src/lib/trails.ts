@@ -45,6 +45,12 @@ export const trailNeighbors = <P extends TrailPost>(ordered: P[], currentId: str
   };
 };
 
+// "Etapa 28 de 30": the post's own step (as on its card); the total also covers gaps, such as a day not in the trail yet.
+export const trailStep = <P extends TrailPost>(ordered: P[], index: number) => ({
+  step: ordered[index]?.trail_position ?? index + 1,
+  total: Math.max(ordered.length, ...ordered.map((post) => post.trail_position ?? 0)),
+});
+
 export interface TrailSummary<T, P> {
   trail: T;
   posts: P[];

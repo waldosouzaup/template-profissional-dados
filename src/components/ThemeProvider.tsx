@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useProfiles } from "@/hooks/useProfile";
+import { applyAppearance } from "@/lib/themes";
 
 export function ThemeProvider() {
   const { data: profiles = [] } = useProfiles();
@@ -7,28 +8,13 @@ export function ThemeProvider() {
 
   useEffect(() => {
     const root = window.document.documentElement;
-    
-    // Apply Light/Dark class
-    if (profile?.theme === "light") {
-      root.classList.add("light");
-      root.classList.remove("dark");
-    } else {
-      root.classList.add("dark");
-      root.classList.remove("light");
+    // Until the profile arrives, keep what index.html painted from the last visit (dark on a first visit).
+    if (!profile) {
+      if (!root.classList.contains("light")) root.classList.add("dark");
+      return;
     }
-
-    // Apply Custom Color if present
-    if (profile?.primary_color) {
-      root.style.setProperty("--primary", profile.primary_color);
-      root.style.setProperty("--ring", profile.primary_color);
-      root.style.setProperty("--accent", profile.primary_color);
-    } else {
-      // Fallback green
-      root.style.removeProperty("--primary");
-      root.style.removeProperty("--ring");
-      root.style.removeProperty("--accent");
-    }
-  }, [profile?.theme, profile?.primary_color]);
+    applyAppearance(root, { preset: profile.theme_preset, mode: profile.theme, primary: profile.primary_color });
+  }, [profile]);
 
   return null;
 }

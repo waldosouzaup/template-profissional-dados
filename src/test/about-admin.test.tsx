@@ -162,7 +162,7 @@ describe("Admin Sobre: página única na ordem da página pública", () => {
     renderAdmin("/admin/about");
     const nav = await screen.findByRole("navigation", { name: "Menu do painel" });
     expect(within(nav).getAllByRole("link").map((a) => a.textContent)).toEqual([
-      "Perfil (Home)", "Sobre", "Projetos", "Conteúdos", "Páginas Custom.", "Configurações",
+      "Perfil (Home)", "Sobre", "Projetos", "Trilhas", "Páginas Custom.", "Configurações",
     ]);
   });
 });

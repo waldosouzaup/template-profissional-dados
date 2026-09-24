@@ -164,6 +164,8 @@ describe("Pré-renderização para IAs e rastreadores", () => {
   it("/blog lista as trilhas e os artigos de cada uma, na ordem de estudo", async () => {
     const page = await render("/blog");
     expect(page.html).toContain('<link rel="canonical" href="https://waldoeller.com/blog" />');
+    expect(page.html).toContain("<title>Trilhas de estudo | Waldo Eller</title>");
+    expect(page.jsonLd).toMatchObject({ "@type": "Blog", name: "Trilhas de estudo — Waldo Eller" });
     const linux = page.root.indexOf("Linux Essentials 30 dias");
     expect(page.root.indexOf('<a href="/blog/trilha/ia">IA</a>')).toBeGreaterThan(-1);
     expect(linux).toBeGreaterThan(page.root.indexOf('<a href="/blog/trilha/ia">IA</a>'));
@@ -175,6 +177,7 @@ describe("Pré-renderização para IAs e rastreadores", () => {
   it("/blog/trilha/:slug: a trilha com os artigos em ordem e ItemList", async () => {
     const page = await render("/blog/trilha/linux-essentials-30-dias");
     expect(page.html).toContain("<title>Linux Essentials 30 dias — Trilha de estudo | Waldo Eller</title>");
+    expect(page.root).toContain('<nav aria-label="Voltar"><a href="/blog">Trilhas</a></nav>');
     expect(page.root).toContain("<h1>Linux Essentials 30 dias</h1>");
     expect(page.root).toContain("Um desafio diário rumo à LPI.");
     expect(page.root).toMatch(/Etapa 01[\s\S]*dia-01[\s\S]*Etapa 02[\s\S]*dia-02/);
@@ -253,6 +256,7 @@ describe("Pré-renderização para IAs e rastreadores", () => {
   it("toda página tem a navegação do site e o conteúdo fica oculto para quem roda o app", async () => {
     const page = await render("/about");
     for (const href of ["/", "/about", "/projects", "/blog", "/contact"]) expect(page.root).toContain(`href="${href}"`);
+    expect(page.root).toContain('<a href="/blog">Trilhas</a>');
     expect(page.root.startsWith("<div data-prerender>")).toBe(true);
     expect(page.html).toContain('document.documentElement.classList.add("js")');
     expect(page.html).toContain(".js [data-prerender]{display:none}");
@@ -264,7 +268,7 @@ describe("llms.txt", () => {
     const text = await buildLlmsTxt(rest);
     expect(text.startsWith("# Waldo Eller\n\n> Profissional de TI com foco em Linux e Cloud.\n")).toBe(true);
     expect(text).toContain("## Páginas");
-    expect(text).toContain("- [Blog](https://waldoeller.com/blog): ");
+    expect(text).toContain("- [Trilhas](https://waldoeller.com/blog): ");
     expect(text).toContain("## Trilhas de estudo");
     expect(text).toContain("- [Linux Essentials 30 dias](https://waldoeller.com/blog/trilha/linux-essentials-30-dias): Um desafio diário rumo à LPI. (3 artigos)");
     expect(text).toContain("### Linux Essentials 30 dias");

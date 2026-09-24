@@ -86,12 +86,11 @@ export const CourseSchema = z.object({
 export type Course = z.infer<typeof CourseSchema>;
 
 export const ExperienceTypeEnum = z.enum(["profissional", "embaixador", "projeto", "outros"]);
-export const IconTypeEnum = z.enum(["rocket", "award", "briefcase"]);
 
 export const ExperienceSchema = z.object({
   id: z.string().uuid(),
   type: ExperienceTypeEnum,
-  icon_type: IconTypeEnum.default("rocket"),
+  icon_type: z.string().default("briefcase"), // one of EXPERIENCE_ICONS (src/lib/experience-icons.ts)
   title: z.string().min(1, "Title is required"),
   institution: z.string().min(1, "Institution is required"), // Keeping as institution in DB for compatibility, but labeled as Company in UI
   description: z.string().optional(),
@@ -102,7 +101,6 @@ export const ExperienceSchema = z.object({
 
 export type Experience = z.infer<typeof ExperienceSchema>;
 export type ExperienceType = z.infer<typeof ExperienceTypeEnum>;
-export type IconType = z.infer<typeof IconTypeEnum>;
 
 export const ProfileSchema = z.object({
   id: z.string().uuid(),
@@ -122,6 +120,7 @@ export const ProfileSchema = z.object({
   navbar_icon: z.string().optional(),
   navbar_logo_url: z.string().optional(),
   theme: z.enum(["dark", "light"]).default("dark"),
+  theme_preset: z.string().default("padrao"), // appearance version, see src/lib/themes.ts
   primary_color: z.string().default("142 71% 45%"),
   stat_1_number: z.string().default("+15"),
   stat_1_label: z.string().default("Projetos Ativos"),

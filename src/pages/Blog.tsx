@@ -26,7 +26,7 @@ const Blog = () => {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
           <div className="w-8 h-8 border border-foreground/10 rounded-full border-t-foreground/40 animate-spin" />
-          <p className="text-[11px] tracking-[0.3em] uppercase text-foreground/25">Carregando Blog</p>
+          <p className="text-[11px] tracking-[0.3em] uppercase text-foreground/25">Carregando Trilhas</p>
         </div>
       </div>
     );
@@ -35,14 +35,14 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 pt-16">
       <SEOHead
-        title="Blog — Trilhas de estudo"
+        title="Trilhas de estudo"
         description="Trilhas de estudo com artigos em sequência sobre Linux, Cloud, Dados e IA, escritas por Waldo Eller."
         canonical={`${SITE_URL}/blog`}
         ogType="website"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Blog",
-          name: "Blog — Waldo Eller",
+          name: "Trilhas de estudo — Waldo Eller",
           description: "Trilhas de estudo com artigos em sequência sobre Linux, Cloud, Dados e IA.",
           url: `${SITE_URL}/blog`,
           author: { "@type": "Person", name: "Waldo Eller" },
@@ -66,7 +66,7 @@ const Blog = () => {
           </p>
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-foreground leading-[1.05] max-w-4xl">
-          Aprenda em <span className="text-primary italic">trilhas</span>, um passo de cada vez.
+          Estude <span className="text-primary italic">comigo</span>, um passo de cada vez
         </h1>
         <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-foreground/60">
           Escolha um assunto e siga os artigos na ordem de estudo, do primeiro ao último.

@@ -1,7 +1,7 @@
 // Server-side copy of every public page, for AI assistants and crawlers that do not run JavaScript.
 // Pure logic (data comes through `rest`), shared by the Netlify edge function and the tests.
 import { stripInlineMarkdown } from "../lib/text.ts";
-import { stepLabel, summarizeTrails, trailNeighbors, trailPath, trailPosts } from "../lib/trails.ts";
+import { stepLabel, summarizeTrails, trailNeighbors, trailPath, trailPosts, trailStep } from "../lib/trails.ts";
 import { SITE_NAME, SITE_URL, escapeHtml as e, href, renderDocument, renderMarkdown, type PageMeta } from "./html.ts";
 
 // Untyped JSON rows from PostgREST; each builder reads the columns it renders.
@@ -54,7 +54,7 @@ const list = (items: string[], tag: "ul" | "ol" = "ul") => (items.length ? `<${t
 const withNote = (main: string, note?: string | null) => (plain(note) ? `${main} — ${e(plain(note))}` : main);
 
 const SITE_NAV = `<header><nav aria-label="Principal">${[
-  ["/", "Início"], ["/about", "Sobre"], ["/projects", "Portfólio"], ["/blog", "Blog"], ["/contact", "Contato"],
+  ["/", "Início"], ["/about", "Sobre"], ["/projects", "Portfólio"], ["/blog", "Trilhas"], ["/contact", "Contato"],
 ].map(([path, text]) => link(path, text)).join(" · ")}</nav></header>`;
 
 const notFound = (title: string, back: [string, string]): Page => ({
@@ -77,7 +77,7 @@ const home = async (rest: Rest): Promise<Page> => {
   return {
     meta: {
       title: profile.full_name ? `${profile.full_name} | ${profile.current_focus || "Especialista"}` : `${SITE_NAME} | Especialista em Dados, Tecnologia e IA`,
-      description: profile.bio_summary || `Portfolio e Blog de ${SITE_NAME}.`,
+      description: profile.bio_summary || `Portfólio e Trilhas de estudo de ${SITE_NAME}.`,
       canonical: `${SITE_URL}/`,
       image: profile.avatar_url || undefined,
       jsonLd: {
@@ -194,7 +194,7 @@ const project = async (rest: Rest, idOrSlug: string): Promise<Page> => {
   };
 };
 
-/* ── Blog ─────────────────────────────────── */
+/* ── Trilhas (/blog) ──────────────────────── */
 const blogIndex = async (rest: Rest): Promise<Page> => {
   const [trails, posts] = await Promise.all([load.trails(rest), load.posts(rest)]);
   const summaries = summarizeTrails(trails, posts);
@@ -202,11 +202,11 @@ const blogIndex = async (rest: Rest): Promise<Page> => {
   const postItem = (p: Row) => withNote(link(postPath(p), p.title.trim()), p.description);
   return {
     meta: {
-      title: "Blog — Trilhas de estudo",
+      title: "Trilhas de estudo",
       description: `Trilhas de estudo com artigos em sequência sobre Linux, Cloud, Dados e IA, escritas por ${SITE_NAME}.`,
       canonical: `${SITE_URL}/blog`,
       jsonLd: {
-        "@context": "https://schema.org", "@type": "Blog", name: `Blog — ${SITE_NAME}`, url: `${SITE_URL}/blog`,
+        "@context": "https://schema.org", "@type": "Blog", name: `Trilhas de estudo — ${SITE_NAME}`, url: `${SITE_URL}/blog`,
         author: { "@type": "Person", name: SITE_NAME },
         hasPart: summaries.map(({ trail: t, posts: items }) => ({
           "@type": "CollectionPage", name: t.name, url: `${SITE_URL}${trailPath(t)}`, numberOfItems: items.length,
@@ -235,7 +235,7 @@ const trail = async (rest: Rest, slug: string): Promise<Page> => {
       image: t.image_url || posts.find((p) => p.image_url)?.image_url || undefined,
       jsonLd: {
         "@context": "https://schema.org", "@type": "CollectionPage", name: t.name, description: t.description || undefined, url,
-        isPartOf: { "@type": "Blog", name: `Blog — ${SITE_NAME}`, url: `${SITE_URL}/blog` },
+        isPartOf: { "@type": "Blog", name: `Trilhas de estudo — ${SITE_NAME}`, url: `${SITE_URL}/blog` },
         mainEntity: {
           "@type": "ItemList", itemListOrder: "https://schema.org/ItemListOrderAscending", numberOfItems: posts.length,
           itemListElement: posts.map((p, i) => ({ "@type": "ListItem", position: i + 1, name: p.title.trim(), url: `${SITE_URL}${encodeURI(postPath(p))}` })),
@@ -243,7 +243,7 @@ const trail = async (rest: Rest, slug: string): Promise<Page> => {
       },
     },
     body: [
-      `<nav aria-label="Voltar">${link("/blog", "Blog")}</nav>`,
+      `<nav aria-label="Voltar">${link("/blog", "Trilhas")}</nav>`,
       `<header><p>Trilha de estudo</p><h1>${e(t.name)}</h1>${t.description ? `<p>${e(t.description)}</p>` : ""}<p>${count(posts.length)}</p></header>`,
       list(posts.map((p) => `${stepLabel(p.trail_position) ? `<p>${stepLabel(p.trail_position)}</p>` : ""}<h2>${link(postPath(p), p.title.trim())}</h2>${p.description ? `<p>${e(plain(p.description))}</p>` : ""}`), "ol"),
     ].join(""),
@@ -263,6 +263,7 @@ const post = async (rest: Rest, idOrSlug: string): Promise<Page> => {
   const t = trails[0] as TrailRow | undefined;
   const ordered = t ? trailPosts(siblings, t.id) : [];
   const { index, previous, next } = trailNeighbors(ordered, p.id);
+  const { step, total } = trailStep(ordered, index);
   const url = `${SITE_URL}${encodeURI(postPath(p))}`;
   const author = profile.full_name || SITE_NAME;
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -270,7 +271,7 @@ const post = async (rest: Rest, idOrSlug: string): Promise<Page> => {
   return {
     meta: {
       title,
-      description: plain(p.description) || `Leia "${title}" no blog de ${SITE_NAME}.`,
+      description: plain(p.description) || `Leia "${title}" nas trilhas de estudo de ${SITE_NAME}.`,
       canonical: url,
       image: p.image_url || undefined,
       type: "article",
@@ -282,15 +283,15 @@ const post = async (rest: Rest, idOrSlug: string): Promise<Page> => {
         ...(p.image_url && { image: p.image_url }),
         ...(t && {
           isPartOf: { "@type": "CollectionPage", name: t.name, url: `${SITE_URL}${trailPath(t)}` },
-          ...(index >= 0 && { position: index + 1 }),
+          ...(index >= 0 && { position: step }),
         }),
         wordCount: p.markdown ? p.markdown.split(/\s+/).length : undefined,
       },
     },
     body: [
-      `<nav aria-label="Trilha">${link("/blog", "Blog")}${t ? ` › ${link(trailPath(t), t.name)}` : ""}</nav>`,
+      `<nav aria-label="Trilha">${link("/blog", "Trilhas")}${t ? ` › ${link(trailPath(t), t.name)}` : ""}</nav>`,
       `<article><header>`,
-      `<p>${[t && index >= 0 ? `Etapa ${pad(index + 1)} de ${pad(ordered.length)}` : "", p.created_at ? `<time datetime="${e(p.created_at)}">${dateLabel(p.created_at)}</time>` : ""].filter(Boolean).join(" · ")}</p>`,
+      `<p>${[t && index >= 0 ? `Etapa ${pad(step)} de ${pad(total)}` : "", p.created_at ? `<time datetime="${e(p.created_at)}">${dateLabel(p.created_at)}</time>` : ""].filter(Boolean).join(" · ")}</p>`,
       `<h1>${e(title)}</h1>`,
       p.description ? `<p>${e(plain(p.description))}</p>` : "",
       `<p>Por ${e(author)}</p></header>`,
@@ -395,7 +396,7 @@ export const buildLlmsTxt = async (rest: Rest) => {
     item("Início", "/", "Apresentação, projetos em destaque, skills e certificações"),
     item("Sobre", "/about", "Formação acadêmica, experiências profissionais, livros e cursos"),
     item("Portfólio", "/projects", "Todos os projetos"),
-    item("Blog", "/blog", "Trilhas de estudo com artigos em sequência"),
+    item("Trilhas", "/blog", "Trilhas de estudo com artigos em sequência"),
     item("Contato", "/contact", "Formas de contato"),
   ];
   if (summaries.length) {

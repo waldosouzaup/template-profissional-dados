@@ -101,7 +101,7 @@ export default function ContentForm() {
       
       <Card>
         <CardHeader>
-          <CardTitle>{isEditing ? "Editar Conteúdo / Blog" : "Novo Conteúdo / Blog"}</CardTitle>
+          <CardTitle>{isEditing ? "Editar Conteúdo / Trilha" : "Novo Conteúdo / Trilha"}</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,7 +145,7 @@ export default function ContentForm() {
                   ))}
                 </select>
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  As trilhas são criadas e editadas em Conteúdos → Trilhas de estudo.
+                  As trilhas são criadas e editadas no menu Trilhas, em Trilhas de estudo.
                 </p>
               </div>
               <div>
@@ -168,7 +168,7 @@ export default function ContentForm() {
               <Textarea
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Descrição curta que aparece na listagem do blog"
+                placeholder="Descrição curta que aparece na listagem da trilha"
                 className="mt-1"
                 rows={2}
               />

@@ -47,6 +47,7 @@ const renderAt = (path: string) => render(
 describe("/blog: trilhas de estudo", () => {
   it("mostra um card por trilha com artigos, na ordem definida no admin", () => {
     renderAt("/blog");
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(/^Estude comigo, um passo de cada vez$/);
     const grid = screen.getByRole("region", { name: "Trilhas de estudo" });
     const cards = within(grid).getAllByRole("link");
     expect(cards.map((c) => c.getAttribute("href"))).toEqual(["/blog/trilha/ia", "/blog/trilha/linux-essentials-30-dias"]);
@@ -94,9 +95,9 @@ describe("/blog/trilha/:slug", () => {
     expect(cards.map((c) => within(c).getByText(/^Etapa/).textContent)).toEqual(["Etapa 01", "Etapa 02", "Etapa 03"]);
   });
 
-  it("volta para o blog e convida a começar pela primeira etapa", () => {
+  it("volta para Trilhas e convida a começar pela primeira etapa", () => {
     renderAt("/blog/trilha/linux-essentials-30-dias");
-    expect(screen.getByRole("link", { name: "Blog" })).toHaveAttribute("href", "/blog");
+    expect(screen.getByRole("link", { name: "Trilhas" })).toHaveAttribute("href", "/blog");
     expect(screen.getByRole("link", { name: "Começar pela etapa 01" })).toHaveAttribute("href", "/blog/dia-01");
   });
 
