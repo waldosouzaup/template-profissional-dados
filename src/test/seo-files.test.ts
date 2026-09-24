@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildProjectRedirects, buildSitemap } from "../../scripts/seo-files.js";
+import { buildProjectRedirects, buildSitemap, buildTrailEntries } from "../../scripts/seo-files.js";
 
 describe("sitemap", () => {
   it("usa o domínio canônico sem www e lastmod quando informado", () => {
@@ -28,5 +28,19 @@ describe("redirecionamentos de projetos", () => {
       "/projects/77ecb037-a884-40b3-b997-28033b474c4a /projects/rifa-online 301\n" +
       "/projects/rifa-uplinux /projects/rifa-online 301\n",
     );
+  });
+});
+
+describe("trilhas no sitemap", () => {
+  it("uma URL por trilha com artigos, com a data do artigo mais recente", () => {
+    const entries = buildTrailEntries(
+      [{ id: "linux", slug: "linux-essentials-30-dias" }, { id: "vazia", slug: "vazia" }],
+      [
+        { trail_id: "linux", created_at: "2026-05-01T00:00:00Z" },
+        { trail_id: "linux", created_at: "2026-05-09T00:00:00Z" },
+        { trail_id: null, created_at: "2026-06-01T00:00:00Z" },
+      ],
+    );
+    expect(entries).toEqual([{ path: "/blog/trilha/linux-essentials-30-dias", lastmod: "2026-05-09T00:00:00Z" }]);
   });
 });

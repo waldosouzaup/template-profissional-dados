@@ -1,16 +1,28 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
+# Search engines, link previews and AI assistants are welcome on every public page.
+# The whole site is readable without JavaScript, and /llms.txt summarizes it for language models.
 
 User-agent: *
 Allow: /
+Disallow: /admin
+
+# AI assistants and AI search (listed explicitly so the intent is unambiguous)
+User-agent: GPTBot
+User-agent: ChatGPT-User
+User-agent: OAI-SearchBot
+User-agent: ClaudeBot
+User-agent: Claude-User
+User-agent: Claude-SearchBot
+User-agent: anthropic-ai
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: CCBot
+User-agent: meta-externalagent
+User-agent: Amazonbot
+User-agent: DuckAssistBot
+User-agent: MistralAI-User
+Allow: /
+Disallow: /admin
 
 Sitemap: https://waldoeller.com/sitemap.xml

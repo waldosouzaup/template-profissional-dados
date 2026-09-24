@@ -21,3 +21,10 @@ export const buildProjectRedirects = (projects) =>
       [id, ...previous_slugs].map((from) => `/projects/${from} /projects/${slug} 301\n`),
     )
     .join("");
+
+// One sitemap entry per study trail that has posts; lastmod is its newest post.
+export const buildTrailEntries = (trails, posts) =>
+  trails.flatMap(({ id, slug }) => {
+    const dates = posts.filter((post) => post.trail_id === id).map((post) => post.created_at).sort();
+    return dates.length ? [{ path: `/blog/trilha/${slug}`, lastmod: dates[dates.length - 1] }] : [];
+  });

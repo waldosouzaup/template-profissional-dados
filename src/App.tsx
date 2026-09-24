@@ -10,6 +10,7 @@ import ProjectDetail from "./pages/ProjectDetail";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import BlogTrail from "./pages/BlogTrail";
 import Contact from "./pages/Contact";
 import Navbar from "./components/portfolio/Navbar";
 import BackToTop from "./components/BackToTop";
@@ -57,6 +58,7 @@ const App = () => (
           <Route path="/projects/:idOrSlug" element={<ProjectDetail />} />
           <Route path="/about" element={<About />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/trilha/:slug" element={<BlogTrail />} />
           <Route path="/blog/:idOrSlug" element={<BlogPost />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/p/:slug" element={<CustomPageView />} />

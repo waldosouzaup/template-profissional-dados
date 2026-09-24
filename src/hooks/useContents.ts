@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
 import { Content } from "@/types/database";
 import { toast } from "sonner";
+import { trailPosts } from "@/lib/trails";
 
 export const useContents = () => {
   const queryClient = useQueryClient();
@@ -25,6 +26,11 @@ export const useContents = () => {
     queryFn: fetchContents,
   });
 
+  // A post edit can also move it inside or between trails.
+  const invalidate = () => {
+    for (const key of ["contents", "content", "trail-posts"]) queryClient.invalidateQueries({ queryKey: [key] });
+  };
+
   const createMutation = useMutation({
     mutationFn: async (newContent: Omit<Content, "id" | "created_at">) => {
       const { data, error } = await supabase
@@ -37,7 +43,7 @@ export const useContents = () => {
       return data as Content;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contents"] });
+      invalidate();
       toast.success("Conteúdo criado com sucesso!");
     },
     onError: (error) => {
@@ -59,7 +65,7 @@ export const useContents = () => {
       return data as Content;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contents"] });
+      invalidate();
       toast.success("Conteúdo atualizado com sucesso!");
     },
     onError: (error) => {
@@ -73,7 +79,7 @@ export const useContents = () => {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["contents"] });
+      invalidate();
       toast.success("Conteúdo excluído com sucesso!");
     },
     onError: (error) => {
@@ -124,29 +130,19 @@ export const useContent = (idOrSlug: string | undefined) => {
   });
 };
 
-export const useRelatedContents = (category: string | undefined | null, currentPostId: string | undefined) => {
-  const fetchRelated = async (): Promise<Content[]> => {
-    if (!category || !currentPostId) return [];
-    
-    const { data, error } = await supabase
-      .from("contents")
-      .select("*")
-      .eq("category", category)
-      .neq("id", currentPostId)
-      .order("created_at", { ascending: false })
-      .limit(3);
-      
-    if (error) {
-      console.error("Error fetching related contents:", error);
-      throw new Error(error.message);
-    }
-    
-    return data || [];
-  };
-
-  return useQuery({
-    queryKey: ["related-contents", category, currentPostId],
-    queryFn: fetchRelated,
-    enabled: !!category && !!currentPostId,
+// Every post of a trail, in study order.
+export const useTrailPosts = (trailId: string | undefined | null) =>
+  useQuery({
+    queryKey: ["trail-posts", trailId],
+    queryFn: async (): Promise<Content[]> => {
+      const { data, error } = await supabase
+        .from("contents")
+        .select("*")
+        .eq("trail_id", trailId)
+        .order("trail_position", { ascending: true, nullsFirst: false })
+        .order("created_at", { ascending: true });
+      if (error) throw new Error(error.message);
+      return trailPosts(data ?? [], trailId as string);
+    },
+    enabled: !!trailId,
   });
-};

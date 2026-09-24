@@ -1,11 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useContent, useContents } from "@/hooks/useContents";
+import { useBlogTrails } from "@/hooks/useBlogTrails";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { slugify } from "@/lib/slug";
 
 export default function ContentForm() {
   const { id } = useParams();
@@ -13,27 +15,31 @@ export default function ContentForm() {
   const isEditing = !!id;
   
   const { data: content, isLoading } = useContent(id);
-  const { createContent, updateContent, isCreating, isUpdating } = useContents();
+  const { data: allContents = [], createContent, updateContent, isCreating, isUpdating } = useContents();
+  const { data: trails = [] } = useBlogTrails();
   
   const [formData, setFormData] = useState({
     title: "",
     slug: "",
     description: "",
     markdown: "",
-    category: "",
+    trail_id: "",
+    trail_position: "",
     image_url: "",
     drive_folder_url: "",
   });
 
-  const generateSlug = (text: string) => {
-    return text
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^\w\s-]/g, "")
-      .replace(/\s+/g, "-")
-      .replace(/--+/g, "-")
-      .trim();
+  // Next free step of a trail, ignoring this post itself.
+  const nextPosition = (trailId: string) =>
+    Math.max(0, ...allContents.filter((post) => post.trail_id === trailId && post.id !== content?.id).map((post) => post.trail_position ?? 0)) + 1;
+
+  const handleTrailChange = (trailId: string) => {
+    const position = !trailId
+      ? ""
+      : trailId === content?.trail_id && content?.trail_position
+        ? String(content.trail_position)
+        : String(nextPosition(trailId));
+    setFormData((prev) => ({ ...prev, trail_id: trailId, trail_position: position }));
   };
 
   useEffect(() => {
@@ -43,7 +49,8 @@ export default function ContentForm() {
         slug: content.slug || "",
         description: content.description || "",
         markdown: content.markdown || "",
-        category: content.category || "",
+        trail_id: content.trail_id || "",
+        trail_position: content.trail_position ? String(content.trail_position) : "",
         image_url: content.image_url || "",
         drive_folder_url: content.drive_folder_url || "",
       });
@@ -51,7 +58,7 @@ export default function ContentForm() {
   }, [content]);
 
   const handleTitleChange = (title: string) => {
-    const newSlug = !isEditing ? generateSlug(title) : formData.slug;
+    const newSlug = !isEditing ? slugify(title) : formData.slug;
     setFormData({ ...formData, title, slug: newSlug });
   };
 
@@ -59,13 +66,20 @@ export default function ContentForm() {
     e.preventDefault();
     
     // Ensure slug is not empty
-    const finalSlug = formData.slug || generateSlug(formData.title);
+    const finalSlug = formData.slug || slugify(formData.title);
+    const trailId = formData.trail_id || null;
+    const data = {
+      ...formData,
+      slug: finalSlug,
+      trail_id: trailId,
+      trail_position: trailId ? Number(formData.trail_position) || nextPosition(trailId) : null,
+    };
     
     try {
       if (isEditing && content) {
-        await updateContent({ ...content, ...formData, slug: finalSlug });
+        await updateContent({ ...content, ...data });
       } else {
-        await createContent({ ...formData, slug: finalSlug });
+        await createContent(data);
       }
       navigate("/admin/contents");
     } catch (error) {
@@ -116,14 +130,37 @@ export default function ContentForm() {
               </p>
             </div>
             
-            <div>
-              <label className="text-sm font-medium text-foreground">Categoria</label>
-              <Input
-                value={formData.category}
-                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                placeholder="Ex: Certificação Linux, Docker, Carreira"
-                className="mt-1"
-              />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-[1fr_170px]">
+              <div>
+                <label htmlFor="content-trail" className="text-sm font-medium text-foreground">Trilha de estudo</label>
+                <select
+                  id="content-trail"
+                  value={formData.trail_id}
+                  onChange={(e) => handleTrailChange(e.target.value)}
+                  className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">Sem trilha (aparece em Outros artigos)</option>
+                  {trails.map((trail) => (
+                    <option key={trail.id} value={trail.id}>{trail.name}</option>
+                  ))}
+                </select>
+                <p className="text-[10px] text-muted-foreground mt-1">
+                  As trilhas são criadas e editadas em Conteúdos → Trilhas de estudo.
+                </p>
+              </div>
+              <div>
+                <label htmlFor="content-trail-position" className="text-sm font-medium text-foreground">Posição na trilha</label>
+                <Input
+                  id="content-trail-position"
+                  type="number"
+                  min={1}
+                  value={formData.trail_position}
+                  onChange={(e) => setFormData({ ...formData, trail_position: e.target.value })}
+                  disabled={!formData.trail_id}
+                  className="mt-1"
+                />
+                <p className="text-[10px] text-muted-foreground mt-1">Ordem de estudo: 1 é o primeiro artigo.</p>
+              </div>
             </div>
             
             <div>

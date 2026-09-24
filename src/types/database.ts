@@ -29,13 +29,26 @@ export const ContentSchema = z.object({
   slug: z.string().optional(),
   description: z.string().optional(),
   markdown: z.string().optional(),
-  category: z.string().optional(),
+  category: z.string().optional(), // legado: substituído pelas trilhas (trail_id)
+  trail_id: z.string().uuid().nullable().optional(),
+  trail_position: z.number().int().positive().nullable().optional(),
   image_url: z.string().optional(),
   drive_folder_url: z.string().optional(),
   created_at: z.string().datetime().optional(),
 });
 
 export type Content = z.infer<typeof ContentSchema>;
+
+// Trilha de estudo do blog (/blog/trilha/<slug>); os artigos apontam para ela por contents.trail_id.
+export interface BlogTrail {
+  id: string;
+  name: string;
+  slug: string;
+  description?: string | null;
+  image_url?: string | null;
+  display_order: number;
+  created_at?: string;
+}
 
 export const CustomPageSchema = z.object({
   id: z.string().uuid().optional(),

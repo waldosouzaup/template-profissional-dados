@@ -25,3 +25,7 @@ dist-ssr
 
 # Generated at build time by scripts/generate-sitemap.js
 public/_redirects
+
+# Local Netlify CLI (netlify dev) files
+.netlify
+deno.lock

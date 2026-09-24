@@ -9,7 +9,8 @@ O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimen
 ## Funcionalidades
 
 - Portfólio com projetos organizados por categorias editáveis no painel (padrão: Dados, Web e IA).
-- Blog com Markdown, categorias, imagem de capa, slug e arquivos complementares via Google Drive.
+- Blog organizado em **trilhas de estudo**: `/blog` mostra um card por trilha e cada trilha lista seus artigos na ordem de estudo, com anterior/próximo em cada post. Posts em Markdown, com capa, slug, ampliação de imagens e arquivos complementares via Google Drive.
+- Conteúdo legível por assistentes de IA e rastreadores sem JavaScript: cada página pública chega com título, meta tags, JSON-LD e o texto completo no HTML (Netlify Edge Function), além de `/llms.txt`.
 - Página exclusiva de contato em `/contact`, com formulário Web3Forms ou fallback por `mailto`.
 - Painel administrativo protegido por Supabase Auth.
 - CMS de páginas customizadas em `/p/:slug`.
@@ -52,8 +53,10 @@ O projeto foi criado para profissionais de Dados, IA, Tecnologia e Desenvolvimen
 | `/projects` | Galeria de projetos |
 | `/projects/:slug` | Detalhe de projeto (URL amigável; links antigos por UUID redirecionam) |
 | `/about` | Página Sobre: título, apresentação, formação acadêmica, experiências profissionais, livros e cursos complementares |
-| `/blog` | Listagem de posts |
-| `/blog/:idOrSlug` | Post individual |
+| `/blog` | Trilhas de estudo (um card por trilha) |
+| `/blog/trilha/:slug` | Artigos da trilha, na ordem de estudo |
+| `/blog/:idOrSlug` | Post individual, com etapa e anterior/próximo na trilha |
+| `/llms.txt` | Mapa do site em Markdown para modelos de linguagem |
 | `/contact` | Página dedicada de contato |
 | `/p/:slug` | Página customizada criada pelo CMS |
 
@@ -66,7 +69,7 @@ Módulos disponíveis:
 - Perfil (Home)
 - Sobre (título e apresentação, formação acadêmica, experiências profissionais, livros e cursos complementares, na mesma ordem da página)
 - Projetos
-- Conteúdos/Blog
+- Conteúdos/Blog (trilhas de estudo e artigos)
 - Páginas customizadas
 - Configurações
 
@@ -127,6 +130,8 @@ O projeto usa Supabase/PostgreSQL. As tabelas principais são:
 - `profiles`
 - `projects`
 - `contents`
+- `blog_trails`
+- `project_categories`
 - `custom_pages`
 - `books`
 - `courses`
@@ -147,8 +152,9 @@ Em um banco já existente, execute no **SQL Editor** do Supabase, nesta ordem, o
 1. `update_home_sections.sql` — textos de Skills e Certificações no perfil, categoria das skills e destaque de cursos na Home.
 2. `project_slugs.sql` — URLs amigáveis dos projetos (`slug`, `previous_slugs`, `updated_at`), com gatilho que normaliza e versiona os slugs.
 3. `project_categories.sql` — tabela `project_categories` (nome, ícone e ordem) usada pelas categorias editáveis; `projects.category` passa a referenciá-la (renomear atualiza os projetos; categorias em uso não podem ser excluídas).
+4. `blog_trails.sql` — tabela `blog_trails` (nome, endereço, descrição, capa e ordem) e as colunas `contents.trail_id` e `contents.trail_position`. Cada categoria usada pelos posts vira uma trilha, e a posição vem do título ("Dia 05/30" → 5) ou da data. Trilhas com artigos não podem ser excluídas.
 
-Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql` e `project_categories.sql`.
+Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql`, `project_categories.sql` e `blog_trails.sql`.
 
 ### Instalação completa
 
@@ -513,6 +519,45 @@ A página `/about` segue esta ordem, espelhada no painel em **Sobre** (página �
 
 Links antigos do painel (`/admin/education`, `/admin/experiences`, `/admin/books`, `/admin/courses`, `/admin/journey`) levam à seção correspondente. A seção Jornada foi removida do site; os itens de `journey_items` permanecem no banco.
 
+## Blog: trilhas de estudo
+
+O blog é organizado em trilhas (por exemplo, *Linux Essentials 30 dias*):
+
+- `/blog` mostra um card por trilha com capa, descrição, quantidade de artigos e tempo de leitura. Trilhas sem artigos não aparecem; posts sem trilha ficam em *Outros artigos*.
+- `/blog/trilha/<slug>` lista os artigos na ordem de estudo (Etapa 01, 02…), com o botão *Começar pela etapa 01*.
+- Cada post mostra a etapa ("Etapa 05 de 08"), volta para a sua trilha, leva ao artigo anterior e ao próximo e sugere os seguintes em *Continue na trilha*.
+
+No painel, em **Conteúdos**:
+
+- **Trilhas de estudo:** crie, edite e exclua trilhas (nome, endereço, descrição, capa e ordem em `/blog`). Sem capa, o card usa a capa do primeiro artigo. Só é possível excluir trilhas sem artigos.
+- **Editar conteúdo:** escolha a *Trilha de estudo* e a *Posição na trilha*. Ao escolher uma trilha, a posição sugerida é a próxima livre.
+
+Depois de rodar `blog_trails.sql`, as trilhas têm o nome das categorias antigas (por exemplo, *Linux*); renomeie e descreva cada uma pelo painel.
+
+## Acesso para IAs e rastreadores
+
+Assistentes como ChatGPT, Claude e Perplexity não executam JavaScript. Por isso, a Edge Function `netlify/edge-functions/prerender.ts` entrega cada página pública já com:
+
+- `<title>`, descrição, canonical, Open Graph/Twitter e JSON-LD da página;
+- o conteúdo completo em HTML semântico dentro de `#root` (post inteiro, trilha, projeto, Sobre etc.);
+- status HTTP corretos: 404 para endereços inexistentes e 301 de UUIDs e slugs antigos para o endereço atual.
+
+Quem abre o site no navegador continua vendo o app React: essa cópia fica oculta enquanto o JavaScript carrega e é substituída na montagem, com o mesmo conteúdo. A lógica fica em `src/seo/` (testada em `src/test/prerender.test.ts`), e as respostas ficam em cache na CDN por 5 minutos, então edições aparecem sem novo deploy.
+
+A mesma função responde `/llms.txt`, um resumo do site em Markdown com links para páginas, trilhas, artigos e projetos. O `public/robots.txt` libera explicitamente os robôs de IA (GPTBot, ClaudeBot, PerplexityBot e outros) e bloqueia `/admin`.
+
+**Configuração na Netlify:** a função lê `VITE_SUPABASE_URL` e `VITE_SUPABASE_ANON_KEY` em tempo de execução. Em *Site configuration → Environment variables*, confirme que o escopo das duas inclui **Functions** (ou *All scopes*). Sem isso o site funciona normalmente, mas sem o HTML pré-renderizado.
+
+Para conferir depois do deploy (o cabeçalho `x-prerender: hit` indica que a função atuou):
+
+```bash
+curl -sI -A GPTBot https://waldoeller.com/blog | grep -i x-prerender
+curl -s -A GPTBot https://waldoeller.com/blog | grep -o '<h1>[^<]*</h1>'
+curl -s https://waldoeller.com/llms.txt | head
+```
+
+Para testar localmente: `npm run build` e depois `npx netlify-cli dev --dir dist --offline`, com as variáveis do `.env.local` exportadas no terminal.
+
 ## Skills e Ícones
 
 O módulo de Skills aceita ícones de:
@@ -546,7 +591,7 @@ O componente `SEOHead` atualiza dinamicamente:
 
 No build, `scripts/generate-sitemap.js` gera a partir do Supabase:
 
-- `public/sitemap.xml` com rotas fixas, projetos publicados, posts e páginas customizadas, sempre no domínio canônico `https://waldoeller.com` e com `lastmod` real dos projetos;
+- `public/sitemap.xml` com rotas fixas, projetos publicados, trilhas de estudo, posts e páginas customizadas, sempre no domínio canônico `https://waldoeller.com` e com `lastmod` real dos projetos;
 - `public/_redirects` com redirecionamentos 301 da Netlify para URLs antigas de projetos (arquivo gerado, fora do Git).
 
 ### URLs amigáveis de projetos
@@ -575,7 +620,7 @@ O arquivo `netlify.toml` já define:
   status = 200
 ```
 
-Configure as variáveis de ambiente na plataforma:
+Configure as variáveis de ambiente na plataforma, com escopo que inclua **Builds** e **Functions** (a Edge Function de pré-renderização também as usa):
 
 ```env
 VITE_SUPABASE_URL=sua_url_do_supabase
@@ -596,7 +641,7 @@ npm run build
 
 Use `npm run typecheck` para checar tipos: o `tsconfig.json` da raiz só referencia os configs da aplicação, então `npx tsc --noEmit` sozinho não verifica nenhum arquivo.
 
-O projeto usa Vitest com ambiente `jsdom` e Testing Library. Os testes ficam em `src/test/` e cobrem as seções da Home, o painel (Perfil, Sobre, projetos), URLs amigáveis, sitemap/redirecionamentos, cards e navegação.
+O projeto usa Vitest com ambiente `jsdom` e Testing Library. Os testes ficam em `src/test/` e cobrem as seções da Home, o painel (Perfil, Sobre, projetos, trilhas), trilhas e posts do blog, a pré-renderização para IAs, URLs amigáveis, sitemap/redirecionamentos, cards e navegação.
 
 ## Licença
 

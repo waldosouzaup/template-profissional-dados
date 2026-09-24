@@ -4,6 +4,7 @@ import { ptBR } from "date-fns/locale";
 import type { Content } from "@/types/database";
 import MediaCard from "@/components/portfolio/MediaCard";
 import { readingMinutes, stripInlineMarkdown } from "@/lib/text";
+import { stepLabel } from "@/lib/trails";
 
 interface PostCardProps {
   post: Content;
@@ -16,7 +17,7 @@ const PostCard = ({ post, style }: PostCardProps) => (
     image={post.image_url}
     imageAlt={post.title}
     fallbackIcon={BookOpen}
-    eyebrow={post.category || "Artigo"}
+    eyebrow={stepLabel(post.trail_position) ?? "Artigo"}
     title={post.title.trim()}
     description={post.description ? stripInlineMarkdown(post.description) : undefined}
     details={

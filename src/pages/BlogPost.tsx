@@ -1,16 +1,20 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import { ArrowLeft, Calendar, Copy, Check, Clock, FolderOpen, Linkedin, Link2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Copy, Check, Clock, FolderOpen, Linkedin, Link2, ZoomIn } from "lucide-react";
 import { SiX } from "react-icons/si";
-import { useContent, useRelatedContents, useContents } from "@/hooks/useContents";
+import { useContent, useContents, useTrailPosts } from "@/hooks/useContents";
+import { useBlogTrails } from "@/hooks/useBlogTrails";
 import { useProfiles } from "@/hooks/useProfile";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import remarkGfm from "remark-gfm";
 import SEOHead from "@/components/SEOHead";
 import PostCard from "@/components/portfolio/PostCard";
-import { readingMinutes, stripInlineMarkdown } from "@/lib/text";
+import { extractMarkdownImages, readingMinutes, stripInlineMarkdown } from "@/lib/text";
+import ImageLightbox, { type LightboxImage } from "@/components/blog/ImageLightbox";
+import { summarizeTrails, trailNeighbors, trailPath } from "@/lib/trails";
+import type { BlogTrail, Content } from "@/types/database";
 import profilePhoto from "@/assets/profile-photo.jpg";
 
 /* ─────────────────────────────────────────────
@@ -128,40 +132,27 @@ const TableOfContents = ({ markdown }: { markdown: string }) => {
 };
 
 /* ─────────────────────────────────────────────
-   CATEGORIES LIST
+   TRAILS LIST
   ───────────────────────────────────────────── */
-const CategoriesList = () => {
-  const { data: allContents = [], isLoading } = useContents();
+const TrailsList = () => {
+  const { data: trails = [] } = useBlogTrails();
+  const { data: allContents = [] } = useContents();
+  const summaries = summarizeTrails(trails, allContents);
 
-  if (isLoading) return null;
-
-  const categories = Array.from(
-    new Set(allContents.map((post) => post.category).filter(Boolean))
-  ) as string[];
-
-  if (categories.length === 0) return null;
-
-  const categoryCounts = allContents.reduce((acc, post) => {
-    if (post.category) {
-      acc[post.category] = (acc[post.category] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  if (summaries.length === 0) return null;
 
   return (
     <div className="py-8 border-t border-foreground/[0.06]">
-      <SidebarLabel>Temas</SidebarLabel>
+      <SidebarLabel>Trilhas de estudo</SidebarLabel>
       <div className="flex flex-wrap gap-2">
-        {categories.map((category) => (
+        {summaries.map(({ trail, posts }) => (
           <Link
-            key={category}
-            to={`/blog?category=${encodeURIComponent(category)}`}
+            key={trail.id}
+            to={trailPath(trail)}
             className="flex items-center gap-2 px-4 py-2 bg-primary/5 border border-primary/10 rounded-full text-[11px] font-bold tracking-widest uppercase text-primary hover:bg-primary/15 hover:border-primary/30 transition-all duration-300"
           >
-            {category}
-            <span className="px-1.5 py-0.5 bg-primary/10 rounded-full text-[9px]">
-              {categoryCounts[category]}
-            </span>
+            {trail.name}
+            <span className="px-1.5 py-0.5 bg-primary/10 rounded-full text-[9px]">{posts.length}</span>
           </Link>
         ))}
       </div>
@@ -234,19 +225,54 @@ const PostCover = ({ src, alt }: { src: string; alt: string }) => (
 );
 
 /* ─────────────────────────────────────────────
-   RELATED ARTICLES
+   TRAIL NAVIGATION
   ───────────────────────────────────────────── */
-const RelatedArticles = ({ category, currentPostId }: { category: string; currentPostId: string }) => {
-  const { data: relatedPosts, isLoading } = useRelatedContents(category, currentPostId);
+const postPath = (post: Content) => `/blog/${post.slug || post.id}`;
+const navCard =
+  "group flex flex-col rounded-2xl border border-foreground/[0.08] p-5 transition-all duration-300 hover:border-primary/40 hover:bg-primary/[0.03]";
 
-  if (isLoading || !relatedPosts || relatedPosts.length === 0) return null;
+const TrailNavigation = ({ previous, next }: { previous?: Content; next?: Content }) => {
+  if (!previous && !next) return null;
+  return (
+    <nav aria-label="Navegação da trilha" className="mt-20 grid max-w-3xl gap-4 border-t border-foreground/[0.06] pt-10 sm:grid-cols-2">
+      {previous ? (
+        <Link to={postPath(previous)} className={navCard}>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            <ArrowLeft className="h-3.5 w-3.5 transition-transform group-hover:-translate-x-0.5" /> Anterior
+          </span>
+          <span className="mt-2 line-clamp-2 text-foreground transition-colors group-hover:text-primary">{previous.title.trim()}</span>
+        </Link>
+      ) : (
+        <span aria-hidden="true" className="hidden sm:block" />
+      )}
+      {next && (
+        <Link to={postPath(next)} className={`${navCard} sm:items-end sm:text-right`}>
+          <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            Próximo <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
+          <span className="mt-2 line-clamp-2 text-foreground transition-colors group-hover:text-primary">{next.title.trim()}</span>
+        </Link>
+      )}
+    </nav>
+  );
+};
+
+const TrailUpNext = ({ trail, posts }: { trail: BlogTrail; posts: Content[] }) => {
+  if (posts.length === 0) return null;
 
   return (
     <section aria-labelledby="related-title" className="border-t border-foreground/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto">
-      <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-foreground/30">Continue no tema</p>
-      <h2 id="related-title" className="mb-10 text-2xl font-light text-foreground">Artigos relacionados</h2>
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.25em] text-foreground/30">Continue na trilha</p>
+          <h2 id="related-title" className="text-2xl font-light text-foreground">{trail.name}</h2>
+        </div>
+        <Link to={trailPath(trail)} className="text-sm font-medium text-primary transition-colors hover:text-primary/80">
+          Ver trilha completa →
+        </Link>
+      </div>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {relatedPosts.map((post, index) => (
+        {posts.map((post, index) => (
           <PostCard key={post.id} post={post} style={{ animationDelay: `${index * 100}ms` }} />
         ))}
       </div>
@@ -258,12 +284,22 @@ const BlogPost = () => {
   const { idOrSlug } = useParams<{ idOrSlug: string }>();
   const { data: post, isLoading } = useContent(idOrSlug);
   const { data: profiles = [] } = useProfiles();
+  const { data: trails = [] } = useBlogTrails();
+  const trail = trails.find((item) => item.id === post?.trail_id);
+  const { data: trailList = [] } = useTrailPosts(trail?.id);
   const author = profiles[0];
   const articleRef = useRef<HTMLDivElement>(null);
+  const contentImages = useMemo(() => extractMarkdownImages(post?.markdown), [post?.markdown]);
+  const [lightbox, setLightbox] = useState<{ images: LightboxImage[]; index: number } | null>(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [idOrSlug]);
+
+  const openImage = (src: string, alt: string) => {
+    const index = contentImages.findIndex((image) => image.src === src);
+    setLightbox(index >= 0 ? { images: contentImages, index } : { images: [{ src, alt }], index: 0 });
+  };
 
   if (isLoading) {
     return (
@@ -289,6 +325,7 @@ const BlogPost = () => {
 
   const readingTime = readingMinutes(post.markdown);
   const authorName = author?.full_name || "Waldo Eller";
+  const { index: stepIndex, previous, next, upNext } = trailNeighbors(trailList, post.id);
 
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 pt-16">
@@ -315,6 +352,10 @@ const BlogPost = () => {
             name: authorName,
           },
           ...(post.image_url && { image: post.image_url }),
+          ...(trail && {
+            isPartOf: { "@type": "CollectionPage", name: trail.name, url: `https://waldoeller.com${trailPath(trail)}` },
+            ...(stepIndex >= 0 && { position: stepIndex + 1 }),
+          }),
           wordCount: post.markdown?.split(/\s+/).length,
           timeRequired: `PT${readingTime}M`,
         }}
@@ -324,18 +365,19 @@ const BlogPost = () => {
       {/* HEADER */}
       <header className="pt-16 sm:pt-20 pb-14 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         <div className="max-w-4xl">
+          {/* Back to the trail the post belongs to; posts outside a trail go back to the blog */}
           <Link
-            to="/blog"
+            to={trail ? trailPath(trail) : "/blog"}
             className="group mb-10 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-sm font-medium text-primary shadow-[0_0_15px_hsl(var(--primary)/0.1)] transition-all duration-300 hover:border-primary/50 hover:bg-primary/10"
           >
             <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
-            Blog
+            {trail ? trail.name : "Blog"}
           </Link>
 
           <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-muted-foreground">
-            {post.category && (
+            {stepIndex >= 0 && (
               <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-primary">
-                {post.category}
+                Etapa {String(stepIndex + 1).padStart(2, "0")} de {String(trailList.length).padStart(2, "0")}
               </span>
             )}
             {post.created_at && (
@@ -395,7 +437,7 @@ const BlogPost = () => {
 
             <div ref={articleRef}>
               <article className="
-                prose dark:prose-invert max-w-3xl
+                prose dark:prose-invert max-w-3xl break-words
 
                 /* Headings */
                 prose-headings:font-light prose-headings:tracking-tight
@@ -461,15 +503,18 @@ const BlogPost = () => {
                       }
                       return <h3 id={id} className="text-xl font-light text-foreground/75 mt-14 mb-4 scroll-mt-24" {...props}>{children}</h3>;
                     },
+                    // Fenced blocks arrive as <pre><code class="language-x">. react-markdown v10 no longer
+                    // flags inline code, so blocks are rendered here and `code` only ever sees inline code.
                     pre: ({ children }: any) => (
-                      <CodeBlock>{(children as any)?.props?.children}</CodeBlock>
+                      <CodeBlock className={children?.props?.className}>{children?.props?.children}</CodeBlock>
                     ),
-                    code: ({ inline, className, children }: any) =>
-                      inline ? (
-                        <code className={className}>{children}</code>
-                      ) : (
-                        <CodeBlock className={className}>{children}</CodeBlock>
-                      ),
+                    code: ({ className, children }: any) => <code className={className}>{children}</code>,
+                    // Wide tables scroll inside their own box instead of widening the page on phones
+                    table: ({ children }: { children?: React.ReactNode }) => (
+                      <div className="scrollbar-themed my-8 overflow-x-auto">
+                        <table className="!my-0">{children}</table>
+                      </div>
+                    ),
                     p: ({ children, ...props }: any) => {
                       const text = typeof children === "string" ? children : Array.isArray(children) ? children.map((c: any) => (typeof c === "string" ? c : "")).join("") : "";
                       const sectionKeywords = ["Problema", "Contexto", "Estratégia", "Resultados", "Solução", "Objetivo", "Tecnologias", "Arquitetura", "Conclusão", "Próximos Passos", "Impacto", "Insights"];
@@ -479,8 +524,18 @@ const BlogPost = () => {
                       }
                       return <p {...props}>{children}</p>;
                     },
-                    img: ({ src, alt, ...props }: any) => (
-                      <img src={src} alt={alt || ""} loading="lazy" {...props} />
+                    img: ({ src, alt }: any) => (
+                      <button
+                        type="button"
+                        onClick={() => openImage(src, alt || "")}
+                        aria-label={`Ampliar imagem${alt ? `: ${alt}` : ""}`}
+                        className="group relative my-12 block w-full cursor-zoom-in rounded-2xl text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4 focus-visible:ring-offset-background"
+                      >
+                        <img src={src} alt={alt || ""} loading="lazy" className="!my-0 w-full transition-opacity group-hover:opacity-90" />
+                        <span className="pointer-events-none absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-background/75 text-foreground opacity-0 backdrop-blur transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                          <ZoomIn className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                      </button>
                     ),
                   }}
                 >
@@ -488,6 +543,8 @@ const BlogPost = () => {
                 </ReactMarkdown>
               </article>
             </div>
+
+            <TrailNavigation previous={previous} next={next} />
           </main>
 
           <aside className="hidden lg:block">
@@ -505,22 +562,27 @@ const BlogPost = () => {
               )}
 
               <ShareButtons title={post.title} />
-              <CategoriesList />
+              <TrailsList />
             </div>
           </aside>
         </div>
       </div>
 
-      {/* RELATED ARTICLES */}
-      {post.category && (
-        <RelatedArticles category={post.category} currentPostId={post.id} />
-      )}
+      <ImageLightbox
+        images={lightbox?.images ?? []}
+        index={lightbox?.index ?? null}
+        onIndexChange={(index) => setLightbox((current) => (current ? { ...current, index } : current))}
+        onClose={() => setLightbox(null)}
+      />
+
+      {/* MORE FROM THE TRAIL */}
+      {trail && <TrailUpNext trail={trail} posts={upNext} />}
 
       {/* FOOTER CTA */}
       <footer className="border-t border-foreground/[0.05] py-20 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-8">
         <div>
           <p className="text-[10px] font-bold tracking-[0.3em] uppercase text-foreground/30 mb-2">Continue lendo</p>
-          <p className="text-2xl font-light text-foreground/70">Explore outros artigos no blog.</p>
+          <p className="text-2xl font-light text-foreground/70">Explore as outras trilhas de estudo.</p>
         </div>
         <Link
           to="/blog"

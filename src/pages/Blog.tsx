@@ -1,31 +1,27 @@
-import { useEffect, useState } from "react";
-import { BookOpen } from "lucide-react";
+import { useEffect } from "react";
+import { BookOpen, Layers } from "lucide-react";
 import { useContents } from "@/hooks/useContents";
+import { useBlogTrails } from "@/hooks/useBlogTrails";
 import SEOHead from "@/components/SEOHead";
 import PostCard from "@/components/portfolio/PostCard";
+import TrailCard from "@/components/blog/TrailCard";
+import { summarizeTrails, trailPath } from "@/lib/trails";
+
+const SITE_URL = "https://waldoeller.com";
 
 const Blog = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { data: contents = [], isLoading } = useContents();
+  const { data: contents = [], isLoading: loadingPosts } = useContents();
+  const { data: trails = [], isLoading: loadingTrails } = useBlogTrails();
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const categories = Array.from(new Set(contents.map(post => post.category).filter(Boolean))) as string[];
-  
-  const categoryCounts = contents.reduce((acc, post) => {
-    if (post.category) {
-      acc[post.category] = (acc[post.category] || 0) + 1;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  const summaries = summarizeTrails(trails, contents);
+  // Posts outside any trail (none, or a trail that no longer exists) are still reachable.
+  const loosePosts = contents.filter((post) => !post.trail_id || !trails.some((trail) => trail.id === post.trail_id));
 
-  const filteredContents = selectedCategory 
-    ? contents.filter(post => post.category === selectedCategory)
-    : contents;
-
-  if (isLoading) {
+  if (loadingPosts || loadingTrails) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4">
@@ -39,27 +35,22 @@ const Blog = () => {
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-foreground/20 pt-16">
       <SEOHead
-        title="Blog — Insights sobre Dados, IA e Tecnologia"
-        description="Artigos e insights sobre Dados, Inteligência Artificial, Tecnologia e NoCode por Waldo Eller."
-        canonical="https://waldoeller.com/blog"
+        title="Blog — Trilhas de estudo"
+        description="Trilhas de estudo com artigos em sequência sobre Linux, Cloud, Dados e IA, escritas por Waldo Eller."
+        canonical={`${SITE_URL}/blog`}
         ogType="website"
         jsonLd={{
           "@context": "https://schema.org",
           "@type": "Blog",
           name: "Blog — Waldo Eller",
-          description: "Artigos e insights sobre Dados, Inteligência Artificial, Tecnologia e NoCode.",
-          url: "https://waldoeller.com/blog",
-          author: {
-            "@type": "Person",
-            name: "Waldo Eller",
-          },
-          blogPost: contents.map((post) => ({
-            "@type": "BlogPosting",
-            headline: post.title,
-            description: post.description,
-            datePublished: post.created_at,
-            url: `https://waldoeller.com/blog/${post.slug || post.id}`,
-            ...(post.image_url && { image: post.image_url }),
+          description: "Trilhas de estudo com artigos em sequência sobre Linux, Cloud, Dados e IA.",
+          url: `${SITE_URL}/blog`,
+          author: { "@type": "Person", name: "Waldo Eller" },
+          hasPart: summaries.map(({ trail, posts }) => ({
+            "@type": "CollectionPage",
+            name: trail.name,
+            url: `${SITE_URL}${trailPath(trail)}`,
+            numberOfItems: posts.length,
           })),
         }}
       />
@@ -68,63 +59,42 @@ const Blog = () => {
       <section className="pt-32 pb-16 px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto animate-[fadeInUp_0.6s_ease-out_both]">
         <div className="flex items-center gap-4 mb-6">
           <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-primary" />
+            <Layers className="w-6 h-6 text-primary" />
           </div>
           <p className="text-[10px] font-bold tracking-[0.25em] uppercase text-foreground/30">
-            Insights & Artigos
+            Trilhas de estudo
           </p>
         </div>
         <h1 className="text-4xl sm:text-5xl lg:text-7xl font-light tracking-tight text-foreground leading-[1.05] max-w-4xl">
-          Explorando a fronteira dos <span className="text-primary italic">Dados e IA</span>.
+          Aprenda em <span className="text-primary italic">trilhas</span>, um passo de cada vez.
         </h1>
+        <p className="mt-6 max-w-2xl text-lg font-light leading-relaxed text-foreground/60">
+          Escolha um assunto e siga os artigos na ordem de estudo, do primeiro ao último.
+        </p>
       </section>
 
-      {/* CATEGORIES NAVIGATION */}
-      <section className="px-8 sm:px-12 lg:px-20 max-w-[1400px] mx-auto mb-12 animate-[fadeInUp_0.7s_ease-out_0.2s_both]">
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            onClick={() => setSelectedCategory(null)}
-            className={`px-6 py-2.5 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-300 border ${
-              selectedCategory === null
-                ? "bg-primary text-[#0a0a0a] border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]"
-                : "bg-foreground/[0.03] text-foreground/40 border-foreground/[0.06] hover:border-foreground/20 hover:text-foreground"
-            }`}
-          >
-            Todos
-            <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[9px] ${
-              selectedCategory === null ? "bg-background/20" : "bg-foreground/10"
-            }`}>
-              {contents.length}
-            </span>
-          </button>
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-6 py-2.5 rounded-full text-[11px] font-bold tracking-widest uppercase transition-all duration-300 border flex items-center ${
-                selectedCategory === category
-                  ? "bg-primary text-[#0a0a0a] border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)]"
-                  : "bg-foreground/[0.03] text-foreground/40 border-foreground/[0.06] hover:border-foreground/20 hover:text-foreground"
-              }`}
-            >
-              {category}
-              <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[9px] ${
-                selectedCategory === category ? "bg-background/20" : "bg-foreground/10"
-              }`}>
-                {categoryCounts[category]}
-              </span>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* BLOG GRID */}
+      {/* TRAILS */}
       <div className="max-w-[1400px] mx-auto px-8 sm:px-12 lg:px-20 pb-40">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredContents.map((post, index) => (
-            <PostCard key={post.id} post={post} style={{ animationDelay: `${(index + 2) * 100}ms` }} />
-          ))}
-        </div>
+        {summaries.length > 0 && (
+          <section aria-label="Trilhas de estudo" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {summaries.map((summary, index) => (
+              <TrailCard key={summary.trail.id} summary={summary} style={{ animationDelay: `${(index + 2) * 100}ms` }} />
+            ))}
+          </section>
+        )}
+
+        {loosePosts.length > 0 && (
+          <section aria-labelledby="loose-posts-title" className={summaries.length > 0 ? "mt-24" : ""}>
+            <h2 id="loose-posts-title" className="mb-8 text-2xl font-light text-foreground">
+              {summaries.length > 0 ? "Outros artigos" : "Artigos"}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {loosePosts.map((post, index) => (
+                <PostCard key={post.id} post={post} style={{ animationDelay: `${(index + 2) * 100}ms` }} />
+              ))}
+            </div>
+          </section>
+        )}
 
         {contents.length === 0 && (
           <div className="py-32 text-center border border-foreground/[0.03] rounded-3xl bg-foreground/[0.01]">

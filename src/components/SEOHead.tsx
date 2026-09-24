@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { formatTitle } from "@/seo/site";
 
 interface SEOHeadProps {
   title: string;
@@ -12,7 +13,8 @@ interface SEOHeadProps {
 
 /**
  * Updates document <head> meta tags dynamically for SPA SEO.
- * Works with react-helmet-less SPAs by directly manipulating DOM.
+ * Reuses the tags the server rendered for the first page, and removes the ones a page does not set,
+ * so nothing (canonical, cover image, description) carries over from the previous route.
  */
 const SEOHead = ({
   title,
@@ -25,14 +27,16 @@ const SEOHead = ({
 }: SEOHeadProps) => {
   useEffect(() => {
     // Title
-    const fullTitle = title.includes("Waldo Eller")
-      ? title
-      : `${title} | Waldo Eller`;
+    const fullTitle = formatTitle(title);
     document.title = fullTitle;
 
-    // Helper to set meta tags
-    const setMeta = (attr: string, key: string, content: string) => {
+    // Sets a meta tag, or removes it when this page has no value for it
+    const setMeta = (attr: string, key: string, content?: string) => {
       let el = document.querySelector(`meta[${attr}="${key}"]`) as HTMLMetaElement;
+      if (!content) {
+        el?.remove();
+        return;
+      }
       if (!el) {
         el = document.createElement("meta");
         el.setAttribute(attr, key);
@@ -43,27 +47,26 @@ const SEOHead = ({
 
     // Standard meta
     setMeta("name", "robots", noindex ? "noindex, follow" : "index, follow");
-    if (description) {
-      setMeta("name", "description", description);
-    }
+    setMeta("name", "description", description);
 
     // Open Graph
     setMeta("property", "og:title", fullTitle);
-    if (description) setMeta("property", "og:description", description);
+    setMeta("property", "og:description", description);
     setMeta("property", "og:type", ogType);
-    if (ogImage) setMeta("property", "og:image", ogImage);
-    if (canonical) {
-      setMeta("property", "og:url", canonical);
-    }
+    setMeta("property", "og:image", ogImage);
+    setMeta("property", "og:url", canonical);
 
     // Twitter
+    setMeta("property", "twitter:card", ogImage ? "summary_large_image" : "summary");
     setMeta("property", "twitter:title", fullTitle);
-    if (description) setMeta("property", "twitter:description", description);
-    if (ogImage) setMeta("property", "twitter:image", ogImage);
+    setMeta("property", "twitter:description", description);
+    setMeta("property", "twitter:image", ogImage);
 
     // Canonical link
-    if (canonical) {
-      let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    let link = document.querySelector('link[rel="canonical"]') as HTMLLinkElement;
+    if (!canonical) {
+      link?.remove();
+    } else {
       if (!link) {
         link = document.createElement("link");
         link.setAttribute("rel", "canonical");
