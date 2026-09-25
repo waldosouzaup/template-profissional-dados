@@ -1,6 +1,6 @@
 -- Categorias de projeto editáveis pelo painel (Editar Projeto → Gerenciar).
 -- Execute no SQL Editor do Supabase ANTES de publicar a versão do site que usa esta tabela.
--- Pode ser executado mais de uma vez com segurança.
+-- Requer security_admin_rls.sql (função public.is_admin). Pode ser executado mais de uma vez com segurança.
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS public.project_categories (
@@ -14,8 +14,10 @@ CREATE TABLE IF NOT EXISTS public.project_categories (
 ALTER TABLE public.project_categories ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public read access" ON public.project_categories;
 DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.project_categories;
+DROP POLICY IF EXISTS "Admin CRUD" ON public.project_categories;
 CREATE POLICY "Allow public read access" ON public.project_categories FOR SELECT USING (true);
-CREATE POLICY "Allow authenticated CRUD" ON public.project_categories FOR ALL TO authenticated USING (true) WITH CHECK (true);
+-- Só a conta administradora escreve (public.is_admin vem de security_admin_rls.sql).
+CREATE POLICY "Admin CRUD" ON public.project_categories FOR ALL TO authenticated USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
 
 -- Obrigatório para tabelas novas em projetos Supabase a partir de 30/10/2026.
 GRANT SELECT ON public.project_categories TO anon;

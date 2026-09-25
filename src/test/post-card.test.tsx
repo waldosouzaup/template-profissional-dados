@@ -20,13 +20,14 @@ const post: Content = {
 afterEach(cleanup);
 
 describe("Card de post do blog", () => {
-  it("aponta para o slug e mostra etapa da trilha, título, data e tempo de leitura", () => {
+  it("aponta para o slug e mostra etapa da trilha, título e tempo de leitura, sem a data", () => {
     render(<MemoryRouter><PostCard post={post} /></MemoryRouter>);
     const card = screen.getByRole("link");
     expect(card).toHaveAttribute("href", "/blog/dia-08-revisao-geral");
     expect(within(card).getByText("Etapa 08")).toBeInTheDocument();
     expect(within(card).getByRole("heading", { name: "Dia 08/30 - Revisão Geral" })).toBeInTheDocument();
-    expect(within(card).getByText("09 mai 2026")).toBeInTheDocument();
+    expect(within(card).queryByText(/2026/)).not.toBeInTheDocument();
+    expect(card.querySelector("time")).toBeNull();
     expect(within(card).getByText("3 min de leitura")).toBeInTheDocument();
     expect(within(card).getByText("Ler artigo")).toBeInTheDocument();
   });

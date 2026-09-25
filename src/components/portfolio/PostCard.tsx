@@ -1,6 +1,4 @@
-import { BookOpen, Calendar, Clock } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
+import { BookOpen, Clock } from "lucide-react";
 import type { Content } from "@/types/database";
 import MediaCard from "@/components/portfolio/MediaCard";
 import { readingMinutes, stripInlineMarkdown } from "@/lib/text";
@@ -22,12 +20,6 @@ const PostCard = ({ post, style }: PostCardProps) => (
     description={post.description ? stripInlineMarkdown(post.description) : undefined}
     details={
       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-        {post.created_at && (
-          <span className="inline-flex items-center gap-1.5">
-            <Calendar className="h-3.5 w-3.5" />
-            <time dateTime={post.created_at}>{format(new Date(post.created_at), "dd MMM yyyy", { locale: ptBR })}</time>
-          </span>
-        )}
         <span className="inline-flex items-center gap-1.5">
           <Clock className="h-3.5 w-3.5" />
           {readingMinutes(post.markdown)} min de leitura

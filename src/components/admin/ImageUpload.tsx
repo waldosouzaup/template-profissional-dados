@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useStorage } from "@/hooks/useStorage";
+import { IMAGE_ACCEPT } from "@/lib/image-upload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Upload, X, ImageIcon, Loader2 } from "lucide-react";
@@ -85,7 +86,7 @@ export const ImageUpload = ({ value, onChange, label, path = "general", allowUrl
             </div>
             <div className="text-center">
               <p className="text-sm font-medium">Clique para fazer upload</p>
-              <p className="text-xs text-muted-foreground">PNG, JPG ou WebP até 5MB</p>
+              <p className="text-xs text-muted-foreground">PNG, JPG, WebP, GIF, AVIF ou ICO até 5 MB</p>
             </div>
           </div>
         )}
@@ -104,7 +105,7 @@ export const ImageUpload = ({ value, onChange, label, path = "general", allowUrl
             type="file" 
             ref={fileInputRef}
             onChange={handleFileChange}
-            accept="image/*"
+            accept={IMAGE_ACCEPT}
             className="hidden"
           />
           <Button 

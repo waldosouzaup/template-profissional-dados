@@ -8,7 +8,7 @@ const SECTION_IMAGES = ["Img: Business Problem", "Img: Context", "Img: Premises"
 const mocks = vi.hoisted(() => ({
   updateProject: vi.fn(),
   project: {
-    id: "p1", slug: "rifa-online", title: "Rifa Online", category: "IA", tags: [], stack: [], galleryImages: [],
+    id: "p1", slug: "rifa-online", title: "Rifa Online", category: "IA", tags: ["React", "Supabase"], stack: [], galleryImages: [],
     premises: [], strategy: [], insights: [], nextSteps: [],
     results: ["+15%: Eficiência", "-30%: Custos", "2x: Velocidade", "99%: Uptime", "Entrega no prazo"],
     stats: [{ value: "+15%", label: "Eficiência" }],
@@ -73,6 +73,17 @@ describe("Editar projeto: imagens das seções", () => {
     fireEvent.click(screen.getAllByRole("button", { name: "Salvar Alterações" })[0]);
     await waitFor(() => expect(mocks.updateProject).toHaveBeenCalledWith(expect.objectContaining({
       id: "p1", results: mocks.project.results,
+    })));
+  });
+
+  it("as tecnologias voltam a ser editáveis e são salvas como lista", async () => {
+    renderEdit();
+    const field = screen.getByLabelText("Tecnologias");
+    expect(field).toHaveValue("React, Supabase");
+    fireEvent.change(field, { target: { value: "React, Supabase , Docker," } });
+    fireEvent.click(screen.getAllByRole("button", { name: "Salvar Alterações" })[0]);
+    await waitFor(() => expect(mocks.updateProject).toHaveBeenCalledWith(expect.objectContaining({
+      id: "p1", tags: ["React", "Supabase", "Docker"],
     })));
   });
 });

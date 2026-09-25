@@ -1,6 +1,7 @@
 // HTML building blocks for the server-rendered copy of each page (see netlify/edge-functions/prerender.ts).
 // Relative imports with extensions only: this runs in Deno too.
 import { Marked } from "marked";
+import { safeUrl } from "../lib/url.ts";
 import { formatTitle } from "./site.ts";
 
 export { SITE_NAME, SITE_URL } from "./site.ts";
@@ -9,17 +10,26 @@ const ENTITIES: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;
 
 export const escapeHtml = (value: unknown) => String(value ?? "").replace(/[&<>"']/g, (char) => ENTITIES[char]);
 
-const UNSAFE_URL = /^\s*(javascript|vbscript|data):/i;
-
 // Internal paths are stored raw ("dia-0830-revisão-geral") and get percent-encoded; external URLs stay as typed.
-export const href = (url: string) => escapeHtml(UNSAFE_URL.test(url) ? "#" : url.startsWith("/") ? encodeURI(url) : url);
+// Anything that is not a web, e-mail, phone or relative address becomes "#".
+export const href = (url: string) => {
+  const safe = safeUrl(url) ?? "#";
+  return escapeHtml(safe.startsWith("/") ? encodeURI(safe) : safe);
+};
 
 // Raw HTML inside Markdown is shown as text, never executed.
 const markdown = new Marked({ gfm: true, async: false });
 markdown.use({
-  renderer: { html: ({ text }) => escapeHtml(text) },
+  renderer: {
+    html: ({ text }) => escapeHtml(text),
+    // The page title is the only h1, as on the site: "#" in the text becomes h2.
+    heading({ tokens, depth }) {
+      const level = Math.max(depth, 2);
+      return `<h${level}>${this.parser.parseInline(tokens)}</h${level}>\n`;
+    },
+  },
   walkTokens: (token) => {
-    if ((token.type === "link" || token.type === "image") && UNSAFE_URL.test(token.href)) token.href = "#";
+    if (token.type === "link" || token.type === "image") token.href = safeUrl(token.href) ?? "#";
   },
 });
 

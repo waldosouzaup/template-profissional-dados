@@ -10,3 +10,49 @@
   from = "/*"
   to = "/index.html"
   status = 200
+
+# Security headers for every page. The Content-Security-Policy allows the common tracking tags
+# (Google Tag/Analytics/GTM, Meta Pixel) pasted in Configurações → Tags de Rastreamento; a tag
+# from another provider needs its domains added here. Supabase = ltgqjjxhkqunuiqxmfvl.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Strict-Transport-Security = "max-age=31536000"
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Cross-Origin-Opener-Policy = "same-origin"
+    Content-Security-Policy = """\
+      default-src 'self'; \
+      script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://*.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net; \
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
+      font-src 'self' data: https://fonts.gstatic.com; \
+      img-src 'self' data: blob: https:; \
+      connect-src 'self' https://ltgqjjxhkqunuiqxmfvl.supabase.co wss://ltgqjjxhkqunuiqxmfvl.supabase.co https://api.web3forms.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.g.doubleclick.net https://www.facebook.com; \
+      frame-src https://www.googletagmanager.com; \
+      object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"""
+
+# The admin panel runs no third-party or inline script. If Netlify also sends the policy above here,
+# the browser enforces both, which still leaves only what this one allows.
+[[headers]]
+  for = "/admin"
+  [headers.values]
+    Content-Security-Policy = """\
+      default-src 'self'; script-src 'self'; \
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
+      font-src 'self' data: https://fonts.gstatic.com; \
+      img-src 'self' data: blob: https:; \
+      connect-src 'self' https://ltgqjjxhkqunuiqxmfvl.supabase.co wss://ltgqjjxhkqunuiqxmfvl.supabase.co; \
+      object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"""
+
+[[headers]]
+  for = "/admin/*"
+  [headers.values]
+    Content-Security-Policy = """\
+      default-src 'self'; script-src 'self'; \
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; \
+      font-src 'self' data: https://fonts.gstatic.com; \
+      img-src 'self' data: blob: https:; \
+      connect-src 'self' https://ltgqjjxhkqunuiqxmfvl.supabase.co wss://ltgqjjxhkqunuiqxmfvl.supabase.co; \
+      object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests"""

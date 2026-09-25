@@ -27,7 +27,7 @@ vi.mock("@/components/admin/ImageUpload", () => ({ ImageUpload: () => null }));
 vi.mock("@/lib/supabase", () => ({
   supabase: {
     auth: {
-      getSession: async () => ({ data: { session: { user: { id: "admin" } } } }),
+      getSession: async () => ({ data: { session: { user: { id: "admin", app_metadata: { role: "admin" } } } } }),
       onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
       signOut: async () => {},
     },

@@ -31,6 +31,24 @@ describe("redirecionamentos de projetos", () => {
   });
 });
 
+describe("redirecionamentos a partir de dados do banco", () => {
+  it("ignora ids e slugs fora do padrão, para nenhum valor criar regras próprias no _redirects", () => {
+    const rules = buildProjectRedirects([
+      { id: "77ecb037-a884-40b3-b997-28033b474c4a", slug: "rifa-online", previous_slugs: ["antigo\n/admin/* https://evil.example 200", "rifa uplinux", "rifa-uplinux"] },
+      { id: "p2", slug: "painel\n/* https://evil.example 200!", previous_slugs: null },
+      { id: "x y", slug: "ok", previous_slugs: [] },
+    ]);
+    expect(rules).toBe(
+      "/projects/77ecb037-a884-40b3-b997-28033b474c4a /projects/rifa-online 301\n" +
+      "/projects/rifa-uplinux /projects/rifa-online 301\n",
+    );
+  });
+
+  it("escapa o lastmod no sitemap", () => {
+    expect(buildSitemap([{ path: "/", lastmod: "2026</lastmod><x>" }])).toContain("<lastmod>2026&lt;/lastmod&gt;&lt;x&gt;</lastmod>");
+  });
+});
+
 describe("trilhas no sitemap", () => {
   it("uma URL por trilha com artigos, com a data do artigo mais recente", () => {
     const entries = buildTrailEntries(

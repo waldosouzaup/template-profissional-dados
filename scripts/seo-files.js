@@ -8,17 +8,23 @@ export const buildSitemap = (entries) => {
   const urls = entries
     .map(({ path, lastmod }) => {
       const loc = `    <loc>${escapeXml(SITE_URL + encodeURI(path))}</loc>`;
-      return lastmod ? `  <url>\n${loc}\n    <lastmod>${lastmod}</lastmod>\n  </url>` : `  <url>\n${loc}\n  </url>`;
+      return lastmod ? `  <url>\n${loc}\n    <lastmod>${escapeXml(String(lastmod))}</lastmod>\n  </url>` : `  <url>\n${loc}\n  </url>`;
     })
     .join("\n");
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`;
 };
 
+// Ids and slugs are lowercase letters, digits and hyphens (the database trigger normalizes slugs);
+// anything else is skipped so a stored value can never add its own line to _redirects.
+const URL_SEGMENT = /^[a-z0-9-]+$/;
+const isSegment = (value) => typeof value === "string" && URL_SEGMENT.test(value);
+
 // Netlify _redirects rules; they run before the SPA fallback in netlify.toml.
 export const buildProjectRedirects = (projects) =>
   projects
+    .filter(({ slug }) => isSegment(slug))
     .flatMap(({ id, slug, previous_slugs = [] }) =>
-      [id, ...previous_slugs].map((from) => `/projects/${from} /projects/${slug} 301\n`),
+      [id, ...(previous_slugs ?? [])].filter(isSegment).map((from) => `/projects/${from} /projects/${slug} 301\n`),
     )
     .join("");
 

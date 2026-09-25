@@ -40,12 +40,13 @@ afterEach(cleanup);
 const renderPost = () => render(<MemoryRouter><BlogPost /></MemoryRouter>);
 
 describe("Página do post", () => {
-  it("abre com volta à trilha, etapa, data, tempo de leitura, título e autor", () => {
+  it("abre com volta à trilha, etapa, tempo de leitura, título e autor, sem a data", () => {
     renderPost();
     expect(screen.getByRole("link", { name: "Linux Essentials 30 dias" })).toHaveAttribute("href", "/blog/trilha/linux-essentials-30-dias");
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Dia 01/30 - Começando do zero com Linux");
     expect(screen.getByText("Etapa 02 de 04")).toBeInTheDocument();
-    expect(document.querySelector("time")).toHaveAttribute("dateTime", "2026-05-02T12:00:00.000Z");
+    expect(document.querySelector("time")).toBeNull();
+    expect(screen.queryByText(/de maio de 2026/)).not.toBeInTheDocument();
     expect(screen.getByText("3 min de leitura")).toBeInTheDocument();
     expect(screen.getByText("Cloud/DevOps")).toBeInTheDocument();
     expect(screen.getByText("Instalei, abri o terminal e já entendi uma coisa: aqui tudo é comando.")).toBeInTheDocument();
@@ -103,6 +104,7 @@ describe("Página do post", () => {
     const data = JSON.parse(document.getElementById("seo-jsonld")!.textContent!);
     expect(data.isPartOf).toEqual({ "@type": "CollectionPage", name: "Linux Essentials 30 dias", url: "https://waldoeller.com/blog/trilha/linux-essentials-30-dias" });
     expect(data.position).toBe(2);
+    expect(data.datePublished).toBeUndefined();
   });
 
   it("artigo sem trilha volta para Trilhas e não mostra navegação de trilha", () => {

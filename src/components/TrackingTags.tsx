@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useProfiles } from "@/hooks/useProfile";
 
 const TRACKING_TAG_ATTRIBUTE = "data-dynamic-tracking-tag";
@@ -39,14 +40,18 @@ const clearTrackingTags = () => {
     .forEach((element) => element.remove());
 };
 
+// Third-party scripts never run in the admin panel, where the page holds the login session.
+const isAdminPath = (pathname: string) => pathname === "/admin" || pathname.startsWith("/admin/");
+
 const TrackingTags = () => {
   const { data: profiles = [] } = useProfiles();
   const trackingTags = profiles[0]?.tracking_tags;
+  const inAdmin = isAdminPath(useLocation().pathname);
 
   useEffect(() => {
     clearTrackingTags();
 
-    if (!trackingTags?.trim()) return;
+    if (inAdmin || !trackingTags?.trim()) return;
 
     const template = document.createElement("template");
     template.innerHTML = trackingTags;
@@ -54,7 +59,7 @@ const TrackingTags = () => {
     Array.from(template.content.childNodes).forEach(appendTrackingNode);
 
     return clearTrackingTags;
-  }, [trackingTags]);
+  }, [trackingTags, inAdmin]);
 
   return null;
 };

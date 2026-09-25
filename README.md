@@ -143,7 +143,7 @@ O projeto usa Supabase/PostgreSQL. As tabelas principais são:
 As políticas esperadas são:
 
 - leitura pública para conteúdo exibido no site;
-- CRUD para usuários autenticados no painel administrativo.
+- escrita (criar, editar, excluir) **só para a conta administradora**, definida por `security_admin_rls.sql` (veja **Segurança**). Uma conta apenas "autenticada" não escreve nada.
 
 ### Migrações
 
@@ -155,8 +155,9 @@ Em um banco já existente, execute no **SQL Editor** do Supabase, nesta ordem, o
 4. `blog_trails.sql` — tabela `blog_trails` (nome, endereço, descrição, capa e ordem) e as colunas `contents.trail_id` e `contents.trail_position`. Cada categoria usada pelos posts vira uma trilha, e a posição vem do título ("Dia 05/30" → 5) ou da data. Trilhas com artigos não podem ser excluídas.
 5. `experience_icons.sql` — libera os ícones por cargo em Experiências Profissionais (remove a lista fixa `rocket`/`award`/`briefcase` da coluna `experience.icon_type`).
 6. `theme_preset.sql` — coluna `profiles.theme_preset`, com a versão de aparência escolhida em Configurações.
+7. `security_admin_rls.sql` — **obrigatório e sempre por último**: marca a sua conta como administradora e troca as políticas de todas as tabelas e do Storage por "leitura pública, escrita só do admin". Rode de novo sempre que executar outro SQL que crie tabelas ou políticas. Veja **Segurança**.
 
-Em instalações novas, rode o SQL completo abaixo e, em seguida, `project_slugs.sql`, `project_categories.sql` e `blog_trails.sql` (o SQL completo já inclui as mudanças de `experience_icons.sql` e `theme_preset.sql`).
+Em instalações novas, crie antes a conta do painel em **Authentication > Users** e rode o SQL completo abaixo, `security_admin_rls.sql` e, em seguida, `project_slugs.sql`, `project_categories.sql`, `blog_trails.sql` e mais uma vez `security_admin_rls.sql` (o SQL completo já inclui as mudanças de `experience_icons.sql` e `theme_preset.sql`).
 
 ### Instalação completa
 
@@ -393,6 +394,8 @@ COMMENT ON COLUMN public.profiles.tracking_tags IS
 'Snippets HTML/JavaScript de rastreamento, como Google Tag, Google Analytics, GTM ou Meta Pixel.';
 ```
 
+> **Importante:** as políticas `Allow authenticated CRUD` acima liberam escrita para qualquer conta logada e servem só para criar a estrutura. Rode `security_admin_rls.sql` logo depois: ele as substitui por políticas que só a conta administradora usa.
+
 > **Permissões da Data API:** a partir de 30/10/2026 o Supabase deixa de liberar automaticamente o acesso da API a tabelas novas no schema `public`. Por isso o SQL acima termina com `GRANT`s explícitos. Toda migration futura que **criar** uma tabela precisa incluir, no mesmo script: `SELECT` para `anon` e `SELECT, INSERT, UPDATE, DELETE` para `authenticated` e `service_role`. Sem isso, a API responde *permission denied*. Scripts que apenas adicionam colunas (como `update_home_sections.sql`) não precisam de grants.
 
 Depois de criar o usuário administrador em **Authentication > Users**, insira o perfil inicial substituindo o `id` pelo UUID do usuário criado:
@@ -452,6 +455,9 @@ Cole o snippet completo fornecido pela ferramenta. Exemplo:
 
 Também são aceitos snippets com `<noscript>`, como os usados pelo Google Tag Manager e Pixel da Meta. Cole apenas códigos de provedores confiáveis.
 
+- As tags rodam só nas páginas públicas: nunca no painel `/admin`, onde fica a sessão de login.
+- A Content-Security-Policy do `netlify.toml` libera Google Tag/Analytics/GTM e Pixel da Meta. Tags de outros provedores precisam ter os domínios adicionados ali (`script-src` e `connect-src`); variáveis "JavaScript personalizado" do GTM exigiriam também `'unsafe-eval'`, que não é recomendado.
+
 ## Storage
 
 Crie no Supabase um bucket público chamado:
@@ -470,6 +476,8 @@ Ele é usado para:
 - livros;
 - certificados;
 - imagens auxiliares do portfólio.
+
+O `security_admin_rls.sql` limita o bucket a imagens PNG, JPG, WebP, GIF, AVIF e ICO de até 5 MB (sem SVG, que pode conter scripts) e deixa enviar, trocar e apagar arquivos só com a conta administradora. O painel aplica as mesmas regras antes de enviar.
 
 ## Formulário de Contato
 
@@ -627,11 +635,35 @@ Cada projeto é publicado em `/projects/<slug>`, por exemplo `/projects/rifa-onl
 3. O banco normaliza o slug (sem acentos, minúsculas, hífens), resolve duplicados com sufixo (`-2`) e, quando o slug muda, guarda o anterior em `previous_slugs`.
 4. URLs antigas (por UUID ou slug anterior) respondem 301 para a atual via `_redirects`; a página também redireciona no navegador e usa o slug no canonical. Slug inexistente mostra "Projeto não encontrado" com `noindex`.
 
+## Segurança
+
+O painel só é protegido no navegador; quem garante a segurança é o Supabase. Antes do primeiro deploy (e em qualquer projeto Supabase novo):
+
+1. **Authentication → Sign In / Providers:** desligue **Allow new users to sign up** e ligue **Confirm email**. Com o cadastro aberto, qualquer pessoa cria uma conta pela API usando a chave anon, que é pública.
+2. **Authentication → URL Configuration:** Site URL `https://waldoeller.com` e apenas endereços do próprio domínio em Redirect URLs.
+3. Rode as consultas de auditoria do topo de `security_admin_rls.sql` (contas, políticas, arquivos e tags de rastreamento) e exclua qualquer conta que não seja sua.
+4. Troque `SEU_EMAIL_ADMIN` em `security_admin_rls.sql` pelo e-mail do login do painel e execute o arquivo. Saia do painel e entre de novo.
+5. Confira: `curl -s "$VITE_SUPABASE_URL/auth/v1/settings" -H "apikey: $VITE_SUPABASE_ANON_KEY"` deve mostrar `"disable_signup": true`.
+
+No site:
+
+- Só a conta com o papel de administrador (`app_metadata.role = "admin"`) abre o painel; outras contas são desconectadas.
+- Links digitados no painel ou escritos no Markdown só viram link quando são `http(s)`, `mailto`, `tel` ou endereços do próprio site (`src/lib/url.ts`), tanto no app quanto no HTML pré-renderizado.
+- O `netlify.toml` envia HSTS, `X-Frame-Options`, `nosniff`, `Referrer-Policy`, `Permissions-Policy` e Content-Security-Policy; no `/admin` a CSP só permite scripts do próprio site.
+
+Riscos conhecidos e próximos passos:
+
+- **2FA:** ative MFA (TOTP) para a conta administradora; `public.is_admin()` pode então exigir `aal2`.
+- **Tags de Rastreamento** executam JavaScript por definição: continuam seguras enquanto só o admin as edita.
+- E-mail, telefone e `contact_form_key` do perfil são públicos pela API (a chave do Web3Forms é pública por design; restrinja o domínio no painel do Web3Forms).
+- Dependências: `npm audit --omit=dev` aponta só avisos moderados do React Router que exigem a versão 7 e não se aplicam a este app (sem SSR e sem caminhos de `<Link>` vindos de visitantes). Os avisos do Vite/Vitest afetam só o servidor de desenvolvimento, que escuta em todas as interfaces (`host: "::"`): evite rodar `npm run dev` em redes públicas.
+- O HSTS não usa `includeSubDomains` para não afetar subdomínios que ainda não tenham HTTPS; adicione quando todos tiverem.
+
 ## Deploy
 
 ### Netlify
 
-O arquivo `netlify.toml` já define:
+O arquivo `netlify.toml` já define o build, o fallback da SPA e os headers de segurança (veja **Segurança**):
 
 ```toml
 [build]
@@ -643,6 +675,8 @@ O arquivo `netlify.toml` já define:
   to = "/index.html"
   status = 200
 ```
+
+O projeto instala dependências com npm a partir do `package-lock.json`.
 
 Configure as variáveis de ambiente na plataforma, com escopo que inclua **Builds** e **Functions** (a Edge Function de pré-renderização também as usa):
 

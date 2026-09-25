@@ -190,7 +190,7 @@ export interface Appearance {
   primary?: string | null;
 }
 
-// Read by the boot script in index.html to paint the last appearance before the app loads.
+// Read by public/appearance-boot.js (loaded first by index.html) to paint the last appearance before the app loads.
 export const APPEARANCE_CACHE_KEY = "appearance";
 
 // "theme" links follow the active version; "preview" links stay while the admin compares versions.

@@ -2,6 +2,7 @@ import { Award, ExternalLink, Loader2 } from "lucide-react";
 import { useCourses } from "@/hooks/useCourses";
 import { useProfiles } from "@/hooks/useProfile";
 import { HOME_SECTION_DEFAULTS } from "@/lib/home-sections";
+import { safeUrl } from "@/lib/url";
 
 const CertificationsSection = () => {
   const { data: courses = [], isLoading, isError } = useCourses();
@@ -44,9 +45,9 @@ const CertificationsSection = () => {
                   {course.topics.map((topic, index) => <li key={`${topic}-${index}`} className="text-xs rounded-md bg-primary/10 text-primary px-2 py-1">{topic}</li>)}
                 </ul>
               )}
-              {course.certificate_url && (
+              {safeUrl(course.certificate_url) && (
                 <div className="mt-auto pt-5">
-                  <a href={course.certificate_url} target="_blank" rel="noopener noreferrer"
+                  <a href={safeUrl(course.certificate_url)} target="_blank" rel="noopener noreferrer"
                     aria-label={`Ver certificado: ${course.title}`}
                     className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline">
                     Ver certificado <ExternalLink className="w-4 h-4" />

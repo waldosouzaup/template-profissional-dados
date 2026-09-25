@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { toast } from "sonner";
+import { IMAGE_EXTENSIONS, imageUploadError } from "@/lib/image-upload";
 
 export const useStorage = () => {
   const [isUploading, setIsUploading] = useState(false);
@@ -8,14 +9,12 @@ export const useStorage = () => {
   const uploadImage = async (file: File, bucket = "portfolio", path = "uploads"): Promise<string | null> => {
     setIsUploading(true);
     try {
-      // 1. Basic check
-      if (!file.type.startsWith("image/")) {
-        throw new Error("O arquivo selecionado não é uma imagem válida.");
-      }
+      // 1. Only the image types and size the bucket accepts
+      const invalid = imageUploadError(file);
+      if (invalid) throw new Error(invalid);
 
-      // 2. Generate unique filename
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      // 2. Unguessable name; the extension follows the file type, not the name it was sent with
+      const fileName = `${crypto.randomUUID()}.${IMAGE_EXTENSIONS[file.type]}`;
       const filePath = `${path}/${fileName}`;
 
       // 3. Upload to Supabase Storage

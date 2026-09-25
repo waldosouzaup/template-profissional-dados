@@ -7,6 +7,7 @@ import { useCourses } from "@/hooks/useCourses";
 import { useEducationList } from "@/hooks/useEducation";
 import { useExperiences } from "@/hooks/useExperiences";
 import SEOHead from "@/components/SEOHead";
+import { safeUrl } from "@/lib/url";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import ExperienceSection from "@/components/portfolio/ExperienceSection";
@@ -196,9 +197,9 @@ const About = () => {
                   )}
                 </div>
                 
-                {course.certificate_url && (
+                {safeUrl(course.certificate_url) && (
                   <a 
-                    href={course.certificate_url} 
+                    href={safeUrl(course.certificate_url)} 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-6 py-3 bg-foreground/5 hover:bg-foreground/10 rounded-xl text-sm font-medium text-foreground transition-all group shrink-0"

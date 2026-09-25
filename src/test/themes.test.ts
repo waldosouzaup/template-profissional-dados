@@ -115,8 +115,9 @@ describe("Aplicação da aparência", () => {
     applyAppearance(root, { preset: "padrao", mode: "dark" });
     localStorage.setItem(APPEARANCE_CACHE_KEY, cached);
 
-    const html = readFileSync("index.html", "utf8");
-    const boot = html.match(/<script id="appearance-boot">([\s\S]*?)<\/script>/)![1];
+    // A plain file, loaded before anything else, so the admin CSP needs no inline script.
+    expect(readFileSync("index.html", "utf8")).toMatch(/<head>[\s\S]*?<script src="\/appearance-boot\.js"><\/script>[\s\S]*?<title>/);
+    const boot = readFileSync("public/appearance-boot.js", "utf8");
     new Function(boot)();
 
     expect(root).toHaveClass("light");

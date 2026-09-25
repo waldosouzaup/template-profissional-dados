@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate, Link } from "react-router-dom";
+import type { Session } from "@supabase/supabase-js";
+import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { LogOut, LayoutDashboard, FolderOpen, FileText, BookUser, User, Loader2, Settings as SettingsIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,6 +15,9 @@ const navItems = [
   { to: "/admin/settings", icon: SettingsIcon, label: "Configurações" },
 ];
 
+// Only the account marked as admin (security_admin_rls.sql) uses the panel; the database enforces the same rule.
+const isAdmin = (session: Session) => session.user.app_metadata?.role === "admin";
+
 export default function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
@@ -24,6 +29,10 @@ export default function AdminLayout() {
       } = await supabase.auth.getSession();
       
       if (!session) {
+        navigate("/admin/login");
+      } else if (!isAdmin(session)) {
+        toast.error("Esta conta não tem acesso ao painel.");
+        await supabase.auth.signOut();
         navigate("/admin/login");
       } else {
         setLoading(false);

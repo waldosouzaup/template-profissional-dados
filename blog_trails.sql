@@ -1,6 +1,7 @@
 -- Trilhas de estudo do blog: /blog mostra as trilhas e cada trilha lista seus artigos na ordem de estudo.
 -- Execute no SQL Editor do Supabase ANTES de publicar a versão do site que usa trilhas.
--- Requer project_slugs.sql (função public.slugify). Pode ser executado mais de uma vez com segurança.
+-- Requer project_slugs.sql (função public.slugify) e security_admin_rls.sql (função public.is_admin).
+-- Pode ser executado mais de uma vez com segurança.
 BEGIN;
 
 CREATE TABLE IF NOT EXISTS public.blog_trails (
@@ -34,8 +35,10 @@ CREATE TRIGGER blog_trails_normalize
 ALTER TABLE public.blog_trails ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow public read access" ON public.blog_trails;
 DROP POLICY IF EXISTS "Allow authenticated CRUD" ON public.blog_trails;
+DROP POLICY IF EXISTS "Admin CRUD" ON public.blog_trails;
 CREATE POLICY "Allow public read access" ON public.blog_trails FOR SELECT USING (true);
-CREATE POLICY "Allow authenticated CRUD" ON public.blog_trails FOR ALL TO authenticated USING (true) WITH CHECK (true);
+-- Só a conta administradora escreve (public.is_admin vem de security_admin_rls.sql).
+CREATE POLICY "Admin CRUD" ON public.blog_trails FOR ALL TO authenticated USING ((SELECT public.is_admin())) WITH CHECK ((SELECT public.is_admin()));
 
 -- Obrigatório para tabelas novas em projetos Supabase a partir de 30/10/2026.
 GRANT SELECT ON public.blog_trails TO anon;

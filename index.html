@@ -4,28 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <link rel="icon" type="image/png" href="/favicon.png" />
-    <script id="appearance-boot">
-      // Paints the last applied appearance (version, mode, colors, heading font) before the app loads.
-      // Written by applyAppearance in src/lib/themes.ts; the app re-applies it once the profile arrives.
-      try {
-        var saved = JSON.parse(localStorage.getItem("appearance") || "null");
-        if (saved) {
-          var root = document.documentElement;
-          root.classList.remove(saved.mode === "light" ? "dark" : "light");
-          root.classList.add(saved.mode === "light" ? "light" : "dark");
-          root.dataset.themePreset = saved.preset;
-          for (var name in saved.vars) root.style.setProperty("--" + name, saved.vars[name]);
-          if (saved.fontStack) root.style.setProperty("--font-display", saved.fontStack);
-          if (saved.fontUrl) {
-            var link = document.createElement("link");
-            link.rel = "stylesheet";
-            link.href = saved.fontUrl;
-            link.setAttribute("data-theme-font", "");
-            document.head.appendChild(link);
-          }
-        }
-      } catch (e) {}
-    </script>
+    <script src="/appearance-boot.js"></script>
     <!-- Fallback: each public page replaces these tags server-side (netlify/edge-functions/prerender.ts) and in the app (SEOHead). -->
     <title>Waldo Eller | Infraestrutura Linux e Cloud/DevOps</title>
     <meta name="description" content="Portfólio e trilhas de estudo de Waldo Eller: Linux, automação, dados, Cloud e DevOps." />

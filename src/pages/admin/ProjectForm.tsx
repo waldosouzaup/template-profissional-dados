@@ -277,6 +277,13 @@ export default function AdminProjectForm() {
               <Input {...form.register("shortDescription")} placeholder="Resumo rápido para a galeria" />
             </div>
             <div>
+              <label htmlFor="project-tags" className="block text-sm font-medium mb-1">Tecnologias</label>
+              <Input id="project-tags" {...form.register("tags")} placeholder="Ex: React, Supabase, Docker" />
+              <p className="text-xs text-muted-foreground mt-1">
+                Separadas por vírgula. Aparecem no topo da página do projeto e nos cards do portfólio.
+              </p>
+            </div>
+            <div>
               <label className="block text-sm font-medium mb-1">Problema de Negócio (Descrição Longa)</label>
               <textarea 
                 {...form.register("description")} 

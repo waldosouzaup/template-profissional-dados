@@ -1,6 +1,7 @@
 import { Download, Github, Linkedin, Instagram } from "lucide-react";
 import { SiWhatsapp } from "react-icons/si";
 import { useProfiles } from "@/hooks/useProfile";
+import { safeUrl } from "@/lib/url";
 import profilePhoto from "@/assets/profile-photo.jpg";
 
 const socialLinks = [
@@ -16,7 +17,7 @@ const ProfileCard = () => {
   
   const avatarUrl = profile?.avatar_url || profilePhoto;
   const profileName = profile?.full_name || "";
-  const cvUrl = profile?.cv_url || "";
+  const cvUrl = safeUrl(profile?.cv_url) ?? "";
 
   if (isLoading) {
     return (

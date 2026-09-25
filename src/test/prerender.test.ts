@@ -41,7 +41,7 @@ const tables: Record<string, Record<string, unknown>[]> = {
     {
       id: POST_UUID, slug: "dia-02", title: "Dia 02/30 - Comandos", description: "Terminal na prática.", trail_id: LINUX, trail_position: 2,
       created_at: "2026-05-02T12:00:00Z", image_url: "https://example.com/dia-02.png",
-      markdown: "## Primeiros comandos\n\nUse `ls -la` para listar.\n\n```bash\necho \"$1\" && sed 's/a/$&/'\n```\n\n- item um\n- item dois",
+      markdown: "# Introdução\n\n## Primeiros comandos\n\nUse `ls -la` para listar.\n\n```bash\necho \"$1\" && sed 's/a/$&/'\n```\n\n- item um\n- item dois",
     },
     { id: "d3", slug: "dia-0830-revisão-geral", title: "Dia 03/30 - Revisão", trail_id: LINUX, trail_position: 3, created_at: "2026-05-03T12:00:00Z", markdown: "Revisão." },
     { id: "prd", slug: "o-que-e-um-prd", title: "O que é um PRD?", description: "Documento de requisitos.", trail_id: "ia", trail_position: 1, created_at: "2026-04-14T12:00:00Z", markdown: "PRD." },
@@ -57,6 +57,7 @@ const tables: Record<string, Record<string, unknown>[]> = {
       description: "Plataforma de rifas.", business_problem: "Vendas manuais em planilhas.", context: "Evento beneficente.",
       technologies: ["React", "Supabase"], results: ["300 bilhetes vendidos"], strategy: ["Checkout via Pix"],
       markdown: "", is_published: true, display_order: 2, demo_url: "https://rifa.example.com",
+      business_problem_image: "https://example.com/rifa-problema.png", gallery_images: ["https://example.com/rifa-1.png"],
     },
     { id: "p2", slug: "painel", previous_slugs: [], title: "Painel de Dados", category: "Dados", description: "Dashboard.", technologies: ["SQL"], is_published: false, display_order: 1, markdown: "## Visão geral\n\nPainel em **SQL**." },
   ],
@@ -112,6 +113,9 @@ describe("Pré-renderização para IAs e rastreadores", () => {
     expect(page.html).toContain('<meta property="og:site_name" content="Waldo Eller" />');
     expect(page.root).toContain("<h1>Dia 02/30 - Comandos</h1>");
     expect(page.root).toContain("<h2>Primeiros comandos</h2>");
+    // "#" no texto vira h2: o único h1 é o título da página.
+    expect(page.root.match(/<h1>/g)).toHaveLength(1);
+    expect(page.root).toContain("<h2>Introdução</h2>");
     expect(page.root).toContain("<code>ls -la</code>");
     expect(page.root).toContain("<li>item dois</li>");
   });
@@ -120,10 +124,14 @@ describe("Pré-renderização para IAs e rastreadores", () => {
     const page = await render("/blog/dia-02");
     expect(page.root).toContain('<a href="/blog/trilha/linux-essentials-30-dias">Linux Essentials 30 dias</a>');
     expect(page.root).toContain("Etapa 02 de 03");
+    // A data de publicação não aparece nem nos dados estruturados.
+    expect(page.root).not.toContain("<time");
+    expect(page.root).not.toContain("maio de 2026");
+    expect(page.jsonLd.datePublished).toBeUndefined();
     expect(page.root).toMatch(/Anterior: <a href="\/blog\/dia-01">Dia 01\/30 - Começando<\/a>/);
     expect(page.root).toMatch(/Próximo: <a href="\/blog\/dia-0830-revis%C3%A3o-geral">Dia 03\/30 - Revisão<\/a>/);
     expect(page.jsonLd).toMatchObject({
-      "@type": "BlogPosting", headline: "Dia 02/30 - Comandos", datePublished: "2026-05-02T12:00:00Z",
+      "@type": "BlogPosting", headline: "Dia 02/30 - Comandos",
       author: { "@type": "Person", name: "Waldo Eller" }, position: 2,
       isPartOf: { "@type": "CollectionPage", name: "Linux Essentials 30 dias", url: "https://waldoeller.com/blog/trilha/linux-essentials-30-dias" },
     });
@@ -143,6 +151,21 @@ describe("Pré-renderização para IAs e rastreadores", () => {
     expect(page.root).not.toContain("javascript:");
     expect(page.root).toContain('<a href="https://example.com">site</a>');
     expect(page.html).toContain("\\u003c/script>\\u003cscript>alert(2)");
+  });
+
+  it("links com esquema disfarçado (tab, caractere de controle, vbscript, data) viram #", async () => {
+    const sneaky = {
+      demo_url: "java\tscript:alert(1)", github_url: "\u0001javascript:alert(2)",
+      markdown: "[a](<java\tscript:alert(3)>) [b](vbscript:msgbox(4)) [c](data:text/html,oi) ![d](JAVASCRIPT:alert(5))",
+    };
+    const source: Rest = async (table, query) => {
+      const rows = await rest(table, query);
+      return table === "projects" ? rows.map((row) => (row.id === PROJECT_UUID ? { ...row, ...sneaky } : row)) : rows;
+    };
+    const page = await render("/projects/rifa-online", source);
+    expect(page.root).toContain('<a href="#">Ver projeto online</a>');
+    expect(page.root).toContain('<a href="#">Ver código</a>');
+    expect(page.root).not.toMatch(/script:|vbscript|data:text|alert\(/i);
   });
 
   it("slug com acento na URL codificada e barra final", async () => {
@@ -197,11 +220,20 @@ describe("Pré-renderização para IAs e rastreadores", () => {
   it("projeto: conteúdo, tecnologias e links; UUID e slug antigo redirecionam; inexistente é 404", async () => {
     const page = await render("/projects/rifa-online");
     expect(page.html).toContain("<title>Rifa Online — Projeto | Waldo Eller</title>");
+    expect(page.html).toContain('<meta name="description" content="Plataforma de rifas." />');
+    expect(page.root).toContain('<nav aria-label="Voltar"><a href="/projects">Portfólio</a></nav>');
     expect(page.root).toContain("<h1>Rifa Online</h1>");
-    expect(page.root).toContain("Vendas manuais em planilhas.");
-    expect(page.root).toContain("React, Supabase");
-    expect(page.root).toContain("300 bilhetes vendidos");
-    expect(page.root).toContain('href="https://rifa.example.com"');
+    expect(page.root).toContain("<p>Plataforma de rifas.</p>");
+    // Sem Markdown, o problema de negócio vira o texto do projeto.
+    expect(page.root).toContain("<p>Vendas manuais em planilhas.</p>");
+    expect(page.root).toContain('<ul aria-label="Tecnologias"><li>React</li><li>Supabase</li></ul>');
+    expect(page.root).toContain('<a href="https://rifa.example.com">Ver projeto online</a>');
+    expect(page.root).toContain('<figure><img src="https://example.com/rifa-problema.png" alt="Problema de negócio" /><figcaption>Problema de negócio</figcaption></figure>');
+    expect(page.root).toContain('<figcaption>Galeria</figcaption>');
+    expect(page.root).toMatch(/<h2>Outros projetos<\/h2>.*<a href="\/projects\/painel">Painel de Dados<\/a>/);
+    // As listas antigas (não editáveis no admin) não aparecem mais, como na página.
+    expect(page.root).not.toContain("300 bilhetes vendidos");
+    expect(page.root).not.toContain("Checkout via Pix");
     expect(page.jsonLd["@type"]).toBe("CreativeWork");
     expect(await prerender(`/projects/${PROJECT_UUID}`, SHELL, rest)).toMatchObject({ status: 301, location: "/projects/rifa-online" });
     expect(await prerender("/projects/rifa-uplinux", SHELL, rest)).toMatchObject({ status: 301, location: "/projects/rifa-online" });

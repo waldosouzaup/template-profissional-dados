@@ -46,8 +46,6 @@ const load = {
 
 const postPath = (post: Row) => `/blog/${post.slug || post.id}`;
 const plain = (text?: string | null) => stripInlineMarkdown(text ?? "").replace(/\s+/g, " ").trim();
-const dateLabel = (iso?: string) =>
-  iso ? new Intl.DateTimeFormat("pt-BR", { dateStyle: "long", timeZone: "America/Sao_Paulo" }).format(new Date(iso)) : "";
 const count = (n: number) => `${n} ${n === 1 ? "artigo" : "artigos"}`;
 const link = (path: string, text: string) => `<a href="${href(path)}">${e(text)}</a>`;
 const list = (items: string[], tag: "ul" | "ol" = "ul") => (items.length ? `<${tag}>${items.map((i) => `<li>${i}</li>`).join("")}</${tag}>` : "");
@@ -157,39 +155,64 @@ const findProject = async (rest: Rest, idOrSlug: string) => {
   return { project: (await rest("projects", `select=*&previous_slugs=cs.${encodeURIComponent(`{${idOrSlug}}`)}`))[0], moved: true };
 };
 
+// Section images from the admin ("Imagens das Seções"), captioned like on the project page.
+const PROJECT_IMAGES = [
+  ["business_problem_image", "Problema de negócio"], ["context_image", "Contexto"], ["premises_image", "Premissas"],
+  ["strategy_image", "Estratégia"], ["results_image", "Resultados"], ["next_steps_image", "Próximos passos"],
+] as const;
+
 const project = async (rest: Rest, idOrSlug: string): Promise<Page> => {
   const { project: p, moved } = await findProject(rest, idOrSlug);
   if (!p) return notFound("Projeto não encontrado", ["/projects", "Ver todos os projetos"]);
   if (moved) return { redirect: `/projects/${p.slug}` };
+
+  const [profile, all] = await Promise.all([load.profile(rest), optional(load.projects(rest))]);
   const url = `${SITE_URL}/projects/${p.slug}`;
-  const summary = p.business_problem || p.description;
-  const textSections = [["Problema de negócio", p.business_problem], ["Contexto", p.context]] as const;
-  const listSections = [["Premissas", p.premises], ["Estratégia", p.strategy], ["Insights", p.insights], ["Resultados", p.results], ["Próximos passos", p.next_steps]] as const;
+  const summary = plain(p.description) || plain(p.business_problem);
+  // Same body as the page: the Markdown, or the business problem text for projects without it.
+  const body = p.markdown?.trim() ? p.markdown : p.business_problem ?? "";
+  const tags: string[] = p.technologies ?? [];
+  const gallery: string[] = (p.gallery_images ?? []).filter(Boolean);
+  const images = [
+    ...PROJECT_IMAGES.filter(([field]) => p[field]).map(([field, caption]) => [p[field], caption]),
+    ...gallery.map((src, i) => [src, gallery.length === 1 ? "Galeria" : `Galeria ${i + 1}`]),
+  ];
+  const others = all.filter((other) => other.id !== p.id);
+  const related = [...others.filter((o) => o.category === p.category), ...others.filter((o) => o.category !== p.category)].slice(0, 3);
+  const isLink = (value?: string | null) => !!value && value.trim() !== "" && value.trim() !== "#";
+
   return {
     meta: {
       title: `${p.title} — Projeto`,
-      description: plain(summary) || `Projeto: ${p.title}`,
+      description: summary || `Projeto: ${p.title}`,
       canonical: url,
       image: p.image_url || undefined,
       type: "article",
       jsonLd: {
-        "@context": "https://schema.org", "@type": "CreativeWork", name: p.title, description: plain(summary) || undefined, url,
-        author: { "@type": "Person", name: SITE_NAME }, ...(p.image_url && { image: p.image_url }), keywords: (p.technologies ?? []).join(", ") || undefined,
+        "@context": "https://schema.org", "@type": "CreativeWork", name: p.title, description: summary || undefined, url,
+        genre: p.category || undefined,
+        author: { "@type": "Person", name: profile.full_name || SITE_NAME, url: `${SITE_URL}/about` },
+        ...(p.image_url && { image: p.image_url }),
+        ...(tags.length > 0 && { keywords: tags.join(", ") }),
+        ...(isLink(p.demo_url) && { sameAs: p.demo_url }),
       },
     },
     body: [
-      `<nav aria-label="Voltar">${link("/projects", "Projetos")}</nav><article><header>`,
+      `<nav aria-label="Voltar">${link("/projects", "Portfólio")}</nav><article><header>`,
       p.category ? `<p>${e(p.category)}</p>` : "",
       `<h1>${e(p.title)}</h1>`,
-      p.description ? `<p>${e(p.description)}</p>` : "",
-      `</header>`,
-      p.technologies?.length ? `<p><strong>Tecnologias:</strong> ${e(p.technologies.join(", "))}</p>` : "",
-      renderMarkdown(p.markdown),
-      ...textSections.filter(([, text]) => text).map(([title, text]) => `<h2>${title}</h2><p>${e(text)}</p>`),
-      ...listSections.filter(([, items]) => items?.length).map(([title, items]) => `<h2>${title}</h2>${list(items.map((i: string) => e(i)))}`),
-      p.demo_url ? `<p>${link(p.demo_url, "Ver projeto online")}</p>` : "",
-      p.github_url ? `<p>${link(p.github_url, "Código no GitHub")}</p>` : "",
+      p.description ? `<p>${e(plain(p.description))}</p>` : "",
+      tags.length ? `<ul aria-label="Tecnologias">${tags.map((tag) => `<li>${e(tag)}</li>`).join("")}</ul>` : "",
+      isLink(p.demo_url) ? `<p>${link(p.demo_url, "Ver projeto online")}</p>` : "",
+      isLink(p.github_url) ? `<p>${link(p.github_url, "Ver código")}</p>` : "",
+      `<p>Por ${e(profile.full_name || SITE_NAME)}</p></header>`,
+      p.image_url ? `<img src="${e(p.image_url)}" alt="${e(p.title)}" />` : "",
+      renderMarkdown(body),
+      images.length
+        ? `<section><h2>Imagens do projeto</h2>${images.map(([src, caption]) => `<figure><img src="${e(src)}" alt="${e(caption)}" /><figcaption>${e(caption)}</figcaption></figure>`).join("")}</section>`
+        : "",
       `</article>`,
+      related.length ? `<section><h2>Outros projetos</h2>${list(related.map((o) => withNote(link(`/projects/${o.slug}`, o.title), o.description)))}</section>` : "",
     ].join(""),
   };
 };
@@ -277,7 +300,7 @@ const post = async (rest: Rest, idOrSlug: string): Promise<Page> => {
       type: "article",
       jsonLd: {
         "@context": "https://schema.org", "@type": "BlogPosting", headline: title, description: plain(p.description) || undefined,
-        datePublished: p.created_at, url, inLanguage: "pt-BR",
+        url, inLanguage: "pt-BR",
         author: { "@type": "Person", name: author, url: `${SITE_URL}/about` },
         publisher: { "@type": "Person", name: author },
         ...(p.image_url && { image: p.image_url }),
@@ -291,7 +314,7 @@ const post = async (rest: Rest, idOrSlug: string): Promise<Page> => {
     body: [
       `<nav aria-label="Trilha">${link("/blog", "Trilhas")}${t ? ` › ${link(trailPath(t), t.name)}` : ""}</nav>`,
       `<article><header>`,
-      `<p>${[t && index >= 0 ? `Etapa ${pad(step)} de ${pad(total)}` : "", p.created_at ? `<time datetime="${e(p.created_at)}">${dateLabel(p.created_at)}</time>` : ""].filter(Boolean).join(" · ")}</p>`,
+      t && index >= 0 ? `<p>Etapa ${pad(step)} de ${pad(total)}</p>` : "",
       `<h1>${e(title)}</h1>`,
       p.description ? `<p>${e(plain(p.description))}</p>` : "",
       `<p>Por ${e(author)}</p></header>`,
